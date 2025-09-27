@@ -1,5 +1,9 @@
 import App from "@/App";
-import HomePage from "@/pages/HomePage";
+import About from "@/pages/public/About";
+import Contact from "@/pages/public/Contact";
+import Home from "@/pages/public/Home";
+import Services from "@/pages/public/Services";
+import Tracking from "@/pages/public/TrackParcel";
 import { createBrowserRouter } from "react-router";
 
 export const router = createBrowserRouter([
@@ -8,8 +12,24 @@ export const router = createBrowserRouter([
     path: "/",
     children: [
       {
-        Component: HomePage,
+        Component: Home,
         index: true,
+      },
+      {
+        Component: Tracking,
+        path: "/tracking",
+      },
+      {
+        Component: Services,
+        path: "/services",
+      },
+      {
+        Component: About,
+        path: "/about",
+      },
+      {
+        Component: Contact,
+        path: "/contact",
       },
     ],
   },

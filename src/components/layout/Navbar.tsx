@@ -30,6 +30,7 @@ import {
   LayoutDashboard,
   Home,
   ShieldAlert,
+  Contact,
 } from "lucide-react";
 import { Logo } from "@/assets/icons/Logo";
 import { ModeToggle } from "./ModeToggler";
@@ -41,6 +42,7 @@ const navigationLinks = [
   { href: "/", label: "Home", icon: Home, role: "PUBLIC" },
   { href: "/tracking", label: "Track Package", icon: Package, role: "PUBLIC" },
   { href: "/services", label: "Services", icon: Truck, role: "PUBLIC" },
+  { href: "/contact", label: "Contact", icon: Contact, role: "PUBLIC" },
   { href: "/about", label: "About", icon: ShieldAlert, role: "PUBLIC" },
 ];
 
