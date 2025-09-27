@@ -1,10 +1,12 @@
-import { Button } from "./components/ui/button";
+import { Outlet } from "react-router";
+import CommonLayout from "./components/layout/CommonLayout";
 
 function App() {
   return (
     <>
-      <h1>Vite + React</h1>
-      <Button>Client</Button>
+      <CommonLayout>
+        <Outlet />
+      </CommonLayout>
     </>
   );
 }
