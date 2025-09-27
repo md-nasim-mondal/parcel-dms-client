@@ -19,7 +19,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Link, useNavigate } from "react-router";
+import { Link, useNavigate, useLocation } from "react-router";
 import {
   Package,
   Truck,
@@ -34,6 +34,7 @@ import {
 } from "lucide-react";
 import { Logo } from "@/assets/icons/Logo";
 import { ModeToggle } from "./ModeToggler";
+import { cn } from "@/lib/utils";
 // import { useAppSelector, useAppDispatch } from "@/hooks/redux";
 // import { logout } from "@/store/slices/authSlice";
 
@@ -57,6 +58,7 @@ export default function Navbar() {
   // const { user, isAuthenticated } = useAppSelector((state) => state.auth);
   // const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleLogout = () => {
     // dispatch(logout());
@@ -79,6 +81,14 @@ export default function Navbar() {
   };
 
   const dashboardLink = getDashboardLink();
+
+  // Check if a route is active
+  const isActiveRoute = (href: string) => {
+    if (href === "/") {
+      return location.pathname === "/";
+    }
+    return location.pathname.startsWith(href);
+  };
 
   // User avatar fallback if no image
   const getUserAvatar = () => {
@@ -118,21 +128,34 @@ export default function Navbar() {
 
           {/* Desktop Navigation */}
           <NavigationMenu className='max-lg:hidden'>
-            <NavigationMenuList className='gap-2'>
-              {navigationLinks.map((link, index) => (
-                <NavigationMenuItem key={index}>
-                  <NavigationMenuLink
-                    asChild
-                    className='text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors font-medium py-2'>
-                    <Link className='text-nowrap' to={link.href}>
-                      {link.icon && (
-                        <link.icon className='w-4 h-4 mr-1 inline' />
-                      )}
-                      {link.label}
-                    </Link>
-                  </NavigationMenuLink>
-                </NavigationMenuItem>
-              ))}
+            <NavigationMenuList className='gap-1'>
+              {navigationLinks.map((link, index) => {
+                const isActive = isActiveRoute(link.href);
+                return (
+                  <NavigationMenuItem key={index}>
+                    <NavigationMenuLink asChild>
+                      <Link 
+                        to={link.href}
+                        className={cn(
+                          "flex items-center gap-1.5 px-4 py-2 rounded-lg font-medium transition-all duration-200",
+                          "text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400",
+                          "hover:bg-blue-50 dark:hover:bg-blue-950/30",
+                          isActive && "text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/30",
+                          isActive && "border border-blue-200 dark:border-blue-800"
+                        )}
+                      >
+                        {link.icon && (
+                          <link.icon className='w-4 h-4' />
+                        )}
+                        {link.label}
+                        {isActive && (
+                          <div className='w-1.5 h-1.5 bg-blue-600 dark:bg-blue-400 rounded-full ml-1' />
+                        )}
+                      </Link>
+                    </NavigationMenuLink>
+                  </NavigationMenuItem>
+                );
+              })}
             </NavigationMenuList>
           </NavigationMenu>
         </div>
@@ -141,11 +164,28 @@ export default function Navbar() {
         <div className='flex items-center gap-4'>
           {/* Dark Mode Toggle */}
           <ModeToggle />
+          
           {/* Desktop Auth Buttons */}
           <div className='flex items-center gap-2 max-lg:hidden'>
             {isAuthenticated ? (
               <div className='flex items-center gap-4'>
                 {/* Dashboard Link Button */}
+                {dashboardLink && (
+                  <Button 
+                    asChild 
+                    variant="outline" 
+                    size="sm" 
+                    className={cn(
+                      "border-blue-200 text-blue-600 hover:bg-blue-50 dark:border-blue-800 dark:text-blue-400 dark:hover:bg-blue-900/20",
+                      isActiveRoute('/dashboard') && "bg-blue-50 dark:bg-blue-900/30 border-blue-300 dark:border-blue-700"
+                    )}
+                  >
+                    <Link to='/dashboard' className="flex items-center gap-2">
+                      <LayoutDashboard className='w-4 h-4' />
+                      Dashboard
+                    </Link>
+                  </Button>
+                )}
 
                 {/* User Profile Dropdown */}
                 <DropdownMenu>
@@ -153,7 +193,11 @@ export default function Navbar() {
                     <Button
                       variant='ghost'
                       size='icon'
-                      className='rounded-full p-0 hover:bg-gray-100 dark:hover:bg-gray-800'>
+                      className={cn(
+                        "rounded-full p-0 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all",
+                        isActiveRoute('/profile') && "ring-2 ring-blue-200 dark:ring-blue-800"
+                      )}
+                    >
                       {getUserAvatar()}
                     </Button>
                   </DropdownMenuTrigger>
@@ -176,7 +220,10 @@ export default function Navbar() {
                       <DropdownMenuItem asChild>
                         <Link
                           to='/dashboard'
-                          className='flex items-center w-full'>
+                          className={cn(
+                            "flex items-center w-full",
+                            isActiveRoute('/dashboard') && "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"
+                          )}>
                           <LayoutDashboard className='w-4 h-4 mr-2' />
                           Dashboard
                         </Link>
@@ -184,7 +231,13 @@ export default function Navbar() {
                     )}
 
                     <DropdownMenuItem asChild>
-                      <Link to='/profile' className='flex items-center w-full'>
+                      <Link 
+                        to='/profile' 
+                        className={cn(
+                          "flex items-center w-full",
+                          isActiveRoute('/profile') && "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"
+                        )}
+                      >
                         <User className='w-4 h-4 mr-2' />
                         My Profile
                       </Link>
@@ -202,17 +255,25 @@ export default function Navbar() {
               </div>
             ) : (
               <div className='flex items-center gap-2'>
-                <Button asChild variant='ghost' size='sm'>
-                  <Link
-                    to='/login'
-                    className='text-gray-700 dark:text-gray-300'>
-                    Login
-                  </Link>
+                <Button 
+                  asChild 
+                  variant='ghost' 
+                  size='sm'
+                  className={cn(
+                    "text-gray-700 dark:text-gray-300",
+                    isActiveRoute('/login') && "text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/30"
+                  )}
+                >
+                  <Link to='/login'>Login</Link>
                 </Button>
                 <Button
                   asChild
                   size='sm'
-                  className='bg-blue-600 hover:bg-blue-700 text-white'>
+                  className={cn(
+                    "bg-blue-600 hover:bg-blue-700 text-white",
+                    isActiveRoute('/register') && "bg-blue-700 dark:bg-blue-600"
+                  )}
+                >
                   <Link to='/register'>Get Started</Link>
                 </Button>
               </div>
@@ -234,6 +295,7 @@ export default function Navbar() {
               align='end'
               className='w-64 p-4 lg:hidden mt-2'
               sideOffset={10}>
+              
               {/* User Info for Mobile */}
               {isAuthenticated && (
                 <div className='flex items-center gap-3 p-3 mb-3 bg-gray-50 dark:bg-gray-800 rounded-lg'>
@@ -250,32 +312,51 @@ export default function Navbar() {
               )}
 
               {/* Mobile Navigation */}
-              <div className='space-y-2'>
-                {navigationLinks.map((link, index) => (
-                  <Link
-                    key={index}
-                    to={link.href}
-                    className='flex items-center gap-3 p-2 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/30 rounded-lg transition-colors'
-                    onClick={() => setMobileMenuOpen(false)}>
-                    {link.icon && <link.icon className='w-4 h-4' />}
-                    <span className='font-medium'>{link.label}</span>
-                  </Link>
-                ))}
+              <div className='space-y-1'>
+                {navigationLinks.map((link, index) => {
+                  const isActive = isActiveRoute(link.href);
+                  return (
+                    <Link
+                      key={index}
+                      to={link.href}
+                      className={cn(
+                        "flex items-center gap-3 p-3 rounded-lg transition-all duration-200",
+                        "text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400",
+                        "hover:bg-blue-50 dark:hover:bg-blue-950/30",
+                        isActive && "text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/30",
+                        isActive && "border border-blue-200 dark:border-blue-800"
+                      )}
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      {link.icon && <link.icon className='w-4 h-4' />}
+                      <span className='font-medium'>{link.label}</span>
+                      {isActive && (
+                        <div className='w-2 h-2 bg-blue-600 dark:bg-blue-400 rounded-full ml-auto' />
+                      )}
+                    </Link>
+                  );
+                })}
 
                 {/* Mobile Auth Section */}
                 <div className='pt-3 border-t border-gray-200 dark:border-gray-700'>
                   {isAuthenticated ? (
-                    <div className='space-y-2'>
+                    <div className='space-y-1'>
                       {dashboardLink && (
                         <Button
                           asChild
                           variant='ghost'
                           size='sm'
-                          className='w-full justify-start'>
+                          className={cn(
+                            "w-full justify-start",
+                            isActiveRoute('/dashboard') && "text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/30"
+                          )}
+                        >
                           <Link
                             to='/dashboard'
-                            onClick={() => setMobileMenuOpen(false)}>
-                            <LayoutDashboard className='w-4 h-4 mr-2' />
+                            onClick={() => setMobileMenuOpen(false)}
+                            className="flex items-center gap-2"
+                          >
+                            <LayoutDashboard className='w-4 h-4' />
                             Dashboard
                           </Link>
                         </Button>
@@ -284,11 +365,17 @@ export default function Navbar() {
                         asChild
                         variant='ghost'
                         size='sm'
-                        className='w-full justify-start'>
+                        className={cn(
+                          "w-full justify-start",
+                          isActiveRoute('/profile') && "text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/30"
+                        )}
+                      >
                         <Link
                           to='/profile'
-                          onClick={() => setMobileMenuOpen(false)}>
-                          <User className='w-4 h-4 mr-2' />
+                          onClick={() => setMobileMenuOpen(false)}
+                          className="flex items-center gap-2"
+                        >
+                          <User className='w-4 h-4' />
                           My Profile
                         </Link>
                       </Button>
@@ -307,20 +394,30 @@ export default function Navbar() {
                         asChild
                         variant='ghost'
                         size='sm'
-                        className='w-full justify-start'>
+                        className={cn(
+                          "w-full justify-start",
+                          isActiveRoute('/login') && "text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/30"
+                        )}
+                      >
                         <Link
                           to='/login'
-                          onClick={() => setMobileMenuOpen(false)}>
+                          onClick={() => setMobileMenuOpen(false)}
+                        >
                           Login
                         </Link>
                       </Button>
                       <Button
                         asChild
                         size='sm'
-                        className='w-full justify-start bg-blue-600 hover:bg-blue-700 text-white'>
+                        className={cn(
+                          "w-full justify-start bg-blue-600 hover:bg-blue-700 text-white",
+                          isActiveRoute('/register') && "bg-blue-700 dark:bg-blue-600"
+                        )}
+                      >
                         <Link
                           to='/register'
-                          onClick={() => setMobileMenuOpen(false)}>
+                          onClick={() => setMobileMenuOpen(false)}
+                        >
                           Get Started
                         </Link>
                       </Button>
