@@ -148,9 +148,9 @@ export default function Navbar() {
                           <link.icon className='w-4 h-4' />
                         )}
                         {link.label}
-                        {isActive && (
+                        {/* {isActive && (
                           <div className='w-1.5 h-1.5 bg-blue-600 dark:bg-blue-400 rounded-full ml-1' />
-                        )}
+                        )} */}
                       </Link>
                     </NavigationMenuLink>
                   </NavigationMenuItem>
@@ -170,7 +170,7 @@ export default function Navbar() {
             {isAuthenticated ? (
               <div className='flex items-center gap-4'>
                 {/* Dashboard Link Button */}
-                {dashboardLink && (
+                {/* {dashboardLink && (
                   <Button 
                     asChild 
                     variant="outline" 
@@ -185,7 +185,7 @@ export default function Navbar() {
                       Dashboard
                     </Link>
                   </Button>
-                )}
+                )} */}
 
                 {/* User Profile Dropdown */}
                 <DropdownMenu>
@@ -330,9 +330,9 @@ export default function Navbar() {
                     >
                       {link.icon && <link.icon className='w-4 h-4' />}
                       <span className='font-medium'>{link.label}</span>
-                      {isActive && (
+                      {/* {isActive && (
                         <div className='w-2 h-2 bg-blue-600 dark:bg-blue-400 rounded-full ml-auto' />
-                      )}
+                      )} */}
                     </Link>
                   );
                 })}
