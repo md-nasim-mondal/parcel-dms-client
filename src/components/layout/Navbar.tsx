@@ -73,7 +73,7 @@ export default function Navbar() {
     role: "admin",
     pic: "", // Empty string for no image
   };
-  const isAuthenticated = true;
+  const isAuthenticated = false;
 
   const getDashboardLink = () => {
     if (!user) return null;
