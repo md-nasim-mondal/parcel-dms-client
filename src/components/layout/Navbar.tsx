@@ -35,7 +35,7 @@ import {
 import { Logo } from "@/assets/icons/Logo";
 import { ModeToggle } from "./ModeToggler";
 import { cn } from "@/lib/utils";
-import { useLogoutMutation } from "@/redux/features/auth/auth.api";
+import { authApi, useLogoutMutation } from "@/redux/features/auth/auth.api";
 import { useDispatch } from "react-redux";
 import { logout as logoutAction } from "@/redux/features/auth/auth.slice";
 import { useAuth } from "@/hooks/useAuth";
@@ -70,8 +70,8 @@ export default function Navbar() {
     } catch (err) {
       console.error("Logout API call failed:", err);
     } finally {
-      // Always clear local state and redirect
       dispatch(logoutAction());
+      dispatch(authApi.util.resetApiState()); // cache clear
       navigate("/", { replace: true });
       setMobileMenuOpen(false);
     }

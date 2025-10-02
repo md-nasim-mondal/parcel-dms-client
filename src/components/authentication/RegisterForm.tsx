@@ -107,7 +107,7 @@ export function RegisterForm({
       const result = await register(userInfo).unwrap();
       console.log(result);
       toast.success("Account created successfully! Please verify your email.");
-      navigate("/verify", { state: { email: data.email } });
+      navigate("/verify", { state: { email: data.email }, replace: true });
     } catch (error: any) {
       console.error(error);
       toast.error(
@@ -115,7 +115,7 @@ export function RegisterForm({
       );
 
       if (error?.data?.message === "User Already Exist") {
-        navigate("/verify", { state: { email: data.email } });
+        navigate("/verify", { state: { email: data.email }, replace: true });
       }
     }
   };
