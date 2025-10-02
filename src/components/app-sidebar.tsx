@@ -138,7 +138,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { user } = useAuth();
   const { state } = useSidebar();
   return (
-    <Sidebar collapsible='icon' {...props}>
+    <Sidebar
+      className='bg-white dark:bg-gray-800 shadow-lg'
+      collapsible='icon'
+      {...props}>
       <SidebarHeader className={`${state === "expanded" ? "px-5" : "px-1"}`}>
         <div className='flex justify-between'>
           {state === "expanded" ? (

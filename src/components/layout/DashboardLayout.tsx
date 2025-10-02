@@ -20,10 +20,10 @@ export default function DashboardLayout() {
   const location = useLocation();
   console.log(location);
   return (
-    <SidebarProvider className='bg-gray-50 dark:bg-gray-900'>
-      <AppSidebar className='bg-white dark:bg-gray-800 shadow-lg' />
-      <SidebarInset>
-        <header className='flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12 justify-between px-4'>
+    <SidebarProvider>
+      <AppSidebar/>
+      <SidebarInset  className='bg-gray-50 dark:bg-gray-900'>
+        <header className='flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12 justify-between px-4 sticky top-0 bg-gray-50 dark:bg-gray-900 border-b'>
           <div className='flex items-center gap-2'>
             <SidebarTrigger className='-ml-1' />
             <Separator
@@ -48,7 +48,7 @@ export default function DashboardLayout() {
             <ModeToggle />
           </div>
         </header>
-        <div className='flex flex-1 flex-col gap-4 p-4 pt-0'>
+        <div className='flex flex-1 flex-col gap-4 p-4'>
           <Outlet />
           <div className='bg-muted/50 min-h-[100vh] flex-1 rounded-xl md:min-h-min' />
         </div>
