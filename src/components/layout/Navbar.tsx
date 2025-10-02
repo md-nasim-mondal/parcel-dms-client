@@ -35,12 +35,10 @@ import {
 import { Logo } from "@/assets/icons/Logo";
 import { ModeToggle } from "./ModeToggler";
 import { cn } from "@/lib/utils";
-import {
-  authApi,
-  useLogoutMutation,
-  useUserInfoQuery,
-} from "@/redux/features/auth/auth.api";
-import { useAppDispatch } from "@/redux/hook";
+import { useLogoutMutation } from "@/redux/features/auth/auth.api";
+import { useDispatch } from "react-redux";
+import { logout as logoutAction } from "@/redux/features/auth/auth.slice";
+import { useAuth } from "@/hooks/useAuth";
 
 // Navigation links array to be used in both desktop and mobile menus
 const navigationLinks = [
@@ -52,28 +50,30 @@ const navigationLinks = [
 ];
 
 const dashboardLinks = {
-  sender: { href: "/dashboard/sender", label: "Sender Dashboard" },
-  receiver: { href: "/dashboard/receiver", label: "Receiver Dashboard" },
-  admin: { href: "/dashboard/admin", label: "Admin Dashboard" },
-  super_admin: { href: "/dashboard/admin", label: "Admin Dashboard" },
+  sender: { href: "/sender/dashboard", label: "Sender Dashboard" },
+  receiver: { href: "/receiver/dashboard", label: "Receiver Dashboard" },
+  admin: { href: "/admin/dashboard", label: "Admin Dashboard" },
+  super_admin: { href: "/admin/dashboard", label: "Admin Dashboard" },
 };
 
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { data: user } = useUserInfoQuery(undefined);
+  const { user, isAuthenticated } = useAuth();
   const [logout] = useLogoutMutation();
-  const dispatch = useAppDispatch();
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
 
   const handleLogout = async () => {
     try {
       await logout(undefined).unwrap();
-      dispatch(authApi.util.resetApiState());
-      navigate("/");
-      setMobileMenuOpen(false);
     } catch (err) {
-      console.error("Logout failed:", err);
+      console.error("Logout API call failed:", err);
+    } finally {
+      // Always clear local state and redirect
+      dispatch(logoutAction());
+      navigate("/", { replace: true });
+      setMobileMenuOpen(false);
     }
   };
 
@@ -94,21 +94,27 @@ export default function Navbar() {
 
   // User avatar fallback if no image
   const getUserAvatar = () => {
-    if (user.pic) {
+    if (!user) return null;
+
+    // If user has profile picture
+    if (user.picture) {
       return (
         <img
-          src={user.pic}
+          src={user.picture}
           alt={user.name}
           className='size-8 rounded-full object-cover'
         />
       );
     }
+
     // Fallback to initials avatar
     const initials = user.name
       .split(" ")
-      .map((n: string[]) => n[0])
+      .map((n: string) => n[0])
       .join("")
-      .toUpperCase();
+      .toUpperCase()
+      .slice(0, 2);
+
     return (
       <div className='size-8 rounded-full bg-blue-600 flex items-center justify-center text-white font-semibold text-sm'>
         {initials}
@@ -149,9 +155,6 @@ export default function Navbar() {
                         )}>
                         {link.icon && <link.icon className='w-4 h-4' />}
                         {link.label}
-                        {/* {isActive && (
-                          <div className='w-1.5 h-1.5 bg-blue-600 dark:bg-blue-400 rounded-full ml-1' />
-                        )} */}
                       </Link>
                     </NavigationMenuLink>
                   </NavigationMenuItem>
@@ -168,7 +171,7 @@ export default function Navbar() {
 
           {/* Desktop Auth Buttons */}
           <div className='flex items-center gap-2 max-lg:hidden'>
-            {user ? (
+            {isAuthenticated && user ? (
               <div className='flex items-center gap-4'>
                 {/* Dashboard Link Button */}
                 {/* {dashboardLink && (
@@ -178,10 +181,12 @@ export default function Navbar() {
                     size='sm'
                     className={cn(
                       "border-blue-200 text-blue-600 hover:bg-blue-50 dark:border-blue-800 dark:text-blue-400 dark:hover:bg-blue-900/20",
-                      isActiveRoute("/dashboard") &&
+                      isActiveRoute(dashboardLink.href) &&
                         "bg-blue-50 dark:bg-blue-900/30 border-blue-300 dark:border-blue-700"
                     )}>
-                    <Link to='/dashboard' className='flex items-center gap-2'>
+                    <Link
+                      to={dashboardLink.href}
+                      className='flex items-center gap-2'>
                       <LayoutDashboard className='w-4 h-4' />
                       Dashboard
                     </Link>
@@ -211,7 +216,7 @@ export default function Navbar() {
                         </p>
                         <p className='text-xs text-blue-600 dark:text-blue-400 capitalize'>
                           {user.role === "super_admin"
-                            ? "SuperAdmin"
+                            ? "Super Admin"
                             : user.role}
                         </p>
                       </div>
@@ -222,14 +227,14 @@ export default function Navbar() {
                     {dashboardLink && (
                       <DropdownMenuItem asChild>
                         <Link
-                          to={dashboardLink?.href}
+                          to={dashboardLink.href}
                           className={cn(
-                            "flex items-center w-full",
-                            isActiveRoute("/dashboard") &&
+                            "flex items-center w-full cursor-pointer",
+                            isActiveRoute(dashboardLink.href) &&
                               "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"
                           )}>
                           <LayoutDashboard className='w-4 h-4 mr-2' />
-                          Go to {dashboardLink.label}
+                          {dashboardLink.label}
                         </Link>
                       </DropdownMenuItem>
                     )}
@@ -238,7 +243,7 @@ export default function Navbar() {
                       <Link
                         to='/profile'
                         className={cn(
-                          "flex items-center w-full",
+                          "flex items-center w-full cursor-pointer",
                           isActiveRoute("/profile") &&
                             "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"
                         )}>
@@ -299,7 +304,7 @@ export default function Navbar() {
               className='w-64 p-4 lg:hidden mt-2'
               sideOffset={10}>
               {/* User Info for Mobile */}
-              {user && (
+              {isAuthenticated && user && (
                 <div className='flex items-center gap-3 p-3 mb-3 bg-gray-50 dark:bg-gray-800 rounded-lg'>
                   {getUserAvatar()}
                   <div className='flex-1 min-w-0'>
@@ -308,6 +313,9 @@ export default function Navbar() {
                     </p>
                     <p className='text-xs text-gray-500 dark:text-gray-400 truncate'>
                       {user.email}
+                    </p>
+                    <p className='text-xs text-blue-600 dark:text-blue-400 capitalize'>
+                      {user.role === "super_admin" ? "Super Admin" : user.role}
                     </p>
                   </div>
                 </div>
@@ -333,16 +341,13 @@ export default function Navbar() {
                       onClick={() => setMobileMenuOpen(false)}>
                       {link.icon && <link.icon className='w-4 h-4' />}
                       <span className='font-medium'>{link.label}</span>
-                      {/* {isActive && (
-                        <div className='w-2 h-2 bg-blue-600 dark:bg-blue-400 rounded-full ml-auto' />
-                      )} */}
                     </Link>
                   );
                 })}
 
                 {/* Mobile Auth Section */}
                 <div className='pt-3 border-t border-gray-200 dark:border-gray-700'>
-                  {user ? (
+                  {isAuthenticated && user ? (
                     <div className='space-y-1'>
                       {dashboardLink && (
                         <Button
@@ -351,15 +356,15 @@ export default function Navbar() {
                           size='sm'
                           className={cn(
                             "w-full justify-start",
-                            isActiveRoute("/dashboard") &&
+                            isActiveRoute(dashboardLink.href) &&
                               "text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/30"
                           )}>
                           <Link
-                            to='/dashboard'
+                            to={dashboardLink.href}
                             onClick={() => setMobileMenuOpen(false)}
                             className='flex items-center gap-2'>
                             <LayoutDashboard className='w-4 h-4' />
-                            Dashboard
+                            {dashboardLink.label}
                           </Link>
                         </Button>
                       )}

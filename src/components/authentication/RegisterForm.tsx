@@ -31,9 +31,9 @@ import {
   Lock,
   User,
   Phone,
-  MapPin,
   ArrowRight,
   UserCheck,
+  Loader2,
 } from "lucide-react";
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
@@ -57,10 +57,6 @@ const registerSchema = z
       .string()
       .min(11, { message: "Phone number must be at least 11 digits" }),
     role: z.nativeEnum(Role),
-    defaultAddress: z
-      .string()
-      .min(10, { message: "Address must be at least 10 characters" })
-      .max(200, { message: "Address must be less than 200 characters" }),
     password: z
       .string()
       .min(8, { message: "Password must be at least 8 characters" })
@@ -81,10 +77,10 @@ export function RegisterForm({
   className,
   ...props
 }: React.HTMLAttributes<HTMLDivElement>) {
-  const [register, { isLoading }] = useRegisterMutation();
-  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const navigate = useNavigate();
+  const [register, { isLoading }] = useRegisterMutation();
 
   const form = useForm<z.infer<typeof registerSchema>>({
     resolver: zodResolver(registerSchema),
@@ -93,7 +89,6 @@ export function RegisterForm({
       email: "",
       phone: "",
       role: undefined,
-      defaultAddress: "",
       password: "",
       confirmPassword: "",
     },
@@ -105,7 +100,6 @@ export function RegisterForm({
       email: data.email,
       phone: data.phone,
       role: data.role,
-      defaultAddress: data.defaultAddress,
       password: data.password,
     };
 
@@ -113,265 +107,261 @@ export function RegisterForm({
       const result = await register(userInfo).unwrap();
       console.log(result);
       toast.success("Account created successfully! Please verify your email.");
-      navigate("/verify");
+      navigate("/verify", { state: { email: data.email } });
     } catch (error: any) {
       console.error(error);
       toast.error(
         error?.data?.message || "Registration failed. Please try again."
       );
+
+      if (error?.data?.message === "User Already Exist") {
+        navigate("/verify", { state: { email: data.email } });
+      }
     }
   };
 
   return (
-    <Card className='border-0 shadow-xl'>
-      <CardContent className='p-8'>
-        <div className={cn("flex flex-col gap-6", className)} {...props}>
+    <Card className='border-0 shadow-lg bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm'>
+      <CardContent className='p-6'>
+        <div className={cn("flex flex-col gap-4", className)} {...props}>
+          {/* Compact Header */}
+          <div className='text-center space-y-1 mb-2'>
+            <h2 className='text-xl font-bold text-gray-900 dark:text-white'>
+              Create Account
+            </h2>
+            <p className='text-gray-600 dark:text-gray-400 text-xs'>
+              Join SwiftDrop in seconds
+            </p>
+          </div>
+
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
-              {/* Name Field */}
-              <FormField
-                control={form.control}
-                name='name'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className='text-gray-700 dark:text-gray-300 font-medium'>
-                      Full Name
-                    </FormLabel>
-                    <FormControl>
-                      <div className='relative'>
-                        <User className='absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400' />
-                        <Input
-                          placeholder='John Doe'
-                          {...field}
-                          className='pl-10 pr-4 py-3 border-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400 transition-colors'
-                        />
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {/* Email Field */}
-              <FormField
-                control={form.control}
-                name='email'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className='text-gray-700 dark:text-gray-300 font-medium'>
-                      Email Address
-                    </FormLabel>
-                    <FormControl>
-                      <div className='relative'>
-                        <Mail className='absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400' />
-                        <Input
-                          placeholder='john@example.com'
-                          type='email'
-                          {...field}
-                          className='pl-10 pr-4 py-3 border-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400 transition-colors'
-                        />
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {/* Phone Field */}
-              <FormField
-                control={form.control}
-                name='phone'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className='text-gray-700 dark:text-gray-300 font-medium'>
-                      Phone Number
-                    </FormLabel>
-                    <FormControl>
-                      <div className='relative'>
-                        <Phone className='absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400' />
-                        <Input
-                          placeholder='+1 (555) 123-4567'
-                          {...field}
-                          className='pl-10 pr-4 py-3 border-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400 transition-colors'
-                        />
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {/* Role Selection */}
-              <FormField
-                control={form.control}
-                name='role'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className='text-gray-700 dark:text-gray-300 font-medium'>
-                      Account Type
-                    </FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-4'>
+              {/* Personal Information - Compact Grid */}
+              <div className='grid grid-cols-1 md:grid-cols-2 gap-3'>
+                {/* Name Field */}
+                <FormField
+                  control={form.control}
+                  name='name'
+                  render={({ field }) => (
+                    <FormItem className='md:col-span-2'>
+                      <FormLabel className='text-gray-700 dark:text-gray-300 font-medium text-xs'>
+                        Full Name
+                      </FormLabel>
                       <FormControl>
                         <div className='relative'>
-                          <UserCheck className='absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 z-10' />
-                          <SelectTrigger className='pl-10 pr-4 py-3 border-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400 transition-colors'>
-                            <SelectValue placeholder='Select your role' />
-                          </SelectTrigger>
+                          <User className='absolute left-3 top-1/2 transform -translate-y-1/2 w-3 h-3 text-gray-400' />
+                          <Input
+                            placeholder='John Doe'
+                            {...field}
+                            className='pl-8 pr-3 py-2 text-sm border-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-1 focus:ring-blue-500/20 transition-all duration-200'
+                          />
                         </div>
                       </FormControl>
-                      <SelectContent>
-                        <SelectItem value={Role.SENDER}>Sender</SelectItem>
-                        <SelectItem value={Role.RECEIVER}>Receiver</SelectItem>
-                        <SelectItem value={Role.DELIVERY_PERSONNEL}>
-                          Delivery Personnel
-                        </SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                      <FormMessage className='text-xs' />
+                    </FormItem>
+                  )}
+                />
 
-              {/* Default Address */}
-              <FormField
-                control={form.control}
-                name='defaultAddress'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className='text-gray-700 dark:text-gray-300 font-medium'>
-                      Default Address
-                    </FormLabel>
-                    <FormControl>
-                      <div className='relative'>
-                        <MapPin className='absolute left-3 top-3 w-4 h-4 text-gray-400' />
-                        <textarea
-                          placeholder='Enter your complete address for deliveries...'
-                          {...field}
-                          rows={3}
-                          className='flex w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md bg-transparent text-sm ring-offset-background placeholder:text-muted-foreground focus:border-blue-500 dark:focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 transition-colors resize-none'
-                        />
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                {/* Email Field */}
+                <FormField
+                  control={form.control}
+                  name='email'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className='text-gray-700 dark:text-gray-300 font-medium text-xs'>
+                        Email
+                      </FormLabel>
+                      <FormControl>
+                        <div className='relative'>
+                          <Mail className='absolute left-3 top-1/2 transform -translate-y-1/2 w-3 h-3 text-gray-400' />
+                          <Input
+                            placeholder='john@example.com'
+                            type='email'
+                            {...field}
+                            className='pl-8 pr-3 py-2 text-sm border-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-1 focus:ring-blue-500/20 transition-all duration-200'
+                          />
+                        </div>
+                      </FormControl>
+                      <FormMessage className='text-xs' />
+                    </FormItem>
+                  )}
+                />
 
-              {/* Password Field */}
-              <FormField
-                control={form.control}
-                name='password'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className='text-gray-700 dark:text-gray-300 font-medium'>
-                      Password
-                    </FormLabel>
-                    <FormControl>
-                      <div className='relative'>
-                        <Lock className='absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400' />
-                        <Input
-                          type={showPassword ? "text" : "password"}
-                          placeholder='Create a strong password'
-                          {...field}
-                          className='pl-10 pr-12 py-3 border-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400 transition-colors'
-                        />
-                        <button
-                          type='button'
-                          onClick={() => setShowPassword(!showPassword)}
-                          className='absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors'>
-                          {showPassword ? (
-                            <EyeOff className='w-4 h-4' />
-                          ) : (
-                            <Eye className='w-4 h-4' />
-                          )}
-                        </button>
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                {/* Phone Field */}
+                <FormField
+                  control={form.control}
+                  name='phone'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className='text-gray-700 dark:text-gray-300 font-medium text-xs'>
+                        Phone
+                      </FormLabel>
+                      <FormControl>
+                        <div className='relative'>
+                          <Phone className='absolute left-3 top-1/2 transform -translate-y-1/2 w-3 h-3 text-gray-400' />
+                          <Input
+                            placeholder='+1234567890'
+                            {...field}
+                            className='pl-8 pr-3 py-2 text-sm border-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-1 focus:ring-blue-500/20 transition-all duration-200'
+                          />
+                        </div>
+                      </FormControl>
+                      <FormMessage className='text-xs' />
+                    </FormItem>
+                  )}
+                />
 
-              {/* Confirm Password Field */}
-              <FormField
-                control={form.control}
-                name='confirmPassword'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className='text-gray-700 dark:text-gray-300 font-medium'>
-                      Confirm Password
-                    </FormLabel>
-                    <FormControl>
-                      <div className='relative'>
-                        <Lock className='absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400' />
-                        <Input
-                          type={showConfirmPassword ? "text" : "password"}
-                          placeholder='Confirm your password'
-                          {...field}
-                          className='pl-10 pr-12 py-3 border-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400 transition-colors'
-                        />
-                        <button
-                          type='button'
-                          onClick={() =>
-                            setShowConfirmPassword(!showConfirmPassword)
-                          }
-                          className='absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors'>
-                          {showConfirmPassword ? (
-                            <EyeOff className='w-4 h-4' />
-                          ) : (
-                            <Eye className='w-4 h-4' />
-                          )}
-                        </button>
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                {/* Role Selection */}
+                <FormField
+                  control={form.control}
+                  name='role'
+                  render={({ field }) => (
+                    <FormItem className='md:col-span-2'>
+                      <FormLabel className='text-gray-700 dark:text-gray-300 font-medium text-xs'>
+                        Role
+                      </FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}>
+                        <FormControl>
+                          <div className='relative'>
+                            <UserCheck className='absolute left-3 top-1/2 transform -translate-y-1/2 w-3 h-3 text-gray-400 z-10' />
+                            <SelectTrigger className='pl-8 pr-3 py-2 text-sm border-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-1 focus:ring-blue-500/20 transition-all duration-200 h-auto w-full'>
+                              <SelectValue placeholder='Select role' />
+                            </SelectTrigger>
+                          </div>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value={Role.SENDER}>Sender</SelectItem>
+                          <SelectItem value={Role.RECEIVER}>
+                            Receiver
+                          </SelectItem>
+                          <SelectItem value={Role.DELIVERY_PERSONNEL}>
+                            Delivery Personnel
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage className='text-xs' />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              {/* Password Fields - Side by Side */}
+              <div className='grid grid-cols-1 md:grid-cols-2 gap-3'>
+                <FormField
+                  control={form.control}
+                  name='password'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className='text-gray-700 dark:text-gray-300 font-medium text-xs'>
+                        Password
+                      </FormLabel>
+                      <FormControl>
+                        <div className='relative'>
+                          <Lock className='absolute left-3 top-1/2 transform -translate-y-1/2 w-3 h-3 text-gray-400' />
+                          <Input
+                            type={showPassword ? "text" : "password"}
+                            placeholder='Create password'
+                            {...field}
+                            className='pl-8 pr-8 py-2 text-sm border-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-1 focus:ring-blue-500/20 transition-all duration-200'
+                          />
+                          <button
+                            type='button'
+                            onClick={() => setShowPassword(!showPassword)}
+                            className='absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors'>
+                            {showPassword ? (
+                              <EyeOff className='w-3 h-3' />
+                            ) : (
+                              <Eye className='w-3 h-3' />
+                            )}
+                          </button>
+                        </div>
+                      </FormControl>
+                      <FormMessage className='text-xs' />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name='confirmPassword'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className='text-gray-700 dark:text-gray-300 font-medium text-xs'>
+                        Confirm Password
+                      </FormLabel>
+                      <FormControl>
+                        <div className='relative'>
+                          <Lock className='absolute left-3 top-1/2 transform -translate-y-1/2 w-3 h-3 text-gray-400' />
+                          <Input
+                            type={showConfirmPassword ? "text" : "password"}
+                            placeholder='Confirm password'
+                            {...field}
+                            className='pl-8 pr-8 py-2 text-sm border-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-1 focus:ring-blue-500/20 transition-all duration-200'
+                          />
+                          <button
+                            type='button'
+                            onClick={() =>
+                              setShowConfirmPassword(!showConfirmPassword)
+                            }
+                            className='absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors'>
+                            {showConfirmPassword ? (
+                              <EyeOff className='w-3 h-3' />
+                            ) : (
+                              <Eye className='w-3 h-3' />
+                            )}
+                          </button>
+                        </div>
+                      </FormControl>
+                      <FormMessage className='text-xs' />
+                    </FormItem>
+                  )}
+                />
+              </div>
 
               {/* Register Button */}
               <Button
                 type='submit'
-                className='w-full bg-blue-600 hover:bg-blue-700 text-white py-3 text-base font-medium transition-all duration-200'
+                className='w-full bg-blue-600 hover:bg-blue-700 text-white py-2 text-sm font-medium transition-all duration-200 shadow-md shadow-blue-600/20 hover:shadow-blue-600/30 disabled:opacity-50 disabled:cursor-not-allowed mt-2'
                 disabled={isLoading}>
                 {isLoading ? (
                   <div className='flex items-center justify-center'>
-                    <div className='w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2'></div>
+                    <Loader2 className='w-4 h-4 animate-spin mr-2' />
                     Creating Account...
                   </div>
                 ) : (
                   <div className='flex items-center justify-center'>
                     Create Account
-                    <ArrowRight className='w-4 h-4 ml-2' />
+                    <ArrowRight className='w-3 h-3 ml-1' />
                   </div>
                 )}
               </Button>
             </form>
           </Form>
 
-          {/* Divider */}
-          <div className='relative'>
+          {/* Compact Divider */}
+          <div className='relative my-2'>
             <div className='absolute inset-0 flex items-center'>
               <div className='w-full border-t border-gray-300 dark:border-gray-600'></div>
             </div>
-            <div className='relative flex justify-center text-sm'>
+            <div className='relative flex justify-center text-xs'>
               <span className='px-2 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400'>
                 Or continue with
               </span>
             </div>
           </div>
 
-          {/* Google Register */}
+          {/* Google Button */}
           <Button
             onClick={() =>
               window.open(`${config.baseApiUrl}/auth/google`, "_self")
             }
             type='button'
             variant='outline'
-            className='w-full cursor-pointer border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors py-3'>
-            <svg className='w-5 h-5 mr-2' viewBox='0 0 24 24'>
+            disabled={isLoading}
+            className='w-full cursor-pointer border border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-all duration-200 py-2 text-sm font-medium disabled:opacity-50'>
+            <svg className='w-4 h-4 mr-2' viewBox='0 0 24 24'>
               <path
                 fill='currentColor'
                 d='M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z'
@@ -392,13 +382,13 @@ export function RegisterForm({
             Continue with Google
           </Button>
 
-          {/* Login Link */}
-          <div className='text-center text-sm pt-4 border-t border-gray-200 dark:border-gray-700'>
+          {/* Compact Login Link */}
+          <div className='text-center text-xs pt-3 border-t border-gray-200 dark:border-gray-700'>
             <p className='text-gray-600 dark:text-gray-400'>
               Already have an account?{" "}
               <Link
                 to='/login'
-                className='text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-medium transition-colors'>
+                className='text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-medium transition-colors hover:underline'>
                 Sign in
               </Link>
             </p>

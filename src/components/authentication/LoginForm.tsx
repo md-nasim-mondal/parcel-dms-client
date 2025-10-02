@@ -13,57 +13,118 @@ import { config } from "@/config";
 import { cn } from "@/lib/utils";
 import { useLoginMutation } from "@/redux/features/auth/auth.api";
 import { type FieldValues, type SubmitHandler, useForm } from "react-hook-form";
-import { Link, useNavigate } from "react-router";
+import { Link, useNavigate, useLocation } from "react-router";
 import { toast } from "sonner";
-import { Eye, EyeOff, Mail, Lock, ArrowRight } from "lucide-react";
+import { Eye, EyeOff, Mail, Lock, ArrowRight, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
+import { useDispatch } from "react-redux";
+import { setUser } from "@/redux/features/auth/auth.slice";
 
 export function LoginForm({
   className,
   ...props
 }: React.HTMLAttributes<HTMLDivElement>) {
   const navigate = useNavigate();
-  const form = useForm();
+  const location = useLocation();
+  const dispatch = useDispatch();
+
+  const form = useForm({
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
+
   const [login, { isLoading }] = useLoginMutation();
   const [showPassword, setShowPassword] = useState(false);
+
+  const from = location.state?.from?.pathname || "/";
 
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
     try {
       const res = await login(data).unwrap();
+
+      console.log(res.data.user);
+
       if (res.success) {
         toast.success("Logged in successfully!");
-        navigate("/");
-      }
-      console.log(res);
-    } catch (err: any) {
-      console.error(err);
-      if (err.data.message === "Password doesn't match") {
-        toast.error("Invalid Credentials!");
-      }
 
-      if (err.message === "User is not verified") {
-        toast.error("Your account is not verified");
-        navigate("/verify", { state: data.email });
+        // Update Redux state with user info
+        if (res.data?.user) {
+          dispatch(setUser(res.data.user));
+        }
+
+        // Redirect to intended page or role-based dashboard
+        const userRole = res.data?.user?.role;
+        const redirectPath = from ||
+          (userRole === "sender"
+            ? "/sender/dashboard"
+            : userRole === "receiver"
+            ? "/receiver/dashboard"
+            : userRole === "admin"
+            ? "/admin/dashboard"
+            : "/");
+
+        navigate(redirectPath, { replace: true });
       }
-      toast.error(err.data.message);
+    } catch (err: any) {
+      console.error("Login error:", err);
+
+      // Improved error handling
+      if (err?.data?.message === "Password doesn't match") {
+        toast.error("Invalid email or password!");
+        form.setError("password", {
+          type: "manual",
+          message: "Invalid credentials",
+        });
+      } else if (err?.data?.message === "User is not verified") {
+        toast.error("Your account is not verified");
+        navigate("/verify", {
+          state: { email: data.email },
+          replace: true,
+        });
+      } else if (err?.data?.message) {
+        toast.error(err.data.message);
+      } else if (err?.status === "FETCH_ERROR") {
+        toast.error("Network error. Please check your connection.");
+      } else {
+        toast.error("Login failed. Please try again.");
+      }
     }
   };
 
   return (
     <>
       {/* Login Card */}
-      <Card className='border-0 shadow-xl'>
+      <Card className='border-0 shadow-lg bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm'>
         <CardContent className='p-8'>
           <div className={cn("flex flex-col gap-6", className)} {...props}>
+            {/* Header */}
+            <div className='text-center space-y-2'>
+              <h2 className='text-2xl font-bold text-gray-900 dark:text-white'>
+                Welcome Back
+              </h2>
+              <p className='text-gray-600 dark:text-gray-400'>
+                Sign in to your SwiftDrop account
+              </p>
+            </div>
+
             <Form {...form}>
               <form
                 onSubmit={form.handleSubmit(onSubmit)}
-                className='space-y-6'>
+                className='space-y-5'>
                 {/* Email Field */}
                 <FormField
                   control={form.control}
                   name='email'
+                  rules={{
+                    required: "Email is required",
+                    pattern: {
+                      value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                      message: "Invalid email address",
+                    },
+                  }}
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className='text-gray-700 dark:text-gray-300 font-medium'>
@@ -75,12 +136,12 @@ export function LoginForm({
                           <Input
                             placeholder='john@example.com'
                             {...field}
-                            value={field.value || ""}
-                            className='pl-10 pr-4 py-3 border-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400 transition-colors'
+                            className='pl-10 pr-4 py-3 border-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 transition-all duration-200'
+                            disabled={isLoading}
                           />
                         </div>
                       </FormControl>
-                      <FormMessage />
+                      <FormMessage className='text-red-500 text-sm' />
                     </FormItem>
                   )}
                 />
@@ -89,6 +150,13 @@ export function LoginForm({
                 <FormField
                   control={form.control}
                   name='password'
+                  rules={{
+                    required: "Password is required",
+                    minLength: {
+                      value: 6,
+                      message: "Password must be at least 6 characters",
+                    },
+                  }}
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className='text-gray-700 dark:text-gray-300 font-medium'>
@@ -101,13 +169,14 @@ export function LoginForm({
                             type={showPassword ? "text" : "password"}
                             placeholder='Enter your password'
                             {...field}
-                            value={field.value || ""}
-                            className='pl-10 pr-12 py-3 border-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400 transition-colors'
+                            className='pl-10 pr-12 py-3 border-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 transition-all duration-200'
+                            disabled={isLoading}
                           />
                           <button
                             type='button'
                             onClick={() => setShowPassword(!showPassword)}
-                            className='absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors'>
+                            disabled={isLoading}
+                            className='absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors disabled:opacity-50'>
                             {showPassword ? (
                               <EyeOff className='w-4 h-4' />
                             ) : (
@@ -116,7 +185,7 @@ export function LoginForm({
                           </button>
                         </div>
                       </FormControl>
-                      <FormMessage />
+                      <FormMessage className='text-red-500 text-sm' />
                     </FormItem>
                   )}
                 />
@@ -125,7 +194,7 @@ export function LoginForm({
                 <div className='text-right'>
                   <Link
                     to='/forgot-password'
-                    className='text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 transition-colors'>
+                    className='text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 transition-colors font-medium'>
                     Forgot your password?
                   </Link>
                 </div>
@@ -133,11 +202,11 @@ export function LoginForm({
                 {/* Login Button */}
                 <Button
                   type='submit'
-                  className='w-full bg-blue-600 hover:bg-blue-700 text-white py-3 text-base font-medium transition-all duration-200'
+                  className='w-full bg-blue-600 hover:bg-blue-700 text-white py-3 text-base font-medium transition-all duration-200 shadow-lg shadow-blue-600/25 hover:shadow-blue-600/40 disabled:opacity-50 disabled:cursor-not-allowed'
                   disabled={isLoading}>
                   {isLoading ? (
                     <div className='flex items-center justify-center'>
-                      <div className='w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2'></div>
+                      <Loader2 className='w-5 h-5 animate-spin mr-2' />
                       Signing in...
                     </div>
                   ) : (
@@ -149,13 +218,14 @@ export function LoginForm({
                 </Button>
               </form>
             </Form>
+
             {/* Divider */}
             <div className='relative'>
               <div className='absolute inset-0 flex items-center'>
                 <div className='w-full border-t border-gray-300 dark:border-gray-600'></div>
               </div>
               <div className='relative flex justify-center text-sm'>
-                <span className='px-2 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400'>
+                <span className='px-3 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 font-medium'>
                   Or continue with
                 </span>
               </div>
@@ -168,8 +238,9 @@ export function LoginForm({
               }
               type='button'
               variant='outline'
-              className='w-full cursor-pointer border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors py-3'>
-              <svg className='w-5 h-5 mr-2' viewBox='0 0 24 24'>
+              disabled={isLoading}
+              className='w-full cursor-pointer border-2 border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-all duration-200 py-3 font-medium disabled:opacity-50'>
+              <svg className='w-5 h-5 mr-3' viewBox='0 0 24 24'>
                 <path
                   fill='currentColor'
                   d='M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z'
@@ -197,7 +268,7 @@ export function LoginForm({
                 <Link
                   to='/register'
                   replace
-                  className='text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-medium transition-colors'>
+                  className='text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-medium transition-colors hover:underline'>
                   Create an account
                 </Link>
               </p>
