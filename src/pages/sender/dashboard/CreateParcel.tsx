@@ -280,7 +280,7 @@ export default function CreateParcel() {
               <div className='flex justify-end'>
                 <Button
                   type='submit'
-                  className='w-full md:w-auto'
+                  className='w-full md:w-auto text-white'
                   disabled={isLoading}>
                   {isLoading ? (
                     <>

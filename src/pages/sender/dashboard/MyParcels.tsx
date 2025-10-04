@@ -99,8 +99,8 @@ export default function MyParcels() {
             View all your parcels and their current status
           </p>
         </div>
-        <Button asChild>
-          <Link to='/sender/create-parcel'>
+        <Button asChild className="text-white">
+          <Link to='/sender/dashboard/create-parcel'>
             <Plus className='mr-2 h-4 w-4' /> New Parcel
           </Link>
         </Button>
