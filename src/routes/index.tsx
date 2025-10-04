@@ -79,7 +79,7 @@ export const router = createBrowserRouter([
   },
   // ✅ Protected Dashboard Routes - Fixed structure
   {
-    path: "/sender",
+    path: "/sender/dashboard",
     element: (
       <ProtectedRoute children={<DashboardLayout />} requiredRole='sender' />
     ),
@@ -90,25 +90,25 @@ export const router = createBrowserRouter([
         Component: SenderDashboard,
       },
       {
-        path: "dashboard/profile",
-        Component: Profile,
-      },
-      {
         path: "dashboard",
         Component: SenderDashboard,
       },
       {
-        path: "dashboard/my-parcels",
+        path: "profile",
+        Component: Profile,
+      },
+      {
+        path: "my-parcels",
         Component: MyParcels,
       },
       {
-        path: "dashboard/create-parcel",
+        path: "create-parcel",
         Component: CreateParcel,
       },
     ],
   },
   {
-    path: "/receiver",
+    path: "/receiver/dashboard",
     element: (
       <ProtectedRoute children={<DashboardLayout />} requiredRole='receiver' />
     ),
@@ -123,21 +123,21 @@ export const router = createBrowserRouter([
         Component: ReceiverDashboard,
       },
       {
-        path: "dashboard/profile",
+        path: "profile",
         Component: Profile,
       },
       {
-        path: "dashboard/parcels",
+        path: "incoming-parcels",
         Component: ReceiverParcels,
       },
       {
-        path: "dashboard/history",
+        path: "delivery-history",
         Component: ParcelHistory,
       },
     ],
   },
   {
-    path: "/admin",
+    path: "/admin/dashboard",
     element: (
       <ProtectedRoute
         children={<DashboardLayout />}
@@ -155,15 +155,15 @@ export const router = createBrowserRouter([
         Component: AdminDashboard,
       },
       {
-        path: "dashboard/profile",
+        path: "profile",
         Component: Profile,
       },
       {
-        path: "dashboard/manage-users",
+        path: "manage-users",
         element: <ManageUsers />,
       },
       {
-        path: "dashboard/manage-parcels",
+        path: "manage-parcels",
         element: <ManageParcels />,
       },
     ],
