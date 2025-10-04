@@ -6,75 +6,29 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { useGetSenderParcelsQuery } from "@/redux/features/parcel/parcel.api";
+import { useGetDeliveryHistoryQuery } from "@/redux/features/parcel/parcel.api";
 import type { IParcel } from "@/types/parcel.type";
 import {
   Package,
-  Clock,
   CheckCircle,
-  Truck,
-  AlertCircle,
-  Plus,
   Search,
-  Filter,
+  Calendar,
 } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router";
 import { Input } from "@/components/ui/input";
 
-export default function MyParcels() {
+export default function ParcelHistory() {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [statusFilter, setStatusFilter] = useState<string | null>(null);
+  const [dateFilter, setDateFilter] = useState<string | null>(null);
 
-  const { data: parcelsData, isLoading } = useGetSenderParcelsQuery({
+  const { data: parcelsData, isLoading } = useGetDeliveryHistoryQuery({
     page: currentPage,
     limit: 10,
     searchTerm,
-    status: statusFilter,
+    date: dateFilter,
   });
-
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case "pending":
-      case "requested":
-        return <Clock className='w-4 h-4 text-yellow-500' />;
-      case "processing":
-      case "approved":
-      case "picked":
-      case "dispatched":
-        return <Truck className='w-4 h-4 text-blue-500' />;
-      case "in-transit":
-        return <Truck className='w-4 h-4 text-purple-500' />;
-      case "delivered":
-        return <CheckCircle className='w-4 h-4 text-green-500' />;
-      case "cancelled":
-        return <AlertCircle className='w-4 h-4 text-red-500' />;
-      default:
-        return <Package className='w-4 h-4 text-gray-500' />;
-    }
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "pending":
-      case "requested":
-        return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300";
-      case "processing":
-      case "approved":
-      case "picked":
-      case "dispatched":
-        return "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300";
-      case "in-transit":
-        return "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300";
-      case "delivered":
-        return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300";
-      case "cancelled":
-        return "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300";
-      default:
-        return "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300";
-    }
-  };
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -85,8 +39,8 @@ export default function MyParcels() {
     // Search is handled by the query params
   };
 
-  const handleFilterChange = (status: string | null) => {
-    setStatusFilter(status);
+  const handleFilterChange = (date: string | null) => {
+    setDateFilter(date);
     setCurrentPage(1); // Reset to first page when filter changes
   };
 
@@ -94,23 +48,18 @@ export default function MyParcels() {
     <div className='container mx-auto py-6'>
       <div className='flex flex-col md:flex-row md:items-center md:justify-between mb-6'>
         <div className='mb-4 md:mb-0'>
-          <h1 className='text-2xl font-bold'>My Parcels</h1>
+          <h1 className='text-2xl font-bold'>Delivery History</h1>
           <p className='text-muted-foreground'>
-            View all your parcels and their current status
+            View all your received parcels
           </p>
         </div>
-        <Button asChild>
-          <Link to='/sender/create-parcel'>
-            <Plus className='mr-2 h-4 w-4' /> New Parcel
-          </Link>
-        </Button>
       </div>
 
       <Card>
         <CardHeader>
           <div className='flex flex-col md:flex-row md:items-center md:justify-between gap-4'>
             <div>
-              <CardTitle>Parcel List</CardTitle>
+              <CardTitle>Delivery History</CardTitle>
               <CardDescription>
                 {parcelsData?.meta?.total || 0} parcels found
               </CardDescription>
@@ -140,8 +89,8 @@ export default function MyParcels() {
                       .getElementById("filter-menu")
                       ?.classList.toggle("hidden")
                   }>
-                  <Filter className='h-4 w-4 mr-2' />
-                  {statusFilter ? `Filter: ${statusFilter}` : "Filter"}
+                  <Calendar className='h-4 w-4 mr-2' />
+                  {dateFilter ? `Date: ${dateFilter}` : "Filter by Date"}
                 </Button>
                 <div
                   id='filter-menu'
@@ -150,32 +99,34 @@ export default function MyParcels() {
                     <button
                       onClick={() => handleFilterChange(null)}
                       className='w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700'>
-                      All
+                      All Dates
                     </button>
                     <button
-                      onClick={() => handleFilterChange("requested")}
+                      onClick={() =>
+                        handleFilterChange(
+                          new Date().toISOString().split("T")[0]
+                        )
+                      }
                       className='w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700'>
-                      Requested
+                      Today
                     </button>
                     <button
-                      onClick={() => handleFilterChange("approved")}
+                      onClick={() => {
+                        const date = new Date();
+                        date.setDate(date.getDate() - 7);
+                        handleFilterChange(date.toISOString().split("T")[0]);
+                      }}
                       className='w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700'>
-                      Approved
+                      Last 7 Days
                     </button>
                     <button
-                      onClick={() => handleFilterChange("in-transit")}
+                      onClick={() => {
+                        const date = new Date();
+                        date.setDate(date.getDate() - 30);
+                        handleFilterChange(date.toISOString().split("T")[0]);
+                      }}
                       className='w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700'>
-                      In Transit
-                    </button>
-                    <button
-                      onClick={() => handleFilterChange("delivered")}
-                      className='w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700'>
-                      Delivered
-                    </button>
-                    <button
-                      onClick={() => handleFilterChange("cancelled")}
-                      className='w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700'>
-                      Cancelled
+                      Last 30 Days
                     </button>
                   </div>
                 </div>
@@ -191,10 +142,9 @@ export default function MyParcels() {
           ) : parcelsData?.data?.length === 0 ? (
             <div className='text-center py-10'>
               <Package className='mx-auto h-12 w-12 text-muted-foreground opacity-50' />
-              <h3 className='mt-4 text-lg font-medium'>No parcels found</h3>
+              <h3 className='mt-4 text-lg font-medium'>No delivery history</h3>
               <p className='mt-2 text-muted-foreground'>
-                You haven't created any parcels yet. Click the button above to
-                create a new one.
+                You don't have any delivered parcels yet.
               </p>
             </div>
           ) : (
@@ -204,42 +154,26 @@ export default function MyParcels() {
                   key={parcel._id}
                   className='flex flex-col md:flex-row md:items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors'>
                   <div className='flex items-center space-x-4 mb-2 md:mb-0'>
-                    {getStatusIcon(parcel.status)}
+                    <CheckCircle className='w-4 h-4 text-green-500' />
                     <div>
                       <p className='font-medium text-gray-900 dark:text-white'>
                         {parcel.trackingId}
                       </p>
                       <p className='text-sm text-gray-600 dark:text-gray-300'>
-                        Receiver: {parcel.receiver.name}
+                        Sender: {parcel.sender.name}
                       </p>
                       <p className='text-xs text-gray-500 dark:text-gray-400'>
-                        Address: {parcel.receiver.defaultAddress || "N/A"}
+                        From: {parcel.sender.defaultAddress}
                       </p>
                     </div>
                   </div>
                   <div className='flex flex-col md:items-end'>
                     <p className='text-sm text-gray-600 dark:text-gray-300'>
-                      {new Date(parcel.createdAt).toLocaleDateString("en-US")}
+                      Delivered on:{" "}
+                      {new Date(parcel.deliveredAt as Date).toLocaleDateString("en-US")}
                     </p>
-                    <span
-                      className={`inline-block px-2 py-1 text-xs rounded-full mt-1 ${getStatusColor(
-                        parcel.status
-                      )}`}>
-                      {parcel.status === "pending"
-                        ? "requested"
-                        : parcel.status === "approved"
-                        ? "approved"
-                        : parcel.status === "picked"
-                        ? "picked"
-                        : parcel.status === "dispatched"
-                        ? "dispatched"
-                        : parcel.status === "in-transit"
-                        ? "in-transit"
-                        : parcel.status === "delivered"
-                        ? "delivered"
-                        : parcel.status === "cancelled"
-                        ? "cancelled"
-                        : parcel.status}
+                    <span className='inline-block px-2 py-1 text-xs rounded-full mt-1 bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300'>
+                      Delivered
                     </span>
                     <div className='mt-2'>
                       <Button
@@ -248,7 +182,7 @@ export default function MyParcels() {
                         asChild
                         className='text-xs'>
                         <Link to={`/tracking?id=${parcel.trackingId}`}>
-                          Track
+                          View Details
                         </Link>
                       </Button>
                     </div>

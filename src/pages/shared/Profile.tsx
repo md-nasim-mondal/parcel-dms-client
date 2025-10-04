@@ -20,6 +20,7 @@ const profileSchema = z.object({
   name: z.string().min(1, "Name is required"),
   email: z.string().email("Invalid email address").min(1, "Email is required"),
   phone: z.string().optional(),
+  defaultAddress: z.string().optional(),
 });
 
 type TProfileSchema = z.infer<typeof profileSchema>;
@@ -34,6 +35,7 @@ const Profile = () => {
       name: "",
       email: "",
       phone: "",
+      defaultAddress: "",
     },
   });
 
@@ -43,6 +45,7 @@ const Profile = () => {
         name: userData.data.name,
         email: userData.data.email,
         phone: userData.data.phone || "",
+        defaultAddress: userData.data.defaultAddress || "",
       });
     }
   }, [userData, form]);
@@ -131,11 +134,30 @@ const Profile = () => {
                 name='phone'
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Phone Number (Optional)</FormLabel>
+                    <FormLabel>Phone Number</FormLabel>
                     <FormControl>
                       <Input
                         {...field}
                         placeholder='Your phone number'
+                        disabled={isLoading}
+                        className='py-3 border-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 transition-all duration-200'
+                      />
+                    </FormControl>
+                    <FormMessage className='text-red-500 text-sm' />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name='defaultAddress'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>defaultAddress/Address</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        placeholder='Your address'
                         disabled={isLoading}
                         className='py-3 border-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 transition-all duration-200'
                       />

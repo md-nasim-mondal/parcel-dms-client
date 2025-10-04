@@ -18,6 +18,7 @@ export interface IUser {
   email: string;
   phone?: string;
   picture?: string;
+  defaultAddress?: string;
   role: "sender" | "receiver" | "admin" | "super_admin" | "delivery_personnel";
   status: "active" | "blocked";
   isVerified: boolean;

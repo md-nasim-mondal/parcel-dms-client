@@ -5,12 +5,13 @@ export interface IParcel {
     _id: string;
     name: string;
     email: string;
+    defaultAddress?: string;
   };
   receiver: {
     name: string;
     email: string;
     phone: string;
-    address: string;
+    defaultAddress?: string;
   };
   weight: number;
   cost: number;
@@ -32,6 +33,7 @@ export interface IParcel {
   }[];
   createdAt: string;
   updatedAt: string;
+  deliveredAt?: Date;
 }
 
 export interface IParcelResponse {

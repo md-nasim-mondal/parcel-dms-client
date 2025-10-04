@@ -16,11 +16,13 @@ import AdminDashboard from "@/pages/admin/dashboard/AdminDashboard";
 import Verify from "@/pages/public/authentication/Verify";
 import CreateParcel from "@/pages/sender/dashboard/CreateParcel";
 import MyParcels from "@/pages/sender/dashboard/MyParcels";
+import ReceiverParcels from "@/pages/receiver/dashboard/ReceiverParcels";
 import ManageUsers from "@/pages/admin/dashboard/ManageUsers";
 import ManageParcels from "@/pages/admin/dashboard/ManageParcels";
 import ForgotPassword from "@/pages/public/authentication/ForgotPassword";
 import ResetPassword from "@/pages/public/authentication/ResetPassword";
 import Profile from "@/pages/shared/Profile";
+import ParcelHistory from "@/pages/receiver/dashboard/ParcelHistory";
 
 export const router = createBrowserRouter([
   {
@@ -123,6 +125,14 @@ export const router = createBrowserRouter([
       {
         path: "dashboard/profile",
         Component: Profile,
+      },
+      {
+        path: "dashboard/parcels",
+        Component: ReceiverParcels,
+      },
+      {
+        path: "dashboard/history",
+        Component: ParcelHistory,
       },
     ],
   },

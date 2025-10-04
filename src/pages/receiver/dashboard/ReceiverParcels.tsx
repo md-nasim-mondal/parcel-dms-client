@@ -6,7 +6,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { useGetSenderParcelsQuery } from "@/redux/features/parcel/parcel.api";
+import { useGetReceiverParcelsQuery } from "@/redux/features/parcel/parcel.api";
 import type { IParcel } from "@/types/parcel.type";
 import {
   Package,
@@ -14,7 +14,6 @@ import {
   CheckCircle,
   Truck,
   AlertCircle,
-  Plus,
   Search,
   Filter,
 } from "lucide-react";
@@ -22,12 +21,12 @@ import { useState } from "react";
 import { Link } from "react-router";
 import { Input } from "@/components/ui/input";
 
-export default function MyParcels() {
+export default function ReceiverParcels() {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [statusFilter, setStatusFilter] = useState<string | null>(null);
 
-  const { data: parcelsData, isLoading } = useGetSenderParcelsQuery({
+  const { data: parcelsData, isLoading } = useGetReceiverParcelsQuery({
     page: currentPage,
     limit: 10,
     searchTerm,
@@ -94,16 +93,11 @@ export default function MyParcels() {
     <div className='container mx-auto py-6'>
       <div className='flex flex-col md:flex-row md:items-center md:justify-between mb-6'>
         <div className='mb-4 md:mb-0'>
-          <h1 className='text-2xl font-bold'>My Parcels</h1>
+          <h1 className='text-2xl font-bold'>Incoming Parcels</h1>
           <p className='text-muted-foreground'>
-            View all your parcels and their current status
+            View all parcels being sent to you and their current status
           </p>
         </div>
-        <Button asChild>
-          <Link to='/sender/create-parcel'>
-            <Plus className='mr-2 h-4 w-4' /> New Parcel
-          </Link>
-        </Button>
       </div>
 
       <Card>
@@ -167,16 +161,6 @@ export default function MyParcels() {
                       className='w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700'>
                       In Transit
                     </button>
-                    <button
-                      onClick={() => handleFilterChange("delivered")}
-                      className='w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700'>
-                      Delivered
-                    </button>
-                    <button
-                      onClick={() => handleFilterChange("cancelled")}
-                      className='w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700'>
-                      Cancelled
-                    </button>
                   </div>
                 </div>
               </div>
@@ -193,8 +177,7 @@ export default function MyParcels() {
               <Package className='mx-auto h-12 w-12 text-muted-foreground opacity-50' />
               <h3 className='mt-4 text-lg font-medium'>No parcels found</h3>
               <p className='mt-2 text-muted-foreground'>
-                You haven't created any parcels yet. Click the button above to
-                create a new one.
+                You don't have any incoming parcels at the moment.
               </p>
             </div>
           ) : (
@@ -210,10 +193,10 @@ export default function MyParcels() {
                         {parcel.trackingId}
                       </p>
                       <p className='text-sm text-gray-600 dark:text-gray-300'>
-                        Receiver: {parcel.receiver.name}
+                        Sender: {parcel.sender.name}
                       </p>
                       <p className='text-xs text-gray-500 dark:text-gray-400'>
-                        Address: {parcel.receiver.defaultAddress || "N/A"}
+                        From: {parcel.sender.defaultAddress || "N/A"}
                       </p>
                     </div>
                   </div>
@@ -241,7 +224,7 @@ export default function MyParcels() {
                         ? "cancelled"
                         : parcel.status}
                     </span>
-                    <div className='mt-2'>
+                    <div className='mt-2 flex space-x-2'>
                       <Button
                         variant='outline'
                         size='sm'
@@ -251,6 +234,14 @@ export default function MyParcels() {
                           Track
                         </Link>
                       </Button>
+                      {parcel.status === "in-transit" && (
+                        <Button
+                          variant='default'
+                          size='sm'
+                          className='text-xs'>
+                          Confirm Delivery
+                        </Button>
+                      )}
                     </div>
                   </div>
                 </div>

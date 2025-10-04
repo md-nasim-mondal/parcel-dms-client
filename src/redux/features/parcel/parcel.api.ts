@@ -41,6 +41,14 @@ export const parcelApi = baseApi.injectEndpoints({
       }),
       providesTags: ["PARCELS"],
     }),
+     getDeliveryHistory: builder.query({
+      query: (params) => ({
+        url: "/parcels/me/history",
+        method: "GET",
+        params,
+      }),
+      providesTags: ["PARCELS"],
+    }),
     trackParcel: builder.query({
       query: (trackingId) => ({
         url: `/parcels/track/${trackingId}`,
@@ -78,6 +86,7 @@ export const {
   useGetReceiverParcelsQuery,
   useGetAllParcelsQuery,
   useGetParcelByIdQuery,
+  useGetDeliveryHistoryQuery,
   useTrackParcelQuery,
   useLazyTrackParcelQuery,
   useUpdateParcelStatusMutation,
