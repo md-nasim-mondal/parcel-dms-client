@@ -14,6 +14,10 @@ import SenderDashboard from "@/pages/sender/dashboard/SenderDashboard";
 import ReceiverDashboard from "@/pages/receiver/dashboard/ReceiverDashboard";
 import AdminDashboard from "@/pages/admin/dashboard/AdminDashboard";
 import Verify from "@/pages/public/authentication/Verify";
+import CreateParcel from "@/pages/sender/dashboard/CreateParcel";
+import MyParcels from "@/pages/sender/dashboard/MyParcels";
+import ManageUsers from "@/pages/admin/dashboard/ManageUsers";
+import ManageParcels from "@/pages/admin/dashboard/ManageParcels";
 
 export const router = createBrowserRouter([
   {
@@ -74,6 +78,14 @@ export const router = createBrowserRouter([
         path: "dashboard",
         Component: SenderDashboard,
       },
+      {
+        path: "dashboard/my-parcels",
+        Component: MyParcels,
+      },
+      {
+        path: "dashboard/create-parcel",
+        Component: CreateParcel,
+      },
     ],
   },
   {
@@ -98,7 +110,7 @@ export const router = createBrowserRouter([
     element: (
       <ProtectedRoute
         children={<DashboardLayout />}
-        requiredRole={["sender", "super_admin"]}
+        requiredRole={["admin", "super_admin"]}
       />
     ),
     errorElement: <ErrorBoundary />,
@@ -110,6 +122,14 @@ export const router = createBrowserRouter([
       {
         path: "dashboard",
         Component: AdminDashboard,
+      },
+      {
+        path: "users",
+        element: <ManageUsers />,
+      },
+      {
+        path: "parcels",
+        element: <ManageParcels />,
       },
     ],
   },

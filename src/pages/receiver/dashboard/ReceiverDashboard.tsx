@@ -1,10 +1,21 @@
-// pages/dashboard/receiver/ReceiverDashboard.tsx
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Package, CheckCircle, Truck, MapPin } from "lucide-react";
+import { useGetReceiverStatsQuery } from "@/redux/features/stats/stats.api";
 import { Link } from "react-router";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Package, CheckCircle, Truck, MapPin } from "lucide-react";
 
-export default function ReceiverDashboard() {
+const ReceiverDashboard = () => {
+  const { data: stats, isLoading } = useGetReceiverStatsQuery();
+
+  const statusCounts = stats?.data?.statusCounts || {
+    pending: 0,
+    processing: 0,
+    shipped: 0,
+    delivered: 0,
+    cancelled: 0,
+  };
+
   const incomingParcels = [
     {
       id: 1,
@@ -41,6 +52,38 @@ export default function ReceiverDashboard() {
     },
   ];
 
+  if (isLoading) {
+    return (
+      <div className='space-y-6'>
+        <Skeleton className='h-10 w-64' />
+        <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
+          {[...Array(3)].map((_, i) => (
+            <Card key={i}>
+              <CardContent className='p-6'>
+                <Skeleton className='h-6 w-24 mb-2' />
+                <Skeleton className='h-8 w-16' />
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+        <div className='grid grid-cols-1 lg:grid-cols-2 gap-6'>
+          {[...Array(2)].map((_, i) => (
+            <Card key={i}>
+              <CardHeader>
+                <Skeleton className='h-6 w-32' />
+              </CardHeader>
+              <CardContent>
+                {[...Array(2)].map((_, j) => (
+                  <Skeleton key={j} className='h-16 w-full mb-4' />
+                ))}
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className='space-y-6'>
       {/* Header */}
@@ -65,7 +108,7 @@ export default function ReceiverDashboard() {
                   Incoming
                 </p>
                 <p className='text-2xl font-bold text-gray-900 dark:text-white mt-1'>
-                  2
+                  {incomingParcels.length}
                 </p>
               </div>
               <div className='w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center'>
@@ -83,7 +126,10 @@ export default function ReceiverDashboard() {
                   In Transit
                 </p>
                 <p className='text-2xl font-bold text-gray-900 dark:text-white mt-1'>
-                  1
+                  {
+                    incomingParcels.filter((p) => p.status === "in-transit")
+                      .length
+                  }
                 </p>
               </div>
               <div className='w-12 h-12 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg flex items-center justify-center'>
@@ -101,7 +147,7 @@ export default function ReceiverDashboard() {
                   Delivered
                 </p>
                 <p className='text-2xl font-bold text-gray-900 dark:text-white mt-1'>
-                  5
+                  {statusCounts.delivered}
                 </p>
               </div>
               <div className='w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center'>
@@ -193,4 +239,6 @@ export default function ReceiverDashboard() {
       </div>
     </div>
   );
-}
+};
+
+export default ReceiverDashboard;

@@ -13,9 +13,21 @@ export interface ILogin {
 }
 
 export interface IUser {
-  id: string;
-  email: string;
-  role: "sender" | "receiver" | "admin" | "super_admin" | "delivery_personnel";
+  _id: string;
   name: string;
-  picture?: string;
+  email: string;
+  phone?: string;
+  role: "sender" | "receiver" | "admin" | "super_admin";
+  status: "active" | "blocked";
+  isVerified: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface ILoginResponse {
+  success: boolean;
+  message: string;
+  data?: {
+    user: IUser;
+  };
 }
