@@ -1,6 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { useState } from "react";
-import { useGetAllUsersQuery, useUpdateUserStatusMutation } from "@/redux/features/user/user.api";
+import {
+  useGetAllUsersQuery,
+  useUpdateUserStatusMutation,
+} from "@/redux/features/user/user.api";
 import {
   Table,
   TableBody,
@@ -40,7 +43,8 @@ const ManageUsers = () => {
     status: statusFilter,
   });
 
-  const [updateUserStatus, { isLoading: isUpdating }] = useUpdateUserStatusMutation();
+  const [updateUserStatus, { isLoading: isUpdating }] =
+    useUpdateUserStatusMutation();
 
   const users = data?.data || [];
   const meta = data?.meta || { total: 0, page: 1, limit: 10 };
@@ -82,61 +86,55 @@ const ManageUsers = () => {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
+    <div className='space-y-6'>
+      <div className='flex justify-between items-center'>
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+          <h1 className='text-3xl font-bold text-gray-900 dark:text-white'>
             Manage Users
           </h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-1">
+          <p className='text-gray-600 dark:text-gray-400 mt-1'>
             View and manage all users in the system
           </p>
         </div>
       </div>
 
       {/* Filters */}
-      <div className="flex flex-col sm:flex-row gap-4">
-        <div className="relative flex-1">
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500 dark:text-gray-400" />
+      <div className='flex flex-col sm:flex-row gap-4'>
+        <div className='relative flex-1'>
+          <Search className='absolute left-2.5 top-2.5 h-4 w-4 text-gray-500 dark:text-gray-400' />
           <Input
-            placeholder="Search by name, email or phone"
-            className="pl-8"
+            placeholder='Search by name, email or phone'
+            className='pl-8'
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        <Select
-          value={roleFilter}
-          onValueChange={setRoleFilter}
-        >
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Filter by role" />
+        <Select value={roleFilter} onValueChange={setRoleFilter}>
+          <SelectTrigger className='w-[180px]'>
+            <SelectValue placeholder='Filter by role' />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">All Roles</SelectItem>
-            <SelectItem value="admin">Admin</SelectItem>
-            <SelectItem value="sender">Sender</SelectItem>
-            <SelectItem value="receiver">Receiver</SelectItem>
+            <SelectItem value='all'>All Roles</SelectItem>
+            <SelectItem value='admin'>Admin</SelectItem>
+            <SelectItem value='sender'>Sender</SelectItem>
+            <SelectItem value='receiver'>Receiver</SelectItem>
           </SelectContent>
         </Select>
-        <Select
-          value={statusFilter}
-          onValueChange={setStatusFilter}
-        >
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Filter by status" />
+        <Select value={statusFilter} onValueChange={setStatusFilter}>
+          <SelectTrigger className='w-[180px]'>
+            <SelectValue placeholder='Filter by status' />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">All Status</SelectItem>
-            <SelectItem value="active">Active</SelectItem>
-            <SelectItem value="inactive">Inactive</SelectItem>
-            <SelectItem value="pending">Pending</SelectItem>
+            <SelectItem value='all'>All Status</SelectItem>
+            <SelectItem value='active'>Active</SelectItem>
+            <SelectItem value='inactive'>Inactive</SelectItem>
+            <SelectItem value='pending'>Pending</SelectItem>
           </SelectContent>
         </Select>
       </div>
 
       {/* Users Table */}
-      <div className="border rounded-lg overflow-hidden">
+      <div className='border rounded-lg overflow-hidden'>
         <Table>
           <TableHeader>
             <TableRow>
@@ -145,7 +143,7 @@ const ManageUsers = () => {
               <TableHead>Phone</TableHead>
               <TableHead>Role</TableHead>
               <TableHead>Status</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
+              <TableHead className='text-right'>Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -154,24 +152,38 @@ const ManageUsers = () => {
                 .fill(0)
                 .map((_, index) => (
                   <TableRow key={index}>
-                    <TableCell><Skeleton className="h-6 w-32" /></TableCell>
-                    <TableCell><Skeleton className="h-6 w-40" /></TableCell>
-                    <TableCell><Skeleton className="h-6 w-28" /></TableCell>
-                    <TableCell><Skeleton className="h-6 w-20" /></TableCell>
-                    <TableCell><Skeleton className="h-6 w-20" /></TableCell>
-                    <TableCell><Skeleton className="h-6 w-24" /></TableCell>
+                    <TableCell>
+                      <Skeleton className='h-6 w-32' />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className='h-6 w-40' />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className='h-6 w-28' />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className='h-6 w-20' />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className='h-6 w-20' />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className='h-6 w-24' />
+                    </TableCell>
                   </TableRow>
                 ))
             ) : users.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="text-center py-8 text-gray-500 dark:text-gray-400">
+                <TableCell
+                  colSpan={6}
+                  className='text-center py-8 text-gray-500 dark:text-gray-400'>
                   No users found
                 </TableCell>
               </TableRow>
             ) : (
               users.map((user: IUser) => (
                 <TableRow key={user._id}>
-                  <TableCell className="font-medium">{user.name}</TableCell>
+                  <TableCell className='font-medium'>{user.name}</TableCell>
                   <TableCell>{user.email}</TableCell>
                   <TableCell>{user.phone}</TableCell>
                   <TableCell>
@@ -184,34 +196,30 @@ const ManageUsers = () => {
                       {user.status}
                     </Badge>
                   </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        asChild
-                      >
+                  <TableCell className='text-right'>
+                    <div className='flex justify-end gap-2'>
+                      <Button variant='outline' size='sm' asChild>
                         <Link to={`/admin/users/${user._id}`}>
-                          <Eye className="h-4 w-4" />
+                          <Eye className='h-4 w-4' />
                         </Link>
                       </Button>
                       {user.status === "active" ? (
                         <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleStatusChange(user._id, "inactive")}
-                          disabled={isUpdating}
-                        >
-                          <UserX className="h-4 w-4 text-red-500" />
+                          variant='outline'
+                          size='sm'
+                          onClick={() =>
+                            handleStatusChange(user._id, "inactive")
+                          }
+                          disabled={isUpdating}>
+                          <UserX className='h-4 w-4 text-red-500' />
                         </Button>
                       ) : (
                         <Button
-                          variant="outline"
-                          size="sm"
+                          variant='outline'
+                          size='sm'
                           onClick={() => handleStatusChange(user._id, "active")}
-                          disabled={isUpdating}
-                        >
-                          <UserCheck className="h-4 w-4 text-green-500" />
+                          disabled={isUpdating}>
+                          <UserCheck className='h-4 w-4 text-green-500' />
                         </Button>
                       )}
                     </div>
@@ -225,25 +233,24 @@ const ManageUsers = () => {
 
       {/* Pagination */}
       {!isLoading && users.length > 0 && (
-        <div className="flex justify-between items-center">
-          <div className="text-sm text-gray-500 dark:text-gray-400">
-            Showing {(page - 1) * limit + 1} to {Math.min(page * limit, meta.total)} of {meta.total} users
+        <div className='flex justify-between items-center'>
+          <div className='text-sm text-gray-500 dark:text-gray-400'>
+            Showing {(page - 1) * limit + 1} to{" "}
+            {Math.min(page * limit, meta.total)} of {meta.total} users
           </div>
-          <div className="flex gap-2">
+          <div className='flex gap-2'>
             <Button
-              variant="outline"
-              size="sm"
+              variant='outline'
+              size='sm'
               onClick={() => setPage(page - 1)}
-              disabled={page === 1}
-            >
+              disabled={page === 1}>
               Previous
             </Button>
             <Button
-              variant="outline"
-              size="sm"
+              variant='outline'
+              size='sm'
               onClick={() => setPage(page + 1)}
-              disabled={page === totalPages}
-            >
+              disabled={page === totalPages}>
               Next
             </Button>
           </div>

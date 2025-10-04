@@ -18,6 +18,9 @@ import CreateParcel from "@/pages/sender/dashboard/CreateParcel";
 import MyParcels from "@/pages/sender/dashboard/MyParcels";
 import ManageUsers from "@/pages/admin/dashboard/ManageUsers";
 import ManageParcels from "@/pages/admin/dashboard/ManageParcels";
+import ForgotPassword from "@/pages/public/authentication/ForgotPassword";
+import ResetPassword from "@/pages/public/authentication/ResetPassword";
+import Profile from "@/pages/shared/Profile";
 
 export const router = createBrowserRouter([
   {
@@ -62,6 +65,16 @@ export const router = createBrowserRouter([
     path: "verify",
     errorElement: <ErrorBoundary />,
   },
+  {
+    Component: ForgotPassword,
+    path: "forgot-password",
+    errorElement: <ErrorBoundary />,
+  },
+  {
+    Component: ResetPassword,
+    path: "reset-password",
+    errorElement: <ErrorBoundary />,
+  },
   // ✅ Protected Dashboard Routes - Fixed structure
   {
     path: "/sender",
@@ -73,6 +86,10 @@ export const router = createBrowserRouter([
       {
         index: true,
         Component: SenderDashboard,
+      },
+      {
+        path: "dashboard/profile",
+        Component: Profile,
       },
       {
         path: "dashboard",
@@ -103,6 +120,10 @@ export const router = createBrowserRouter([
         path: "dashboard",
         Component: ReceiverDashboard,
       },
+      {
+        path: "dashboard/profile",
+        Component: Profile,
+      },
     ],
   },
   {
@@ -124,11 +145,15 @@ export const router = createBrowserRouter([
         Component: AdminDashboard,
       },
       {
-        path: "users",
+        path: "dashboard/profile",
+        Component: Profile,
+      },
+      {
+        path: "dashboard/manage-users",
         element: <ManageUsers />,
       },
       {
-        path: "parcels",
+        path: "dashboard/manage-parcels",
         element: <ManageParcels />,
       },
     ],

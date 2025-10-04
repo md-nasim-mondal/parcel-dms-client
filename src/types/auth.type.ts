@@ -13,11 +13,12 @@ export interface ILogin {
 }
 
 export interface IUser {
-  _id: string;
+  _id?: string;
   name: string;
   email: string;
   phone?: string;
-  role: "sender" | "receiver" | "admin" | "super_admin";
+  picture?: string;
+  role: "sender" | "receiver" | "admin" | "super_admin" | "delivery_personnel";
   status: "active" | "blocked";
   isVerified: boolean;
   createdAt?: string;
@@ -30,4 +31,13 @@ export interface ILoginResponse {
   data?: {
     user: IUser;
   };
+}
+
+export interface IForgotPassword {
+  email: string;
+}
+
+export interface IResetPassword {
+  id: string;
+  newPassword: string;
 }
