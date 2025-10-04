@@ -17,7 +17,7 @@ import { useSidebarLinks } from "@/hooks/useSidebarLinks";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { user } = useAuth();
-  const { state } = useSidebar();
+  const { state, setOpen, open } = useSidebar();
   const navItems = useSidebarLinks();
 
   return (
@@ -33,13 +33,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         } border-b border-slate-200 dark:border-slate-600`}>
         <div className='flex h-16 items-center justify-between'>
           {state === "expanded" ? (
-            <Link to={navItems[0]?.links[0]?.url || "/"}>
+            <Link to={"/"}>
               <Logo1 size='sm' isExpended={state === "expanded"} />
             </Link>
           ) : (
-            <Link to={navItems[0]?.links[0]?.url || "/"}>
+            <div onClick={() => setOpen(!open)}>
               <Logo1 size='sm' />
-            </Link>
+            </div>
           )}
           <SidebarTrigger className='-ml-1 md:hidden' />
         </div>
