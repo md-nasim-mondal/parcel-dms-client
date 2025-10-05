@@ -160,11 +160,11 @@ export const router = createBrowserRouter([
       },
       {
         path: "manage-users",
-        element: <ManageUsers />,
+        Component: ManageUsers,
       },
       {
         path: "manage-parcels",
-        element: <ManageParcels />,
+        Component: ManageParcels,
       },
     ],
   },
