@@ -23,7 +23,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar
       // Change: Updated sidebar background and border for depth
-      className='bg-white dark:bg-slate-950 border-r border-slate-200 dark:border-slate-800 shadow-lg'
+      className='bg-white dark:bg-slate-950 border-r border-slate-200 dark:border-slate-600 shadow-lg'
       collapsible='icon'
       {...props}>
       <SidebarHeader
@@ -37,7 +37,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               <Logo1 size='sm' isExpended={state === "expanded"} />
             </Link>
           ) : (
-            <div onClick={() => setOpen(!open)}>
+            <div onClick={() => setOpen(!open)} className="mx-auto text-center">
               <Logo1 size='sm' />
             </div>
           )}
@@ -50,16 +50,16 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               : user?.role === "delivery_personnel"
               ? "Delivery Personnel"
               : user?.role}{" "}
-            Panel
+            Dashboard Panel
           </p>
         )}
       </SidebarHeader>
 
-      <SidebarContent className='flex h-full flex-col px-3 py-4'>
+      <SidebarContent className='flex h-full flex-col py-4'>
         {navItems.map((group, index) => (
           <div key={index} className='mb-2'>
             {group.title && (
-              <h2 className='px-4 py-2 text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider'>
+              <h2 className={`py-2 font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider ${state === "expanded" ? "px-4 text-xs" : "text-center text-[8px]"}`}>
                 {group.title}
               </h2>
             )}
