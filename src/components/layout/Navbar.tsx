@@ -214,10 +214,13 @@ export default function Navbar() {
                         <p className='text-xs text-gray-500 dark:text-gray-400'>
                           {user.email}
                         </p>
-                        <p className='text-xs text-blue-600 dark:text-blue-400 capitalize'>
+                        <p className='text-xs text-blue-600 dark:text-blue-400'>
+                          You are a{" "}
+                          <span className="capitalize">
                           {user.role === "super_admin"
                             ? "Super Admin"
                             : user.role}
+                          </span>
                         </p>
                       </div>
                     </DropdownMenuLabel>
@@ -315,6 +318,7 @@ export default function Navbar() {
                       {user.email}
                     </p>
                     <p className='text-xs text-blue-600 dark:text-blue-400 capitalize'>
+                      You are a{" "}
                       {user.role === "super_admin" ? "Super Admin" : user.role}
                     </p>
                   </div>

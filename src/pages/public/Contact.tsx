@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
 
@@ -142,11 +143,11 @@ export default function Contact() {
                 <form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
                   <div className='grid md:grid-cols-2 gap-6'>
                     <div>
-                      <label
+                      <Label
                         htmlFor='name'
                         className='block text-sm font-medium mb-2 text-gray-900 dark:text-white'>
                         Full Name *
-                      </label>
+                      </Label>
                       <Input
                         id='name'
                         {...register("name")}
@@ -165,11 +166,11 @@ export default function Contact() {
                     </div>
 
                     <div>
-                      <label
+                      <Label
                         htmlFor='email'
                         className='block text-sm font-medium mb-2 text-gray-900 dark:text-white'>
                         Email Address *
-                      </label>
+                      </Label>
                       <Input
                         id='email'
                         type='email'
@@ -191,11 +192,11 @@ export default function Contact() {
 
                   <div className='grid md:grid-cols-2 gap-6'>
                     <div>
-                      <label
+                      <Label
                         htmlFor='phone'
                         className='block text-sm font-medium mb-2 text-gray-900 dark:text-white'>
                         Phone Number *
-                      </label>
+                      </Label>
                       <Input
                         id='phone'
                         {...register("phone")}
@@ -214,11 +215,11 @@ export default function Contact() {
                     </div>
 
                     <div>
-                      <label
+                      <Label
                         htmlFor='subject'
                         className='block text-sm font-medium mb-2 text-gray-900 dark:text-white'>
                         Subject *
-                      </label>
+                      </Label>
                       <Input
                         id='subject'
                         {...register("subject")}
@@ -238,11 +239,11 @@ export default function Contact() {
                   </div>
 
                   <div>
-                    <label
+                    <Label
                       htmlFor='message'
                       className='block text-sm font-medium mb-2 text-gray-900 dark:text-white'>
                       Message *
-                    </label>
+                    </Label>
                     <Textarea
                       id='message'
                       rows={6}

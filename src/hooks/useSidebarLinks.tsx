@@ -33,7 +33,7 @@ export const navLinkGroups = [
     links: [
       {
         title: "Manage All Parcels",
-        url: "/all-parcels",
+        url: "/manage-parcels",
         icon: Package,
         roles: [role.superAdmin, role.admin],
       },

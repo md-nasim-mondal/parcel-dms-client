@@ -1,281 +1,105 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { config } from "@/config";
-import { cn } from "@/lib/utils";
-import { useLoginMutation } from "@/redux/features/auth/auth.api";
-import { type FieldValues, type SubmitHandler, useForm } from "react-hook-form";
+import { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router";
+import { useForm, type SubmitHandler, type FieldValues } from "react-hook-form";
 import { toast } from "sonner";
 import { Eye, EyeOff, Mail, Lock, ArrowRight, Loader2 } from "lucide-react";
-import { useState } from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { useDispatch } from "react-redux";
-import { setUser } from "@/redux/features/auth/auth.slice";
 
-export function LoginForm({
-  className,
-  ...props
-}: React.HTMLAttributes<HTMLDivElement>) {
+import { useLoginMutation } from "@/redux/features/auth/auth.api";
+import { setUser } from "@/redux/features/auth/auth.slice";
+import { useDispatch } from "react-redux";
+import { config } from "@/config";
+
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { getRoleBasedPathPrefix } from "@/hooks/useSidebarLinks";
+
+export function LoginForm() {
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch();
-
-  const form = useForm({
-    defaultValues: {
-      email: "",
-      password: "",
-    },
-  });
-
   const [login, { isLoading }] = useLoginMutation();
   const [showPassword, setShowPassword] = useState(false);
 
-  const from = location.state?.from?.pathname || "/";
+  const from = location.state?.from?.pathname || null;
+
+  const form = useForm({
+    defaultValues: { email: "", password: "" },
+  });
 
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
     try {
-      const res = await login(data).unwrap();
-
-      console.log(res.data.user);
-
+      const res = await login(data as { email: string; password: string; }).unwrap();
       if (res.success) {
         toast.success("Logged in successfully!");
-
-        // Update Redux state with user info
-        if (res.data?.user) {
-          dispatch(setUser(res.data.user));
-        }
-
-        // Redirect to intended page or role-based dashboard
+        if (res.data?.user) dispatch(setUser(res.data.user));
         const userRole = res.data?.user?.role;
-        const redirectPath = from ||
-          (userRole === "sender"
-            ? "/sender/dashboard"
-            : userRole === "receiver"
-            ? "/receiver/dashboard"
-            : userRole === "admin"
-            ? "/admin/dashboard"
-            : "/");
-
+        const redirectPath = from || `${getRoleBasedPathPrefix(userRole)}/dashboard`;
         navigate(redirectPath, { replace: true });
       }
     } catch (err: any) {
-      console.error("Login error:", err);
-
-      // Improved error handling
-      if (err?.data?.message === "Password doesn't match") {
-        toast.error("Invalid email or password!");
-        form.setError("password", {
-          type: "manual",
-          message: "Invalid credentials",
-        });
-      } else if (err?.data?.message === "User is not verified") {
-        toast.error("Your account is not verified");
-        navigate("/verify", {
-          state: { email: data.email },
-          replace: true,
-        });
-      } else if (err?.data?.message) {
-        toast.error(err.data.message);
-      } else if (err?.status === "FETCH_ERROR") {
-        toast.error("Network error. Please check your connection.");
-      } else {
-        toast.error("Login failed. Please try again.");
-      }
+      toast.error(err?.data?.message || "Login failed. Please try again.");
     }
   };
 
   return (
-    <>
-      {/* Login Card */}
-      <Card className='border-0 shadow-lg bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm'>
-        <CardContent className='p-8'>
-          <div className={cn("flex flex-col gap-6", className)} {...props}>
-            {/* Header */}
-            <div className='text-center space-y-2'>
-              <h2 className='text-2xl font-bold text-gray-900 dark:text-white'>
-                Welcome Back
-              </h2>
-              <p className='text-gray-600 dark:text-gray-400'>
-                Sign in to your SwiftDrop account
-              </p>
-            </div>
-
-            <Form {...form}>
-              <form
-                onSubmit={form.handleSubmit(onSubmit)}
-                className='space-y-5'>
-                {/* Email Field */}
-                <FormField
-                  control={form.control}
-                  name='email'
-                  rules={{
-                    required: "Email is required",
-                    pattern: {
-                      value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                      message: "Invalid email address",
-                    },
-                  }}
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className='text-gray-700 dark:text-gray-300 font-medium'>
-                        Email Address
-                      </FormLabel>
-                      <FormControl>
-                        <div className='relative'>
-                          <Mail className='absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400' />
-                          <Input
-                            placeholder='john@example.com'
-                            {...field}
-                            className='pl-10 pr-4 py-3 border-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 transition-all duration-200'
-                            disabled={isLoading}
-                          />
-                        </div>
-                      </FormControl>
-                      <FormMessage className='text-red-500 text-sm' />
-                    </FormItem>
-                  )}
-                />
-
-                {/* Password Field */}
-                <FormField
-                  control={form.control}
-                  name='password'
-                  rules={{
-                    required: "Password is required",
-                    minLength: {
-                      value: 6,
-                      message: "Password must be at least 6 characters",
-                    },
-                  }}
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className='text-gray-700 dark:text-gray-300 font-medium'>
-                        Password
-                      </FormLabel>
-                      <FormControl>
-                        <div className='relative'>
-                          <Lock className='absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400' />
-                          <Input
-                            type={showPassword ? "text" : "password"}
-                            placeholder='Enter your password'
-                            {...field}
-                            className='pl-10 pr-12 py-3 border-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 transition-all duration-200'
-                            disabled={isLoading}
-                          />
-                          <button
-                            type='button'
-                            onClick={() => setShowPassword(!showPassword)}
-                            disabled={isLoading}
-                            className='absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors disabled:opacity-50'>
-                            {showPassword ? (
-                              <EyeOff className='w-4 h-4' />
-                            ) : (
-                              <Eye className='w-4 h-4' />
-                            )}
-                          </button>
-                        </div>
-                      </FormControl>
-                      <FormMessage className='text-red-500 text-sm' />
-                    </FormItem>
-                  )}
-                />
-
-                {/* Forgot Password Link */}
-                <div className='text-right'>
-                  <Link
-                    to='/forgot-password'
-                    className='text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 transition-colors font-medium'>
-                    Forgot your password?
-                  </Link>
-                </div>
-
-                {/* Login Button */}
-                <Button
-                  type='submit'
-                  className='w-full bg-blue-600 hover:bg-blue-700 text-white py-3 text-base font-medium transition-all duration-200 shadow-lg shadow-blue-600/25 hover:shadow-blue-600/40 disabled:opacity-50 disabled:cursor-not-allowed'
-                  disabled={isLoading}>
-                  {isLoading ? (
-                    <div className='flex items-center justify-center'>
-                      <Loader2 className='w-5 h-5 animate-spin mr-2' />
-                      Signing in...
+    <Card className="border-0 shadow-lg bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm">
+      <CardContent className="p-6">
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <FormField control={form.control} name="email" render={({ field }) => (
+              <FormItem>
+                <FormLabel>Email Address</FormLabel>
+                <FormControl>
+                   <div className="relative">
+                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                      <Input placeholder="john@example.com" {...field} className="pl-9" />
                     </div>
-                  ) : (
-                    <div className='flex items-center justify-center'>
-                      Sign In
-                      <ArrowRight className='w-4 h-4 ml-2' />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )} />
+
+            <FormField control={form.control} name="password" render={({ field }) => (
+                <FormItem>
+                  <div className="flex justify-between items-center">
+                    <FormLabel>Password</FormLabel>
+                    <Link to="/forgot-password" className="text-xs font-medium text-blue-600 dark:text-blue-400 hover:underline">
+                      Forgot Password?
+                    </Link>
+                  </div>
+                  <FormControl>
+                    <div className="relative">
+                       <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                       <Input type={showPassword ? "text" : "password"} placeholder="••••••••" {...field} className="pl-9 pr-10" />
+                       <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
+                         {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                       </button>
                     </div>
-                  )}
-                </Button>
-              </form>
-            </Form>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )} />
 
-            {/* Divider */}
-            <div className='relative'>
-              <div className='absolute inset-0 flex items-center'>
-                <div className='w-full border-t border-gray-300 dark:border-gray-600'></div>
-              </div>
-              <div className='relative flex justify-center text-sm'>
-                <span className='px-3 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 font-medium'>
-                  Or continue with
-                </span>
-              </div>
-            </div>
-
-            {/* Google Login */}
-            <Button
-              onClick={() =>
-                window.open(`${config.baseApiUrl}/auth/google`, "_self")
-              }
-              type='button'
-              variant='outline'
-              disabled={isLoading}
-              className='w-full cursor-pointer border-2 border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-all duration-200 py-3 font-medium disabled:opacity-50'>
-              <svg className='w-5 h-5 mr-3' viewBox='0 0 24 24'>
-                <path
-                  fill='currentColor'
-                  d='M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z'
-                />
-                <path
-                  fill='currentColor'
-                  d='M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z'
-                />
-                <path
-                  fill='currentColor'
-                  d='M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z'
-                />
-                <path
-                  fill='currentColor'
-                  d='M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z'
-                />
-              </svg>
-              Continue with Google
+            <Button type="submit" className="w-full !mt-6" disabled={isLoading}>
+              {isLoading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <ArrowRight className="w-4 h-4 mr-2" />}
+              {isLoading ? "Signing In..." : "Sign In"}
             </Button>
+          </form>
+        </Form>
 
-            {/* Registration Link */}
-            <div className='text-center text-sm pt-4 border-t border-gray-200 dark:border-gray-700'>
-              <p className='text-gray-600 dark:text-gray-400'>
-                Don&apos;t have an account?{" "}
-                <Link
-                  to='/register'
-                  replace
-                  className='text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-medium transition-colors hover:underline'>
-                  Create an account
-                </Link>
-              </p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-    </>
+        <div className="relative my-6">
+          <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-gray-300 dark:border-gray-600"></div></div>
+          <div className="relative flex justify-center text-xs uppercase"><span className="bg-white/80 dark:bg-gray-800/80 px-2 text-gray-500 dark:text-gray-400">Or continue with</span></div>
+        </div>
+
+        <Button variant="outline" className="w-full" disabled={isLoading} onClick={() => window.open(`${config.baseApiUrl}/auth/google`, "_self")}>
+            <svg className='w-4 h-4 mr-2' viewBox='0 0 24 24'><path fill='currentColor' d='M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z'/><path fill='currentColor' d='M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z'/><path fill='currentColor' d='M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z'/><path fill='currentColor' d='M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z'/></svg>
+            Continue with Google
+        </Button>
+      </CardContent>
+    </Card>
   );
 }

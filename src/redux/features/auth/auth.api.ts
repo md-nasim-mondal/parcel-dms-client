@@ -1,27 +1,27 @@
 import { baseApi } from "@/redux/baseApi";
-import type { IResponse, ISendOtp, IVerifyOtp } from "@/types";
+import type { IResponse } from "@/types";
+import type { IForgotPassword, ILoginResponse, IResetPassword, ISendOtp, IUser } from "@/types/auth.type";
 
 export const authApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    login: builder.mutation({
-      query: (userInfo) => ({
+    login: builder.mutation<
+      ILoginResponse,
+      { email: string; password: string }
+    >({
+      query: (credentials) => ({
         url: "/auth/login",
         method: "POST",
-        data: userInfo,
+        data: credentials,
       }),
     }),
-    logout: builder.mutation({
-      query: () => ({
-        url: "/auth/logout",
-        method: "POST",
-      }),
-      invalidatesTags: ["USER"],
-    }),
-    register: builder.mutation({
-      query: (userInfo) => ({
+    register: builder.mutation<
+      ILoginResponse,
+      { name: string; email: string; password: string; role: string }
+    >({
+      query: (userData) => ({
         url: "/auth/register",
         method: "POST",
-        data: userInfo,
+        data: userData,
       }),
     }),
     sendOtp: builder.mutation<IResponse<null>, ISendOtp>({
@@ -31,28 +31,53 @@ export const authApi = baseApi.injectEndpoints({
         data: userInfo,
       }),
     }),
-    verifyOtp: builder.mutation<IResponse<null>, IVerifyOtp>({
-      query: (userInfo) => ({
-        url: "/otp/verify",
-        method: "POST",
-        data: userInfo,
-      }),
-    }),
-    userInfo: builder.query({
+    verifyOtp: builder.mutation<ILoginResponse, { email: string; otp: string }>(
+      {
+        query: (data) => ({
+          url: "/auth/verify",
+          method: "POST",
+          data,
+        }),
+      }
+    ),
+    userInfo: builder.query<{ success: boolean; data: IUser }, void>({
       query: () => ({
         url: "/users/me",
         method: "GET",
       }),
       providesTags: ["USER"],
     }),
+    logout: builder.mutation<{ success: boolean; message: string }, void>({
+      query: () => ({
+        url: "/auth/logout",
+        method: "POST",
+      }),
+      invalidatesTags: ["USER"],
+    }),
+    forgotPassword: builder.mutation<IResponse<null>, IForgotPassword>({
+      query: (data) => ({
+        url: "/auth/forgot-password",
+        method: "POST",
+        data,
+      }),
+    }),
+    resetPassword: builder.mutation<IResponse<null>, IResetPassword>({
+      query: (data) => ({
+        url: "/auth/reset-password",
+        method: "POST",
+        data,
+      }),
+    }),
   }),
 });
 
 export const {
-  useRegisterMutation,
   useLoginMutation,
+  useRegisterMutation,
   useSendOtpMutation,
   useVerifyOtpMutation,
   useUserInfoQuery,
   useLogoutMutation,
+  useForgotPasswordMutation,
+  useResetPasswordMutation,
 } = authApi;

@@ -1,202 +1,191 @@
-// pages/dashboard/admin/AdminDashboard.tsx
-import { Button } from "@/components/ui/button";
+import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Package, Users, BarChart3, Settings, Eye, Edit } from "lucide-react";
-import { Link } from "react-router";
+import { useGetParcelStatsQuery, useGetUserStatsQuery } from "@/redux/features/stats/stats.api";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Users, Package, CircleDollarSign, BarChart2, UserCheck, UserX, LineChart, PieChart as PieIcon, Blocks
+} from "lucide-react";
+import {
+  ResponsiveContainer, PieChart, Pie, Cell, Tooltip, Legend, Bar, XAxis, YAxis, ComposedChart, Line,
+  BarChart
+} from "recharts";
+import { cn } from "@/lib/utils";
 
-export default function AdminDashboard() {
-  const systemStats = {
-    totalUsers: 156,
-    totalParcels: 342,
-    pendingParcels: 23,
-    deliveredToday: 45,
-  };
+// ========= TypeScript Interfaces for API Data =========
+interface ChartDataItem {
+  name: string;
+  count: number;
+}
 
-  const recentActivities = [
-    {
-      id: 1,
-      action: "Parcel Created",
-      user: "john@example.com",
-      time: "2 minutes ago",
-      details: "TRK123461",
-    },
-    {
-      id: 2,
-      action: "Delivery Confirmed",
-      user: "sarah@example.com",
-      time: "5 minutes ago",
-      details: "TRK123458",
-    },
-    {
-      id: 3,
-      action: "User Registered",
-      user: "newuser@example.com",
-      time: "10 minutes ago",
-      details: "Receiver",
-    },
+// ========= Reusable Components with Proper Types =========
+interface StatCardProps {
+  title: string;
+  value: string | number;
+  icon: React.ElementType;
+  details?: string;
+  className?: string;
+}
+
+const StatCard: React.FC<StatCardProps> = ({ title, value, icon: Icon, details, className }) => (
+  <Card className={cn("border-0 text-white", className)}>
+    <CardContent className="p-5">
+      <div className="flex items-center justify-between">
+        <p className="text-sm font-medium text-white/80">{title}</p>
+        <div className="p-2 bg-white/20 rounded-lg"><Icon className="w-5 h-5" /></div>
+      </div>
+      <p className="text-3xl font-bold mt-2">{value}</p>
+      {details && <p className="text-xs text-white/70 mt-1">{details}</p>}
+    </CardContent>
+  </Card>
+);
+
+const formatChartData = (data: { _id: string | null; count: number }[] | undefined): ChartDataItem[] => {
+    return data?.map(item => ({ name: (item._id || 'N/A').replace("_", " ").replace(/\b\w/g, c => c.toUpperCase()), count: item.count })) || [];
+};
+
+// ========= Main Statistics Page Component =========
+export default function StatisticsPage() {
+  // ✅ FIX: Removed incorrect generic types. RTK Query infers this automatically.
+  const { data: parcelStatsData, isLoading: isLoadingParcel } = useGetParcelStatsQuery(undefined);
+  const { data: userStatsData, isLoading: isLoadingUser } = useGetUserStatsQuery(undefined);
+  
+  const isLoading = isLoadingParcel || isLoadingUser;
+
+  // ✅ FIX: Access data directly from the response.
+  const userStats = userStatsData?.data;
+  const parcelStats = parcelStatsData?.data;
+
+  const parcelGrowthData = [
+    { name: 'Last 30d', newParcels: parcelStats?.parcelCreatedInLast30Days ?? 0 },
+    { name: 'Last 14d', newParcels: parcelStats?.parcelCreatedInLast14Days ?? 0 },
+    { name: 'Last 7d', newParcels: parcelStats?.parcelCreatedInLast7Days ?? 0 },
   ];
 
+  if (isLoading) {
+    // A more detailed skeleton for a better loading experience
+    return (
+      <div className="space-y-8">
+        <div className="space-y-2"><Skeleton className="h-8 w-1/3" /><Skeleton className="h-4 w-1/2" /></div>
+        <div><Skeleton className="h-4 w-1/4 mb-4" /><div className="grid grid-cols-2 md:grid-cols-4 gap-6">{[...Array(4)].map((_, i) => <Skeleton key={i} className="h-28" />)}</div></div>
+        <div><Skeleton className="h-4 w-1/4 mb-4" /><div className="grid grid-cols-2 md:grid-cols-4 gap-6">{[...Array(4)].map((_, i) => <Skeleton key={i} className="h-28" />)}</div></div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">{[...Array(4)].map((_, i) => <Skeleton key={i} className="h-80" />)}</div>
+      </div>
+    );
+  }
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Header */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-            Admin Dashboard
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-1">
-            Manage system operations and monitor activities
-          </p>
+      <div>
+        <h1 className="text-3xl font-bold text-slate-900 dark:text-white">Comprehensive Statistics</h1>
+        <p className="text-slate-600 dark:text-slate-400 mt-1">An in-depth look at all user and parcel metrics from the database.</p>
+      </div>
+
+      {/* User Statistics Cards */}
+      <div>
+        <h2 className="text-xl font-semibold mb-4 flex items-center"><Users className="w-5 h-5 mr-2 text-blue-500" /> User Statistics</h2>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+          <StatCard title="Total Users" value={userStats?.totalUsers ?? 0} icon={Users} details={`+${userStats?.newUsersInLast30Days ?? 0} in last 30 days`} className="bg-gradient-to-br from-blue-500 to-blue-700" />
+          <StatCard title="Active Users" value={userStats?.totalActiveUsers ?? 0} icon={UserCheck} details={`+${userStats?.newUsersInLast7Days ?? 0} new this week`} className="bg-gradient-to-br from-green-500 to-green-700" />
+          <StatCard title="Inactive Users" value={userStats?.totalInActiveUsers ?? 0} icon={UserX} className="bg-gradient-to-br from-amber-500 to-amber-600" />
+          <StatCard title="Blocked Users" value={userStats?.totalBlockedUsers ?? 0} icon={UserX} className="bg-gradient-to-br from-red-500 to-red-700" />
         </div>
       </div>
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card className="bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 border-0">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-300">
-                  Total Users
-                </p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">
-                  {systemStats.totalUsers}
-                </p>
-              </div>
-              <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center">
-                <Users className="w-6 h-6 text-blue-600 dark:text-blue-400" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-gradient-to-r from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 border-0">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-300">
-                  Total Parcels
-                </p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">
-                  {systemStats.totalParcels}
-                </p>
-              </div>
-              <div className="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center">
-                <Package className="w-6 h-6 text-green-600 dark:text-green-400" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-gradient-to-r from-yellow-50 to-yellow-100 dark:from-yellow-900/20 dark:to-yellow-800/20 border-0">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-300">
-                  Pending
-                </p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">
-                  {systemStats.pendingParcels}
-                </p>
-              </div>
-              <div className="w-12 h-12 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg flex items-center justify-center">
-                <BarChart3 className="w-6 h-6 text-yellow-600 dark:text-yellow-400" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-gradient-to-r from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20 border-0">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-300">
-                  Delivered Today
-                </p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">
-                  {systemStats.deliveredToday}
-                </p>
-              </div>
-              <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center">
-                <Settings className="w-6 h-6 text-purple-600 dark:text-purple-400" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+      {/* Parcel Statistics Cards */}
+      <div>
+        <h2 className="text-xl font-semibold mb-4 flex items-center"><Package className="w-5 h-5 mr-2 text-violet-500" /> Parcel Statistics</h2>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+          <StatCard title="Total Parcels" value={parcelStats?.totalParcel ?? 0} icon={Package} details={`+${parcelStats?.parcelCreatedInLast30Days ?? 0} in last 30 days`} className="bg-gradient-to-br from-violet-500 to-violet-700" />
+          <StatCard title="Avg. Fee" value={`৳${(parcelStats?.avgFeePerParcel?.[0]?.avgFee || 0).toFixed(2)}`} icon={CircleDollarSign} details="Per parcel" className="bg-gradient-to-br from-cyan-500 to-cyan-600" />
+          <StatCard title="Unique Senders" value={parcelStats?.totalParcelCreatedByUniqueSender ?? 0} icon={Users} className="bg-gradient-to-br from-sky-500 to-sky-700" />
+          <StatCard title="Unique Receivers" value={parcelStats?.totalParcelReceiverByUniqueReceiver ?? 0} icon={Users} className="bg-gradient-to-br from-teal-500 to-teal-700" />
+        </div>
       </div>
-
+      
+      {/* Charts Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Quick Actions */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Quick Actions</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 gap-4">
-              <Button asChild variant="outline" className="h-16 flex-col">
-                <Link to="/admin/parcels">
-                  <Package className="w-5 h-5 mb-1" />
-                  <span>Manage Parcels</span>
-                </Link>
-              </Button>
-              <Button asChild variant="outline" className="h-16 flex-col">
-                <Link to="/admin/users">
-                  <Users className="w-5 h-5 mb-1" />
-                  <span>Manage Users</span>
-                </Link>
-              </Button>
-              <Button asChild variant="outline" className="h-16 flex-col">
-                <Link to="/admin/analytics">
-                  <BarChart3 className="w-5 h-5 mb-1" />
-                  <span>Analytics</span>
-                </Link>
-              </Button>
-              <Button asChild variant="outline" className="h-16 flex-col">
-                <Link to="/admin/settings">
-                  <Settings className="w-5 h-5 mb-1" />
-                  <span>Settings</span>
-                </Link>
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+          <Card className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
+              <CardHeader><CardTitle className="flex items-center"><PieIcon className="w-5 h-5 mr-2" />User Role Distribution</CardTitle></CardHeader>
+              <CardContent>
+                  <ResponsiveContainer width="100%" height={300}>
+                      <PieChart>
+                          <Pie data={formatChartData(userStats?.usersByRole)} dataKey="count" nameKey="name" cx="50%" cy="50%" outerRadius={90} label>
+                              {formatChartData(userStats?.usersByRole).map((_, index) => (
+                                  <Cell key={`cell-${index}`} fill={["#3B82F6", "#10B981", "#F97316", "#8B5CF6"][index % 4]} />
+                              ))}
+                          </Pie>
+                          <Tooltip contentStyle={{ backgroundColor: '#1e293b', border: 'none', borderRadius: '0.5rem' }} itemStyle={{color: '#cbd5e1'}} />
+                          <Legend />
+                      </PieChart>
+                  </ResponsiveContainer>
+              </CardContent>
+          </Card>
 
-        {/* Recent Activities */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Recent Activities</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {recentActivities.map((activity) => (
-                <div
-                  key={activity.id}
-                  className="flex items-center justify-between p-3 border border-gray-200 dark:border-gray-700 rounded-lg"
-                >
-                  <div className="flex-1">
-                    <p className="font-medium text-gray-900 dark:text-white">
-                      {activity.action}
-                    </p>
-                    <p className="text-sm text-gray-600 dark:text-gray-300">
-                      {activity.user} • {activity.time}
-                    </p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
-                      {activity.details}
-                    </p>
-                  </div>
-                  <div className="flex space-x-2">
-                    <Button size="sm" variant="ghost">
-                      <Eye className="w-4 h-4" />
-                    </Button>
-                    <Button size="sm" variant="ghost">
-                      <Edit className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+          <Card className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
+              <CardHeader><CardTitle className="flex items-center"><BarChart2 className="w-5 h-5 mr-2" />Parcel Status</CardTitle></CardHeader>
+              <CardContent>
+                  <ResponsiveContainer width="100%" height={300}>
+                      <BarChart data={formatChartData(parcelStats?.totalParcelByStatus)} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
+                          <XAxis dataKey="name" stroke="#a1a1aa" fontSize={12} tickLine={false} axisLine={false} />
+                          <YAxis stroke="#a1a1aa" fontSize={12} tickLine={false} axisLine={false} />
+                          <Tooltip contentStyle={{ backgroundColor: '#1e293b', border: 'none', borderRadius: '0.5rem' }} cursor={{fill: 'rgba(100, 116, 139, 0.1)'}} />
+                          <Bar dataKey="count" fill="#8B5CF6" radius={[4, 4, 0, 0]} />
+                      </BarChart>
+                  </ResponsiveContainer>
+              </CardContent>
+          </Card>
+          
+          <Card className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
+              <CardHeader><CardTitle className="flex items-center"><LineChart className="w-5 h-5 mr-2" />New Parcels Trend</CardTitle></CardHeader>
+              <CardContent>
+                  <ResponsiveContainer width="100%" height={300}>
+                      <ComposedChart data={parcelGrowthData} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
+                          <XAxis dataKey="name" stroke="#a1a1aa" fontSize={12} />
+                          <YAxis stroke="#a1a1aa" fontSize={12} />
+                          <Tooltip contentStyle={{ backgroundColor: '#1e293b', border: 'none', borderRadius: '0.5rem' }} />
+                          <Legend />
+                          <Line type="monotone" dataKey="newParcels" name="New Parcels" stroke="#34D399" strokeWidth={2} />
+                      </ComposedChart>
+                  </ResponsiveContainer>
+              </CardContent>
+          </Card>
+
+          {/* ✅ New Tabbed Chart for Parcel Types and Shipping Methods */}
+          <Card className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
+            <CardHeader>
+              <CardTitle className="flex items-center"><Blocks className="w-5 h-5 mr-2" />Parcel Breakdown</CardTitle>
+            </CardHeader>
+            <CardContent>
+                <Tabs defaultValue="type">
+                    <TabsList className="grid w-full grid-cols-2">
+                        <TabsTrigger value="type">By Type</TabsTrigger>
+                        <TabsTrigger value="shipping">By Shipping Method</TabsTrigger>
+                    </TabsList>
+                    <TabsContent value="type">
+                        <ResponsiveContainer width="100%" height={250}>
+                            <BarChart data={formatChartData(parcelStats?.parcelPerType)} margin={{ top: 20, right: 20, left: -10, bottom: 5 }}>
+                                <XAxis dataKey="name" stroke="#a1a1aa" fontSize={12} tickLine={false} axisLine={false} />
+                                <YAxis stroke="#a1a1aa" fontSize={12} tickLine={false} axisLine={false} />
+                                <Tooltip contentStyle={{ backgroundColor: '#1e293b', border: 'none', borderRadius: '0.5rem' }} cursor={{fill: 'rgba(100, 116, 139, 0.1)'}} />
+                                <Bar dataKey="count" fill="#3B82F6" radius={[4, 4, 0, 0]} />
+                            </BarChart>
+                        </ResponsiveContainer>
+                    </TabsContent>
+                    <TabsContent value="shipping">
+                        <ResponsiveContainer width="100%" height={250}>
+                            <BarChart data={formatChartData(parcelStats?.parcelPerShippingType)} margin={{ top: 20, right: 20, left: -10, bottom: 5 }}>
+                                <XAxis dataKey="name" stroke="#a1a1aa" fontSize={12} tickLine={false} axisLine={false} />
+                                <YAxis stroke="#a1a1aa" fontSize={12} tickLine={false} axisLine={false} />
+                                <Tooltip contentStyle={{ backgroundColor: '#1e293b', border: 'none', borderRadius: '0.5rem' }} cursor={{fill: 'rgba(100, 116, 139, 0.1)'}} />
+                                <Bar dataKey="count" fill="#10B981" radius={[4, 4, 0, 0]} />
+                            </BarChart>
+                        </ResponsiveContainer>
+                    </TabsContent>
+                </Tabs>
+            </CardContent>
+          </Card>
       </div>
     </div>
   );

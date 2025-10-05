@@ -14,6 +14,15 @@ import SenderDashboard from "@/pages/sender/dashboard/SenderDashboard";
 import ReceiverDashboard from "@/pages/receiver/dashboard/ReceiverDashboard";
 import AdminDashboard from "@/pages/admin/dashboard/AdminDashboard";
 import Verify from "@/pages/public/authentication/Verify";
+import CreateParcel from "@/pages/sender/dashboard/CreateParcel";
+import MyParcels from "@/pages/sender/dashboard/MyParcels";
+import ReceiverParcels from "@/pages/receiver/dashboard/ReceiverParcels";
+import ManageUsers from "@/pages/admin/dashboard/ManageUsers";
+import ManageParcels from "@/pages/admin/dashboard/ManageParcels";
+import ForgotPassword from "@/pages/public/authentication/ForgotPassword";
+import ResetPassword from "@/pages/public/authentication/ResetPassword";
+import Profile from "@/pages/shared/Profile";
+import ParcelHistory from "@/pages/receiver/dashboard/ParcelHistory";
 
 export const router = createBrowserRouter([
   {
@@ -58,9 +67,19 @@ export const router = createBrowserRouter([
     path: "verify",
     errorElement: <ErrorBoundary />,
   },
+  {
+    Component: ForgotPassword,
+    path: "forgot-password",
+    errorElement: <ErrorBoundary />,
+  },
+  {
+    Component: ResetPassword,
+    path: "reset-password",
+    errorElement: <ErrorBoundary />,
+  },
   // ✅ Protected Dashboard Routes - Fixed structure
   {
-    path: "/sender",
+    path: "/sender/dashboard",
     element: (
       <ProtectedRoute children={<DashboardLayout />} requiredRole='sender' />
     ),
@@ -74,10 +93,22 @@ export const router = createBrowserRouter([
         path: "dashboard",
         Component: SenderDashboard,
       },
+      {
+        path: "profile",
+        Component: Profile,
+      },
+      {
+        path: "my-parcels",
+        Component: MyParcels,
+      },
+      {
+        path: "create-parcel",
+        Component: CreateParcel,
+      },
     ],
   },
   {
-    path: "/receiver",
+    path: "/receiver/dashboard",
     element: (
       <ProtectedRoute children={<DashboardLayout />} requiredRole='receiver' />
     ),
@@ -91,14 +122,26 @@ export const router = createBrowserRouter([
         path: "dashboard",
         Component: ReceiverDashboard,
       },
+      {
+        path: "profile",
+        Component: Profile,
+      },
+      {
+        path: "incoming-parcels",
+        Component: ReceiverParcels,
+      },
+      {
+        path: "delivery-history",
+        Component: ParcelHistory,
+      },
     ],
   },
   {
-    path: "/admin",
+    path: "/admin/dashboard",
     element: (
       <ProtectedRoute
         children={<DashboardLayout />}
-        requiredRole={["sender", "super_admin"]}
+        requiredRole={["admin", "super_admin"]}
       />
     ),
     errorElement: <ErrorBoundary />,
@@ -110,6 +153,18 @@ export const router = createBrowserRouter([
       {
         path: "dashboard",
         Component: AdminDashboard,
+      },
+      {
+        path: "profile",
+        Component: Profile,
+      },
+      {
+        path: "manage-users",
+        Component: ManageUsers,
+      },
+      {
+        path: "manage-parcels",
+        Component: ManageParcels,
       },
     ],
   },

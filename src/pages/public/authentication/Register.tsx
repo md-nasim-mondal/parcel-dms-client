@@ -4,45 +4,37 @@ import { Link } from "react-router";
 
 const Register = () => {
   return (
-    <div className='min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-gray-900 dark:via-blue-950 dark:to-indigo-900 flex items-center justify-center p-4'>
-      <div className='w-full max-w-md'> {/* ✅ Back to normal max-width */}
-        {/* Compact Logo Section */}
-        <div className='text-center mb-6'>
-          <div className='flex justify-center mb-3'>
-            <div className='relative'>
-              <div className='w-12 h-12 bg-white dark:bg-gray-800 rounded-xl flex items-center justify-center shadow-md'>
-                <Package className='w-6 h-6 text-blue-600 dark:text-blue-400' />
+    <div className="min-h-screen w-full bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-gray-900 dark:via-blue-950 dark:to-indigo-900 flex flex-col items-center justify-center p-4">
+      <div className="w-full max-w-md">
+        {/* Logo Section */}
+        <div className="text-center mb-6">
+          <div className="flex justify-center mb-3">
+            <div className="relative">
+              <div className="w-16 h-16 bg-white dark:bg-gray-800 rounded-2xl flex items-center justify-center shadow-lg">
+                <Package className="w-8 h-8 text-blue-600 dark:text-blue-400" />
               </div>
-              <div className='absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center border-2 border-white dark:border-gray-900'>
-                <Truck className='w-3 h-3 text-white' />
+              <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-green-500 rounded-full flex items-center justify-center border-4 border-white dark:border-gray-900">
+                <Truck className="w-4 h-4 text-white" />
               </div>
             </div>
           </div>
-          <h1 className='text-xl font-bold text-gray-900 dark:text-white mb-1'>
-            Join SwiftDrop
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">
+            Create Your SwiftDrop Account
           </h1>
-          <p className='text-gray-600 dark:text-gray-300 text-sm'>
-            Create your account in seconds
+          <p className="text-gray-600 dark:text-gray-300 text-sm">
+            Join us and experience seamless delivery.
           </p>
         </div>
 
-        {/* Register Form */}
+        {/* Register Form Component */}
         <RegisterForm />
 
-        {/* Compact Footer Note */}
-        <div className='text-center mt-4'>
-          <p className='text-xs text-gray-500 dark:text-gray-400'>
-            By creating an account, you agree to our{" "}
-            <Link
-              to='/terms'
-              className='hover:text-gray-700 dark:hover:text-gray-300 transition-colors hover:underline'>
-              Terms
-            </Link>{" "}
-            and{" "}
-            <Link
-              to='/privacy'
-              className='hover:text-gray-700 dark:hover:text-gray-300 transition-colors hover:underline'>
-              Privacy
+        {/* Footer Text */}
+        <div className="text-center mt-6 text-sm">
+          <p className="text-gray-600 dark:text-gray-400">
+            Already have an account?{" "}
+            <Link to="/login" className="font-medium text-blue-600 dark:text-blue-400 hover:underline">
+              Sign In
             </Link>
           </p>
         </div>
