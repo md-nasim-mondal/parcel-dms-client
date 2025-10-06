@@ -131,7 +131,7 @@ export const parcelApi = baseApi.injectEndpoints({
     }),
     getParcelById: builder.query<IResponse<IParcel>, string | undefined>({
       query: (id) => ({
-        url: `/parcels/${id}/details`,
+        url: `/parcels/details/${id}`,
         method: "GET",
       }),
       providesTags: ["PARCELS"],
@@ -141,7 +141,7 @@ export const parcelApi = baseApi.injectEndpoints({
       { id: string; data: Partial<IParcel> }
     >({
       query: ({ id, data }) => ({
-        url: `/parcels/${id}/delivery-status`,
+        url: `/parcels/delivery-status/${id}`,
         method: "PATCH",
         data,
       }),
@@ -152,7 +152,7 @@ export const parcelApi = baseApi.injectEndpoints({
       { id: string; data: Partial<IParcel> }
     >({
       query: ({ id, data }) => ({
-        url: `/parcels/${id}/block-status`,
+        url: `/parcels/block-status/${id}`,
         method: "PATCH",
         data,
       }),

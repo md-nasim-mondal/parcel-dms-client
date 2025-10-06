@@ -1,15 +1,15 @@
 export const ParcelStatus = {
-  REQUESTED: "Requested",
-  APPROVED: "Approved",
-  PICKED: "Picked",
-  DISPATCHED: "Dispatched",
-  IN_TRANSIT: "In-Transit",
-  RESCHEDULED: "Rescheduled",
-  DELIVERED: "Delivered",
-  RETURNED: "Returned",
-  CANCELLED: "Cancelled",
-  BLOCKED: "Blocked",
-  FLAGGED: "Flagged",
+  REQUESTED: "requested",
+  APPROVED: "approved",
+  PICKED: "picked",
+  DISPATCHED: "dispatched",
+  IN_TRANSIT: "in-transit",
+  RESCHEDULED: "rescheduled",
+  DELIVERED: "delivered",
+  RETURNED: "returned",
+  CANCELLED: "cancelled",
+  BLOCKED: "blocked",
+  FLAGGED: "flagged",
 } as const;
 
 export type ParcelStatus = (typeof ParcelStatus)[keyof typeof ParcelStatus];

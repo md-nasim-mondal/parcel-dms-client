@@ -78,8 +78,14 @@ export const getStatusHexColor = (status: string): string => {
 
 // Get status color classes for badges and UI components
 export const getStatusColor = (status: string): string => {
-  const normalizedStatus = status as StatusType;
-  return lightColors[normalizedStatus] || lightColors.default;
+  if (!status) return lightColors.default;
+  // Normalize first letter uppercase, rest lowercase (to match your keys)
+  const normalized =
+    status.charAt(0).toUpperCase() + status.slice(1).toLowerCase();
+
+  return (
+    lightColors[normalized as keyof typeof lightColors] || lightColors.default
+  );
 };
 
 // Get user status color classes

@@ -362,7 +362,7 @@ const columns: ColumnDef<IParcel>[] = [
         <>
           {personnelArray.length > 0
             ? personnelArray.map((personnel: any) => (
-                <div key={personnel.id}>{personnel.name}</div>
+                <div key={personnel._id}>{personnel.name}</div>
               ))
             : "-"}
         </>
