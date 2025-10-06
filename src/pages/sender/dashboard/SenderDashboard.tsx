@@ -3,7 +3,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useGetSenderStatsQuery } from "@/redux/features/stats/stats.api";
 import { Link } from "react-router";
 import { Skeleton } from "@/components/ui/skeleton";
-import { BarChart, PieChart } from "@/components/charts";
 import {
   Package,
   Truck,
@@ -11,6 +10,7 @@ import {
   Clock,
   Plus,
 } from "lucide-react";
+import { BarChart, PieChart } from "recharts";
 
 const SenderDashboard = () => {
   const { data: stats, isLoading } = useGetSenderStatsQuery();
