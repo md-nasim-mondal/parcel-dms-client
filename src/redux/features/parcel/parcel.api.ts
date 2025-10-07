@@ -1,23 +1,10 @@
 import { baseApi } from "@/redux/baseApi";
+import type { IAnalyticsData, IResponse } from "@/types";
+import type { IParcelTrackData } from "@/types/parcel.type";
+import type { IParcel, IParcelParams } from "@/types/sender.parcel.type";
 
 export const parcelApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    createParcel: builder.mutation({
-      query: (parcelData) => ({
-        url: "/parcels",
-        method: "POST",
-        data: parcelData,
-      }),
-      invalidatesTags: ["PARCELS"],
-    }),
-    getSenderParcels: builder.query({
-      query: (params) => ({
-        url: "/parcels/my-parcels",
-        method: "GET",
-        params,
-      }),
-      providesTags: ["PARCELS"],
-    }),
     getReceiverParcels: builder.query({
       query: (params) => ({
         url: "/parcels/incoming",
@@ -26,34 +13,13 @@ export const parcelApi = baseApi.injectEndpoints({
       }),
       providesTags: ["PARCELS"],
     }),
-    getAllParcels: builder.query({
-      query: (params) => ({
-        url: "/parcels",
-        method: "GET",
-        params,
-      }),
-      providesTags: ["PARCELS"],
-    }),
-    getParcelById: builder.query({
-      query: (id) => ({
-        url: `/parcels/${id}`,
-        method: "GET",
-      }),
-      providesTags: ["PARCELS"],
-    }),
-     getDeliveryHistory: builder.query({
+    getDeliveryHistory: builder.query({
       query: (params) => ({
         url: "/parcels/me/history",
         method: "GET",
         params,
       }),
       providesTags: ["PARCELS"],
-    }),
-    trackParcel: builder.query({
-      query: (trackingId) => ({
-        url: `/parcels/track/${trackingId}`,
-        method: "GET",
-      }),
     }),
     updateParcelStatus: builder.mutation({
       query: ({ id, status, note }) => ({
@@ -63,19 +29,157 @@ export const parcelApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["PARCELS"],
     }),
-    cancelParcel: builder.mutation({
-      query: (id) => ({
-        url: `/parcels/${id}/cancel`,
-        method: "PATCH",
-      }),
-      invalidatesTags: ["PARCELS"],
-    }),
     confirmDelivery: builder.mutation({
       query: (id) => ({
         url: `/parcels/${id}/confirm-delivery`,
         method: "PATCH",
       }),
       invalidatesTags: ["PARCELS"],
+    }),
+    // Sender
+    createParcel: builder.mutation<IResponse<IParcel>, Partial<IParcel>>({
+      query: (data) => ({
+        url: "/parcels",
+        method: "POST",
+        data,
+      }),
+      invalidatesTags: ["PARCELS"],
+    }),
+    cancelParcel: builder.mutation<unknown, { id: string; note: string }>({
+      query: ({ id, note }) => ({
+        url: `/parcels/cancel/${id}`,
+        method: "POST",
+        data: { note },
+      }),
+      invalidatesTags: ["PARCELS"],
+    }),
+    deleteParcel: builder.mutation<unknown, string>({
+      query: (id) => ({
+        url: `/parcels/delete/${id}`,
+        method: "POST",
+      }),
+      invalidatesTags: ["PARCELS"],
+    }),
+    getParcelStatusLog: builder.query<IResponse<IParcel>, string | undefined>({
+      query: (id) => ({
+        url: `/parcels/${id}/status-log`,
+        method: "GET",
+      }),
+      providesTags: ["PARCELS"],
+    }),
+    getSenderParcels: builder.query<IResponse<IParcel[]>, IParcelParams>({
+      query: ({ searchTerm, page, limit, sort, currentStatus }) => ({
+        url: "/parcels/me",
+        method: "GET",
+        params: {
+          searchTerm: searchTerm,
+          page: page,
+          limit: limit,
+          sort: sort,
+          currentStatus: currentStatus,
+        },
+      }),
+      providesTags: ["PARCELS"],
+    }),
+    // Receiver
+    getIncomingParcels: builder.query<IResponse<IParcel[]>, IParcelParams>({
+      query: ({ searchTerm, page, limit, sort, currentStatus }) => ({
+        url: "/parcels/me/incoming",
+        method: "GET",
+        params: {
+          searchTerm: searchTerm,
+          page: page,
+          limit: limit,
+          sort: sort,
+          currentStatus: currentStatus,
+        },
+      }),
+      providesTags: ["PARCELS"],
+    }),
+    getReceiverParcelHistory: builder.query<
+      IResponse<IParcel[]>,
+      IParcelParams
+    >({
+      query: ({ searchTerm, page, limit, sort, currentStatus }) => ({
+        url: "/parcels/me/history",
+        method: "GET",
+        params: {
+          searchTerm: searchTerm,
+          page: page,
+          limit: limit,
+          sort: sort,
+          currentStatus: currentStatus,
+        },
+      }),
+      providesTags: ["PARCELS"],
+    }),
+    confirmParcelDelivery: builder.mutation<unknown, string>({
+      query: (id) => ({
+        url: `/parcels/confirm/${id}`,
+        method: "PATCH",
+      }),
+      invalidatesTags: ["PARCELS"],
+    }),
+    // admin
+    getAllParcels: builder.query<IResponse<IParcel[]>, IParcelParams>({
+      query: (params) => ({
+        url: "/parcels",
+        method: "GET",
+        params,
+      }),
+      providesTags: ["PARCELS"],
+    }),
+    getParcelById: builder.query<IResponse<IParcel>, string | undefined>({
+      query: (id) => ({
+        url: `/parcels/details/${id}`,
+        method: "GET",
+      }),
+      providesTags: ["PARCELS"],
+    }),
+    updateStatusAndPersonnel: builder.mutation<
+      unknown,
+      { id: string; data: Partial<IParcel> }
+    >({
+      query: ({ id, data }) => ({
+        url: `/parcels/delivery-status/${id}`,
+        method: "PATCH",
+        data,
+      }),
+      invalidatesTags: ["PARCELS"],
+    }),
+    blockParcel: builder.mutation<
+      unknown,
+      { id: string; data: Partial<IParcel> }
+    >({
+      query: ({ id, data }) => ({
+        url: `/parcels/block-status/${id}`,
+        method: "PATCH",
+        data,
+      }),
+      invalidatesTags: ["PARCELS"],
+    }),
+    adminCreateParcel: builder.mutation<IResponse<IParcel>, Partial<IParcel>>({
+      query: (data) => ({
+        url: "/parcels/create-parcel",
+        method: "POST",
+        data,
+      }),
+      invalidatesTags: ["PARCELS"],
+    }),
+    getParcelAnalytics: builder.query<IResponse<IAnalyticsData>, void>({
+      query: () => ({
+        url: "/stats/parcels",
+        method: "GET",
+      }),
+      providesTags: ["PARCELS"],
+    }),
+    // public
+    trackParcel: builder.query<IResponse<IParcelTrackData>, string>({
+      query: (trackingId) => ({
+        url: `/parcels/tracking/${trackingId}`,
+        method: "GET",
+      }),
+      providesTags: ["PARCELS"],
     }),
   }),
 });
@@ -92,4 +196,13 @@ export const {
   useUpdateParcelStatusMutation,
   useCancelParcelMutation,
   useConfirmDeliveryMutation,
+  useDeleteParcelMutation,
+  useGetParcelStatusLogQuery,
+  useGetIncomingParcelsQuery,
+  useGetReceiverParcelHistoryQuery,
+  useAdminCreateParcelMutation,
+  useUpdateStatusAndPersonnelMutation,
+  useBlockParcelMutation,
+  useConfirmParcelDeliveryMutation,
+  useGetParcelAnalyticsQuery,
 } = parcelApi;

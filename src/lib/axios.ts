@@ -4,6 +4,29 @@ import axios, { type AxiosRequestConfig } from "axios";
 export const axiosInstance = axios.create({
   baseURL: config.baseApiUrl,
   withCredentials: true,
+    // ✅ এই অংশটি অ্যারে প্যারামিটার সঠিকভাবে ফরম্যাট করবে
+  paramsSerializer: (params) => {
+    if (!params) {
+      return "";
+    }
+    
+    const searchParams = new URLSearchParams();
+    for (const key of Object.keys(params)) {
+      const value = params[key];
+
+      if (Array.isArray(value)) {
+        // ?key=value1&key=value2 ফরম্যাট তৈরি করবে
+        value.forEach((item) => {
+          if (item !== null && item !== undefined) {
+            searchParams.append(key, item);
+          }
+        });
+      } else if (value !== null && value !== undefined) {
+        searchParams.append(key, value);
+      }
+    }
+    return searchParams.toString();
+  },
 });
 
 // Add a request interceptor

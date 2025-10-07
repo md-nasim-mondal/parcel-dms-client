@@ -1,4 +1,4 @@
-import { RegisterForm } from "@/components/authentication/RegisterForm";
+import { RegisterForm } from "@/components/modules/authentication/RegisterForm";
 import { Package, Truck } from "lucide-react";
 import { Link } from "react-router";
 

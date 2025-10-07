@@ -1,4 +1,4 @@
-import { LoginForm } from "@/components/authentication/LoginForm";
+import { LoginForm } from "@/components/modules/authentication/LoginForm";
 import { Package, Truck } from "lucide-react";
 import { Link } from "react-router";
 

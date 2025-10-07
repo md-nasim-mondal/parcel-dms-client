@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useMemo } from "react";
-import { role } from "@/constants/role";
 import { useAuth } from "@/hooks/useAuth";
 import {
   Package,
@@ -9,7 +8,9 @@ import {
   Users, // This import was missing
   History, // This import was missing
   LayoutGrid,
+  type LucideIcon,
 } from "lucide-react";
+import { Role } from "@/types/user.type";
 
 // This helper function is correct and needs no changes.
 export const getRoleBasedPathPrefix = (
@@ -17,17 +18,29 @@ export const getRoleBasedPathPrefix = (
 ): string => {
   if (!userRole) return "";
   switch (userRole) {
-    case role.superAdmin:
-      return "/admin";
-    case role.deliveryPersonnel:
+    case Role.SUPER_ADMIN:
+      return "/ADMIN";
+    case Role.DELIVERY_PERSONNEL:
       return "/delivery-personnel";
     default:
       return `/${userRole.toLowerCase()}`;
   }
 };
 
+interface NavLink {
+  title: string;
+  url: string;
+  icon: LucideIcon;
+  roles: Role[];
+}
+
+interface NavLinkGroup {
+  title: string;
+  links: NavLink[];
+}
+
 // This data structure is correct and needs no changes.
-export const navLinkGroups = [
+export const navLinkGroups: NavLinkGroup[] = [
   {
     title: "Parcels",
     links: [
@@ -35,37 +48,37 @@ export const navLinkGroups = [
         title: "Manage All Parcels",
         url: "/manage-parcels",
         icon: Package,
-        roles: [role.superAdmin, role.admin],
+        roles: [Role.SUPER_ADMIN, Role.ADMIN],
       },
       {
         title: "Create Parcel",
         url: "/create-parcel",
         icon: PackagePlus,
-        roles: [role.sender, role.admin, role.superAdmin],
+        roles: [Role.SENDER, Role.ADMIN, Role.SUPER_ADMIN],
       },
       {
         title: "My Parcels",
         url: "/my-parcels",
         icon: Package,
-        roles: [role.sender],
+        roles: [Role.SENDER],
       },
       {
         title: "Incoming Parcels",
         url: "/incoming-parcels",
         icon: Truck,
-        roles: [role.receiver],
+        roles: [Role.RECEIVER],
       },
       {
         title: "Delivery History",
         url: "/delivery-history",
         icon: History,
-        roles: [role.receiver, role.deliveryPersonnel],
+        roles: [Role.RECEIVER, Role.DELIVERY_PERSONNEL],
       },
       {
         title: "My Tasks",
         url: "/my-tasks",
         icon: Truck,
-        roles: [role.deliveryPersonnel],
+        roles: [Role.DELIVERY_PERSONNEL],
       },
     ],
   },
@@ -76,7 +89,7 @@ export const navLinkGroups = [
         title: "Manage Users",
         url: "/manage-users",
         icon: Users,
-        roles: [role.superAdmin, role.admin],
+        roles: [Role.SUPER_ADMIN, Role.ADMIN],
       },
     ],
   },
@@ -110,11 +123,10 @@ export function useSidebarLinks() {
       ]),
     };
 
-    const filteredGroups = navLinkGroups
-      .map((group) => ({
+    const filteredGroups = navLinkGroups.map((group) =>({
         ...group,
         links: group.links.filter((link) =>
-          link.roles.includes(userRole as string)
+          link.roles.includes(userRole)
         ),
       }))
       .filter((group) => group.links.length > 0)

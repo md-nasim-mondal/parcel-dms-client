@@ -5,6 +5,10 @@ export interface IResponse<T> {
   success: boolean;
   message: string;
   data: T;
+  meta?: {
+    totalPage?: number,
+    total?: number,
+  },
 }
 
 export type TRole = "super_admin" | "admin" | "sender" | "receiver";
@@ -31,4 +35,22 @@ export interface IErrorResponse {
     name: string;
   };
   stack?: string;
+}
+
+export interface IAnalyticsData {
+  totalParcel?: number;
+  totalParcelByStatus?: Array<{
+    _id: string;
+    count: number;
+  }>;
+  parcelCreatedInLast7Days?: number;
+  parcelCreatedInLast30Days?: number;
+  parcelPerType?: Array<{
+    _id: string;
+    count: number;
+  }>;
+  parcelPerShippingType?: Array<{
+    _id: string;
+    count: number;
+  }>;
 }
