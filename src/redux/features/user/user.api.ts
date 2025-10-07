@@ -1,12 +1,23 @@
 import { baseApi } from "@/redux/baseApi";
 import type { IResponse } from "@/types";
-import type { IUser } from "@/types/auth.type";
+import type { IUser } from "@/types/user.type";
 
 export const userApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getAllUsers: builder.query<
-      { success: boolean; data: IUser[]; meta: { page: number; limit: number; total: number } },
-      { page?: number; limit?: number; role?: string; status?: string; searchTerm?: string }
+      {
+        success: boolean;
+        data: IUser[];
+        meta: { page: number; limit: number; total: number };
+      },
+      {
+        page?: number;
+        limit?: number;
+        role?: string;
+        status?: string;
+        searchTerm?: string;
+        isActive?: string;
+      }
     >({
       query: (params) => ({
         url: "/users",

@@ -1,3 +1,6 @@
+// FILE: ParcelManagementTable.tsx
+
+// --- Import necessary dependencies from React, libraries, and local files. ---
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   Form,
@@ -105,12 +108,14 @@ import {
   useGetAllParcelsQuery,
   useUpdateStatusAndPersonnelMutation,
 } from "@/redux/features/parcel/parcel.api";
+import { useGetAllUsersQuery } from "@/redux/features/user/user.api";
 import {
   ParcelStatus,
   ParcelType,
   ShippingType,
   type IParcel,
 } from "@/types/sender.parcel.type";
+import { IsActive, Role, type IUser } from "@/types/user.type";
 import { getNameInitials } from "@/utils/getNameInitials";
 import { getStatusColor } from "@/utils/getStatusColor";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -121,6 +126,7 @@ import { toast } from "sonner";
 import z from "zod";
 import { AdminCreateParcelDialog } from "./AdminParcelModal";
 
+// --- Define Zod schemas for form validation. ---
 const updateStatusPersonnelSchema = z.object({
   currentStatus: z.enum(Object.values(ParcelStatus) as [string]).optional(),
   currentLocation: z.string().nullable().optional(),
@@ -134,7 +140,9 @@ const updateBlockedStatusSchema = z.object({
   reason: z.string().optional(),
 });
 
+// --- Define the columns for the Tanstack Table. Each object represents a column. ---
 const columns: ColumnDef<IParcel>[] = [
+  // --- Column for Sender's information ---
   {
     header: "Sender",
     accessorKey: "sender",
@@ -143,19 +151,19 @@ const columns: ColumnDef<IParcel>[] = [
       const initials = getNameInitials(name);
 
       return (
-        <div className='flex items-start gap-3'>
-          <Avatar className='h-8 w-8 rounded-lg grayscale'>
-            <AvatarFallback className='rounded-lg'>{initials}</AvatarFallback>
+        <div className="flex items-start gap-3">
+          <Avatar className="h-8 w-8 rounded-lg grayscale">
+            <AvatarFallback className="rounded-lg">{initials}</AvatarFallback>
           </Avatar>
-          <div className='space-y-1'>
-            <div className='font-medium'>{name}</div>
-            <div className='text-sm text-muted-foreground'>
+          <div className="space-y-1">
+            <div className="font-medium">{name}</div>
+            <div className="text-sm text-muted-foreground">
               {row.original?.pickupAddress}
             </div>
-            <div className='text-sm text-muted-foreground'>
+            <div className="text-sm text-muted-foreground">
               {row.original?.sender?.email}
             </div>
-            <div className='text-sm text-muted-foreground'>
+            <div className="text-sm text-muted-foreground">
               {row.original?.sender?.phone}
             </div>
           </div>
@@ -166,6 +174,7 @@ const columns: ColumnDef<IParcel>[] = [
     enableHiding: true,
     enableSorting: false,
   },
+  // --- Column for Receiver's information ---
   {
     header: "Receiver",
     accessorKey: "receiver",
@@ -173,19 +182,19 @@ const columns: ColumnDef<IParcel>[] = [
       const name = row.original?.receiver?.name;
       const initials = getNameInitials(name);
       return (
-        <div className='flex items-start gap-3'>
-          <Avatar className='h-8 w-8 rounded-lg grayscale'>
-            <AvatarFallback className='rounded-lg'>{initials}</AvatarFallback>
+        <div className="flex items-start gap-3">
+          <Avatar className="h-8 w-8 rounded-lg grayscale">
+            <AvatarFallback className="rounded-lg">{initials}</AvatarFallback>
           </Avatar>
-          <div className='space-y-1'>
-            <div className='font-medium'>{row.original?.receiver?.name}</div>
-            <div className='text-sm text-muted-foreground'>
+          <div className="space-y-1">
+            <div className="font-medium">{row.original?.receiver?.name}</div>
+            <div className="text-sm text-muted-foreground">
               {row.original?.deliveryAddress}
             </div>
-            <div className='text-sm text-muted-foreground'>
+            <div className="text-sm text-muted-foreground">
               {row.original?.receiver?.email}
             </div>
-            <div className='text-sm text-muted-foreground'>
+            <div className="text-sm text-muted-foreground">
               {row.original?.receiver?.phone}
             </div>
           </div>
@@ -196,43 +205,46 @@ const columns: ColumnDef<IParcel>[] = [
     enableHiding: true,
     enableSorting: false,
   },
+  // --- Column for Estimated Delivery Date ---
   {
     header: "Estimated Delivery",
     accessorKey: "estimatedDelivery",
     cell: ({ row }) => (
-      <div>{format(row.getValue("estimatedDelivery"), "PPP")}</div>
+      <div>{format(new Date(row.getValue("estimatedDelivery")), "PPP")}</div>
     ),
     size: 165,
     enableHiding: true,
     enableSorting: true,
   },
+  // --- Column for Actual Delivery Date ---
   {
     header: "Delivered At",
     accessorKey: "deliveredAt",
     cell: ({ row }) => {
       const deliveredAt = row.getValue("deliveredAt");
       return (
-        <div>{deliveredAt ? format(deliveredAt as Date, "PPP") : "-"}</div>
+        <div>{deliveredAt ? format(new Date(deliveredAt as string), "PPP") : "-"}</div>
       );
     },
     size: 165,
     enableHiding: true,
     enableSorting: true,
   },
+  // --- Column for Cancellation Date ---
   {
     header: "Cancelled At",
     accessorKey: "cancelledAt",
     cell: ({ row }) => {
       const cancelledAt = row.getValue("cancelledAt");
       return (
-        <div>{cancelledAt ? format(cancelledAt as Date, "PPP") : "-"}</div>
+        <div>{cancelledAt ? format(new Date(cancelledAt as string), "PPP") : "-"}</div>
       );
     },
     size: 165,
     enableHiding: true,
     enableSorting: true,
   },
-
+  // --- Column for Parcel Information (Weight, Type, Shipping) ---
   {
     header: "Parcel Info",
     accessorKey: "weight",
@@ -244,17 +256,17 @@ const columns: ColumnDef<IParcel>[] = [
         .charAt(0)
         .toUpperCase()}${row.original?.shippingType.slice(1)}`;
       return (
-        <div className='space-y-1'>
-          <div className='font-medium flex items-center gap-2'>
-            <Scale className='h-4 w-4' />
+        <div className="space-y-1">
+          <div className="font-medium flex items-center gap-2">
+            <Scale className="h-4 w-4" />
             {row.original?.weight} {row.original?.weightUnit}
           </div>
-          <div className='text-sm text-muted-foreground flex items-center gap-2'>
-            <Package className='h-4 w-4' />
+          <div className="text-sm text-muted-foreground flex items-center gap-2">
+            <Package className="h-4 w-4" />
             {packageType}
           </div>
-          <div className='text-sm text-muted-foreground flex items-center gap-2'>
-            <Truck className='h-4 w-4' />
+          <div className="text-sm text-muted-foreground flex items-center gap-2">
+            <Truck className="h-4 w-4" />
             {shippingType}
           </div>
         </div>
@@ -264,6 +276,7 @@ const columns: ColumnDef<IParcel>[] = [
     enableHiding: true,
     enableSorting: true,
   },
+  // --- Column for Delivery Cost ---
   {
     header: "Cost",
     accessorKey: "fee",
@@ -275,9 +288,9 @@ const columns: ColumnDef<IParcel>[] = [
         minimumFractionDigits: 0,
       }).format(amount);
       return (
-        <div className='space-y-1'>
+        <div className="space-y-1">
           <div>{formatted.slice(4)}</div>
-          <div className='text-sm text-muted-foreground'>BDT</div>
+          <div className="text-sm text-muted-foreground">BDT</div>
         </div>
       );
     },
@@ -285,6 +298,7 @@ const columns: ColumnDef<IParcel>[] = [
     enableHiding: true,
     enableSorting: true,
   },
+  // --- Column for Payment Status ---
   {
     header: "Paid",
     accessorKey: "isPaid",
@@ -295,6 +309,7 @@ const columns: ColumnDef<IParcel>[] = [
     enableHiding: true,
     enableSorting: true,
   },
+  // --- Column for Blocked Status ---
   {
     header: "Blocked",
     accessorKey: "isBlocked",
@@ -303,9 +318,12 @@ const columns: ColumnDef<IParcel>[] = [
       return (
         <Badge
           className={cn(
-            { "bg-green-100 text-green-800": !isBlocked },
-            { "bg-red-100 text-red-800": isBlocked }
-          )}>
+            "dark:text-white",
+            !isBlocked
+              ? "bg-green-100 text-green-800 dark:bg-green-800/40"
+              : "bg-red-100 text-red-800 dark:bg-red-800/40",
+          )}
+        >
           {isBlocked ? "Yes" : "No"}
         </Badge>
       );
@@ -314,6 +332,7 @@ const columns: ColumnDef<IParcel>[] = [
     enableHiding: true,
     enableSorting: true,
   },
+  // --- Column for Current Location ---
   {
     header: "Current Location",
     accessorKey: "currentLocation",
@@ -325,12 +344,13 @@ const columns: ColumnDef<IParcel>[] = [
     enableHiding: true,
     enableSorting: true,
   },
+  // --- Column for Applied Coupon ---
   {
     header: "Coupon",
     accessorKey: "coupon",
     cell: ({ row }) => {
       return (
-        <div className='text-left'>
+        <div className="text-left">
           {row.getValue("coupon") ? row.getValue("coupon") : "-"}
         </div>
       );
@@ -339,17 +359,18 @@ const columns: ColumnDef<IParcel>[] = [
     enableHiding: true,
     enableSorting: true,
   },
+  // --- Column for Tracking ID ---
   {
     header: "Tracking ID",
     accessorKey: "trackingId",
     cell: ({ row }) => (
-      <div className='text-left'>{row.getValue("trackingId")}</div>
+      <div className="text-left">{row.getValue("trackingId")}</div>
     ),
     size: 210,
     enableHiding: true,
     enableSorting: true,
   },
-
+  // --- Column for Assigned Delivery Personnel ---
   {
     header: "Delivery Personnel",
     accessorKey: "deliveryPersonnel",
@@ -372,17 +393,18 @@ const columns: ColumnDef<IParcel>[] = [
     enableHiding: true,
     enableSorting: true,
   },
+  // --- Column for Creation Date ---
   {
     header: "Created At",
     accessorKey: "createdAt",
     cell: ({ row }) => {
-      return <div>{format(row.getValue("createdAt") as Date, "PPP")}</div>;
+      return <div>{format(new Date(row.getValue("createdAt")), "PPP")}</div>;
     },
     size: 180,
     enableHiding: true,
     enableSorting: true,
   },
-
+  // --- Column for Current Parcel Status ---
   {
     header: "Status",
     accessorKey: "currentStatus",
@@ -395,23 +417,25 @@ const columns: ColumnDef<IParcel>[] = [
     enableHiding: true,
     enableSorting: true,
   },
-
+  // --- Column for Row Actions (Edit, Delete, etc.) ---
   {
     id: "actions",
-    header: () => <span className='sr-only'>Actions</span>,
+    header: () => <span className="sr-only">Actions</span>,
     cell: ({ row }) => <RowActions row={row} />,
     size: 60,
     enableHiding: false,
   },
 ];
 
+// --- This is the main table component. It manages state for filters, sorting, and pagination. ---
 export default function ParcelManagementTable() {
+  // --- State management for component functionalities like dialogs, filters, and table state. ---
   const id = useId();
   const [open, setOpen] = useState(false);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [typeFilter, setTypeFilter] = useState<ParcelType[]>([]);
   const [shippingTypeFilter, setShippingTypeFilter] = useState<ShippingType[]>(
-    []
+    [],
   );
   const [blockedParcelFilter, setBlockedParcelFilter] = useState<
     boolean | undefined
@@ -419,45 +443,40 @@ export default function ParcelManagementTable() {
   const [statusFilter, setStatusFilter] = useState<string[]>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({
     currentLocation: false,
-    trackingId: false,
     cancelledAt: false,
     coupon: false,
-    isPaid: false,
-    // deliveryPersonnel: false,
+    isPaid: false
   });
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: 10,
   });
-
-  // Add search states
   const [searchTerm, setSearchTerm] = useState("");
   const [appliedSearchTerm, setAppliedSearchTerm] = useState("");
-
   const [sorting, setSorting] = useState<SortingState>([]);
 
-  const currentQuery = {
+  // --- Construct the query object to fetch data based on the current state of filters, search, and pagination. ---
+  const currentQuery: any = {
     searchTerm: appliedSearchTerm || undefined,
     page: pagination.pageIndex + 1,
     limit: pagination.pageSize,
     sort: sorting.length > 0 ? sorting[0].id : "-createdAt",
-    currentStatus: statusFilter.length > 0 ? [...statusFilter] : undefined,
-    type: typeFilter.length > 0 ? [...typeFilter] : undefined,
+    currentStatus: statusFilter.length > 0 ? statusFilter : undefined,
+    type: typeFilter.length > 0 ? typeFilter : undefined,
     shippingType:
-      shippingTypeFilter.length > 0 ? [...shippingTypeFilter] : undefined,
+      shippingTypeFilter.length > 0 ? shippingTypeFilter : undefined,
     isBlocked:
       blockedParcelFilter !== undefined ? blockedParcelFilter : undefined,
   };
 
+  // --- Fetch parcel data using the RTK Query hook. This hook handles fetching, caching, and re-fetching. ---
   const {
     data: parcelsData,
     isLoading: isLoadingParcels,
     isError: isErrorParcels,
-  } = useGetAllParcelsQuery({
-    ...currentQuery,
-  });
+  } = useGetAllParcelsQuery(currentQuery);
 
-  // Search handlers
+  // --- Handler functions to update state for search and filters. ---
   const handleSearch = () => {
     setAppliedSearchTerm(searchTerm);
     setPagination((prev) => ({ ...prev, pageIndex: 0 }));
@@ -469,7 +488,6 @@ export default function ParcelManagementTable() {
     setPagination((prev) => ({ ...prev, pageIndex: 0 }));
   };
 
-  // handleStatusChange function
   const handleStatusChange = (checked: boolean, value: ParcelStatus) => {
     setStatusFilter((prev) => {
       if (checked) {
@@ -508,36 +526,23 @@ export default function ParcelManagementTable() {
     setPagination((prev) => ({ ...prev, pageIndex: 0 }));
   };
 
+  // --- Initialize the table instance using the useReactTable hook with server-side options for pagination, sorting, and filtering. ---
   const table = useReactTable({
     data: parcelsData?.data || [],
     columns,
-    // Server-side pagination configuration
     manualPagination: true,
     pageCount: parcelsData?.meta?.totalPage,
     rowCount: parcelsData?.meta?.total,
-
-    // Server-side sorting configuration
     manualSorting: true,
     enableSortingRemoval: true,
     enableMultiSort: false,
-
-    // manual filtering
     manualFiltering: true,
-
     getCoreRowModel: getCoreRowModel(),
-    // getSortedRowModel: getSortedRowModel(),
-
-    // onSortingChange: setSorting,
-    // getPaginationRowModel: getPaginationRowModel(),
-    // onPaginationChange: setPagination,
     onColumnFiltersChange: setColumnFilters,
     onColumnVisibilityChange: setColumnVisibility,
-    // getFilteredRowModel: getFilteredRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
-    // Event handlers
     onSortingChange: (updater) => {
-      setSorting(updater);
-      // Reset to first page when sorting changes
+      setSorting(updater as SortingState);
       setPagination((prev) => ({ ...prev, pageIndex: 0 }));
     },
     onPaginationChange: setPagination,
@@ -549,24 +554,24 @@ export default function ParcelManagementTable() {
     },
   });
 
+  // --- Display loading or error states before rendering the table. ---
   if (isLoadingParcels) {
-    return <Loading message='Loading parcels data...' />;
+    return <Loading message="Loading parcels data..." />;
   }
 
   if (!isLoadingParcels && isErrorParcels) {
     return <Error />;
   }
 
+  // --- JSX for the filter controls area (search, status filter, etc.). ---
   const content = (
-    <div className='flex flex-wrap items-center justify-between gap-3'>
-      <div className='flex items-center gap-3'>
-        {/* Filter by tracking id */}
-        <div className='relative'>
+    <div className="flex flex-wrap items-center justify-between gap-3">
+      <div className="flex items-center gap-3">
+        <div className="relative">
           <Input
-            // id={id}
-            className='peer ps-9 pe-9'
-            placeholder='Search...'
-            type='text'
+            className="peer ps-9 pe-9"
+            placeholder="Search By TrackingId..."
+            type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             onKeyDown={(e) => {
@@ -575,27 +580,27 @@ export default function ParcelManagementTable() {
               }
             }}
           />
-          <div className='text-muted-foreground/80 pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 peer-disabled:opacity-50'>
+          <div className="text-muted-foreground/80 pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 peer-disabled:opacity-50">
             <SearchIcon size={16} />
           </div>
           {searchTerm && (
             <button
-              className='text-muted-foreground/80 hover:text-foreground focus-visible:border-ring focus-visible:ring-ring/50 absolute inset-y-0 end-5 flex h-full w-9 items-center justify-center rounded-e-md transition-[color,box-shadow] outline-none focus:z-10 focus-visible:ring-[3px] disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50'
-              aria-label='Clear input'
-              onClick={handleClearSearch}>
-              <XIcon size={16} aria-hidden='true' />
+              className="text-muted-foreground/80 hover:text-foreground focus-visible:border-ring focus-visible:ring-ring/50 absolute inset-y-0 end-5 flex h-full w-9 items-center justify-center rounded-e-md transition-[color,box-shadow] outline-none focus:z-10 focus-visible:ring-[3px] disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50"
+              aria-label="Clear input"
+              onClick={handleClearSearch}
+            >
+              <XIcon size={16} aria-hidden="true" />
             </button>
           )}
-          {
-            <button
-              onClick={handleSearch}
-              className='text-muted-foreground/80 hover:text-foreground focus-visible:border-ring focus-visible:ring-ring/50 absolute inset-y-0 end-0 flex h-full w-9 items-center justify-center rounded-e-md transition-[color,box-shadow] outline-none focus:z-10 focus-visible:ring-[3px] disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50'
-              aria-label='Submit search'
-              type='submit'>
-              <ArrowRightIcon size={16} aria-hidden='true' />
-            </button>
-          }
-          <div className='absolute -inset-y-4 -start-2 text-muted-foreground/80'>
+          <button
+            onClick={handleSearch}
+            className="text-muted-foreground/80 hover:text-foreground focus-visible:border-ring focus-visible:ring-ring/50 absolute inset-y-0 end-0 flex h-full w-9 items-center justify-center rounded-e-md transition-[color,box-shadow] outline-none focus:z-10 focus-visible:ring-[3px] disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50"
+            aria-label="Submit search"
+            type="submit"
+          >
+            <ArrowRightIcon size={16} aria-hidden="true" />
+          </button>
+          <div className="absolute -inset-y-4 -start-2 text-muted-foreground/80">
             <Tooltip>
               <TooltipTrigger>
                 <InfoIcon size={14} />
@@ -607,31 +612,30 @@ export default function ParcelManagementTable() {
           </div>
         </div>
 
-        {/* Filter by status */}
         <Popover>
           <PopoverTrigger asChild>
-            <Button variant='outline'>
+            <Button variant="outline">
               <FilterIcon
-                className='-ms-1 opacity-60'
+                className="-ms-1 opacity-60"
                 size={16}
-                aria-hidden='true'
+                aria-hidden="true"
               />
               Status
               {statusFilter.length > 0 && (
-                <span className='bg-background text-muted-foreground/70 -me-1 inline-flex h-5 max-h-full items-center rounded border px-1 font-[inherit] text-[0.625rem] font-medium'>
+                <span className="bg-background text-muted-foreground/70 -me-1 inline-flex h-5 max-h-full items-center rounded border px-1 font-[inherit] text-[0.625rem] font-medium">
                   {statusFilter.length}
                 </span>
               )}
             </Button>
           </PopoverTrigger>
-          <PopoverContent className='w-auto min-w-36 p-3' align='start'>
-            <div className='space-y-3'>
-              <div className='text-muted-foreground text-xs font-medium'>
+          <PopoverContent className="w-auto min-w-36 p-3" align="start">
+            <div className="space-y-3">
+              <div className="text-muted-foreground text-xs font-medium">
                 Filters
               </div>
-              <div className='space-y-3'>
+              <div className="space-y-3">
                 {Object.values(ParcelStatus).map((value, i) => (
-                  <div key={value} className='flex items-center gap-2'>
+                  <div key={value} className="flex items-center gap-2">
                     <Checkbox
                       id={`status-${i}`}
                       checked={statusFilter.includes(value)}
@@ -641,7 +645,8 @@ export default function ParcelManagementTable() {
                     />
                     <Label
                       htmlFor={`status-${i}`}
-                      className='flex grow justify-between gap-2 font-normal'>
+                      className="flex grow justify-between gap-2 font-normal"
+                    >
                       {value}
                     </Label>
                   </div>
@@ -650,31 +655,31 @@ export default function ParcelManagementTable() {
             </div>
           </PopoverContent>
         </Popover>
-        {/* Filter by parcel type */}
+
         <Popover>
           <PopoverTrigger asChild>
-            <Button variant='outline'>
+            <Button variant="outline">
               <FilterIcon
-                className='-ms-1 opacity-60'
+                className="-ms-1 opacity-60"
                 size={16}
-                aria-hidden='true'
+                aria-hidden="true"
               />
               Parcel Type
               {typeFilter.length > 0 && (
-                <span className='bg-background text-muted-foreground/70 -me-1 inline-flex h-5 max-h-full items-center rounded border px-1 font-[inherit] text-[0.625rem] font-medium'>
+                <span className="bg-background text-muted-foreground/70 -me-1 inline-flex h-5 max-h-full items-center rounded border px-1 font-[inherit] text-[0.625rem] font-medium">
                   {typeFilter.length}
                 </span>
               )}
             </Button>
           </PopoverTrigger>
-          <PopoverContent className='w-auto min-w-36 p-3' align='start'>
-            <div className='space-y-3'>
-              <div className='text-muted-foreground text-xs font-medium'>
+          <PopoverContent className="w-auto min-w-36 p-3" align="start">
+            <div className="space-y-3">
+              <div className="text-muted-foreground text-xs font-medium">
                 Filters
               </div>
-              <div className='space-y-3'>
+              <div className="space-y-3">
                 {Object.values(ParcelType).map((value, i) => (
-                  <div key={value} className='flex items-center gap-2'>
+                  <div key={value} className="flex items-center gap-2">
                     <Checkbox
                       id={`type-${i}`}
                       checked={typeFilter.includes(value)}
@@ -684,7 +689,8 @@ export default function ParcelManagementTable() {
                     />
                     <Label
                       htmlFor={`type-${i}`}
-                      className='flex grow justify-between gap-2 font-normal'>
+                      className="flex grow justify-between gap-2 font-normal"
+                    >
                       {value.charAt(0).toUpperCase() + value.slice(1)}
                     </Label>
                   </div>
@@ -693,31 +699,31 @@ export default function ParcelManagementTable() {
             </div>
           </PopoverContent>
         </Popover>
-        {/* Filter by shipping type */}
+
         <Popover>
           <PopoverTrigger asChild>
-            <Button variant='outline'>
+            <Button variant="outline">
               <FilterIcon
-                className='-ms-1 opacity-60'
+                className="-ms-1 opacity-60"
                 size={16}
-                aria-hidden='true'
+                aria-hidden="true"
               />
               Shipping Type
               {shippingTypeFilter.length > 0 && (
-                <span className='bg-background text-muted-foreground/70 -me-1 inline-flex h-5 max-h-full items-center rounded border px-1 font-[inherit] text-[0.625rem] font-medium'>
+                <span className="bg-background text-muted-foreground/70 -me-1 inline-flex h-5 max-h-full items-center rounded border px-1 font-[inherit] text-[0.625rem] font-medium">
                   {shippingTypeFilter.length}
                 </span>
               )}
             </Button>
           </PopoverTrigger>
-          <PopoverContent className='w-auto min-w-36 p-3' align='start'>
-            <div className='space-y-3'>
-              <div className='text-muted-foreground text-xs font-medium'>
+          <PopoverContent className="w-auto min-w-36 p-3" align="start">
+            <div className="space-y-3">
+              <div className="text-muted-foreground text-xs font-medium">
                 Filters
               </div>
-              <div className='space-y-3'>
+              <div className="space-y-3">
                 {Object.values(ShippingType).map((value, i) => (
-                  <div key={value} className='flex items-center gap-2'>
+                  <div key={value} className="flex items-center gap-2">
                     <Checkbox
                       id={`shippingType-${i}`}
                       checked={shippingTypeFilter.includes(value)}
@@ -727,7 +733,8 @@ export default function ParcelManagementTable() {
                     />
                     <Label
                       htmlFor={`shippingType-${i}`}
-                      className='flex grow justify-between gap-2 font-normal'>
+                      className="flex grow justify-between gap-2 font-normal"
+                    >
                       {value.charAt(0).toUpperCase() + value.slice(1)}
                     </Label>
                   </div>
@@ -736,31 +743,31 @@ export default function ParcelManagementTable() {
             </div>
           </PopoverContent>
         </Popover>
-        {/* Filter by blocked parcels */}
+
         <Popover>
           <PopoverTrigger asChild>
-            <Button variant='outline'>
+            <Button variant="outline">
               <FilterIcon
-                className='-ms-1 opacity-60'
+                className="-ms-1 opacity-60"
                 size={16}
-                aria-hidden='true'
+                aria-hidden="true"
               />
               Blocked
               {blockedParcelFilter !== undefined && (
-                <span className='bg-background text-muted-foreground/70 -me-1 inline-flex h-5 max-h-full items-center rounded border px-1 font-[inherit] text-[0.625rem] font-medium'>
+                <span className="bg-background text-muted-foreground/70 -me-1 inline-flex h-5 max-h-full items-center rounded border px-1 font-[inherit] text-[0.625rem] font-medium">
                   {blockedParcelFilter ? "Yes" : "No"}
                 </span>
               )}
             </Button>
           </PopoverTrigger>
-          <PopoverContent className='w-auto min-w-36 p-3' align='start'>
-            <div className='space-y-3'>
-              <div className='text-muted-foreground text-xs font-medium'>
+          <PopoverContent className="w-auto min-w-36 p-3" align="start">
+            <div className="space-y-3">
+              <div className="text-muted-foreground text-xs font-medium">
                 Filters
               </div>
-              <div className='space-y-3'>
+              <div className="space-y-3">
                 {["Yes", "No"].map((value, i) => (
-                  <div key={value} className='flex items-center gap-2'>
+                  <div key={value} className="flex items-center gap-2">
                     <Checkbox
                       id={`blocking-${i}`}
                       checked={blockedParcelFilter === (value === "Yes")}
@@ -770,7 +777,8 @@ export default function ParcelManagementTable() {
                     />
                     <Label
                       htmlFor={`blocking-${i}`}
-                      className='flex grow justify-between gap-2 font-normal'>
+                      className="flex grow justify-between gap-2 font-normal"
+                    >
                       {value}
                     </Label>
                   </div>
@@ -779,19 +787,19 @@ export default function ParcelManagementTable() {
             </div>
           </PopoverContent>
         </Popover>
-        {/* Toggle columns visibility */}
+
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant='outline'>
+            <Button variant="outline">
               <Columns3Icon
-                className='-ms-1 opacity-60'
+                className="-ms-1 opacity-60"
                 size={16}
-                aria-hidden='true'
+                aria-hidden="true"
               />
               View
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align='end'>
+          <DropdownMenuContent align="end">
             <DropdownMenuLabel>Toggle columns</DropdownMenuLabel>
             {table
               .getAllColumns()
@@ -800,12 +808,13 @@ export default function ParcelManagementTable() {
                 return (
                   <DropdownMenuCheckboxItem
                     key={column.id}
-                    className='capitalize'
+                    className="capitalize"
                     checked={column.getIsVisible()}
                     onCheckedChange={(value) =>
                       column.toggleVisibility(!!value)
                     }
-                    onSelect={(event) => event.preventDefault()}>
+                    onSelect={(event) => event.preventDefault()}
+                  >
                     {column.id}
                   </DropdownMenuCheckboxItem>
                 );
@@ -813,13 +822,12 @@ export default function ParcelManagementTable() {
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-      <div className='flex items-center gap-3'>
-        {/* Send parcel button */}
+      <div className="flex items-center gap-3">
         <Button
           onClick={() => setOpen(true)}
-          className='ml-auto'
-          variant='outline'>
-          <PlusIcon className='-ms-1 opacity-60' size={16} aria-hidden='true' />
+          className="ml-auto text-white"
+        >
+          <PlusIcon className="-ms-1 opacity-60" size={16} aria-hidden="true" />
           Create Parcel
         </Button>
         <AdminCreateParcelDialog open={open} onOpenChange={setOpen} />
@@ -836,63 +844,54 @@ export default function ParcelManagementTable() {
     return (
       <>
         {content}
-        <Information message='No parcel data available' />
+        <Information message="No parcel data available" />
       </>
     );
   }
 
+  // --- Render the main layout, including filters, the table, and pagination. ---
   return (
-    <div className='space-y-4'>
-      {/* Filters */}
+    <div className="space-y-4">
       {content}
-
-      {/* Table */}
-      <div className='bg-background rounded-md border overflow-auto'>
-        <Table className='table-auto min-w-full'>
+      <div className="rounded-md border bg-background dark:bg-zinc-900/50 dark:border-zinc-700 overflow-auto">
+        <Table className="table-auto min-w-full">
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id} className='hover:bg-transparent'>
+              <TableRow
+                key={headerGroup.id}
+                className="border-b dark:border-zinc-700 hover:bg-zinc-100/50 dark:hover:bg-zinc-800/50"
+              >
                 {headerGroup.headers.map((header) => {
                   return (
                     <TableHead
                       key={header.id}
                       style={{ width: `${header.getSize()}px` }}
-                      className='h-11'>
+                      className="h-11"
+                    >
                       {header.isPlaceholder ? null : header.column.getCanSort() ? (
                         <div
                           className={cn(
-                            header.column.getCanSort() &&
-                              "flex h-full cursor-pointer items-center justify-between gap-2 select-none"
+                            "flex h-full cursor-pointer items-center justify-between gap-2 select-none",
                           )}
                           onClick={header.column.getToggleSortingHandler()}
-                          onKeyDown={(e) => {
-                            // Enhanced keyboard handling for sorting
-                            if (
-                              header.column.getCanSort() &&
-                              (e.key === "Enter" || e.key === " ")
-                            ) {
-                              e.preventDefault();
-                              header.column.getToggleSortingHandler()?.(e);
-                            }
-                          }}
-                          tabIndex={header.column.getCanSort() ? 0 : undefined}>
+                        >
                           {flexRender(
                             header.column.columnDef.header,
-                            header.getContext()
+                            header.getContext(),
                           )}
                           {{
                             asc: (
                               <ChevronUpIcon
-                                className='shrink-0 opacity-60'
+                                className="shrink-0 opacity-60"
                                 size={16}
-                                aria-hidden='true'
+                                aria-hidden="true"
                               />
                             ),
                             desc: (
                               <ChevronDownIcon
-                                className='shrink-0 opacity-60'
+                                className="shrink-0 opacity-60"
                                 size={16}
-                                aria-hidden='true'
+                                aria-hidden="true"
                               />
                             ),
                           }[header.column.getIsSorted() as string] ?? null}
@@ -900,7 +899,7 @@ export default function ParcelManagementTable() {
                       ) : (
                         flexRender(
                           header.column.columnDef.header,
-                          header.getContext()
+                          header.getContext(),
                         )
                       )}
                     </TableHead>
@@ -914,12 +913,14 @@ export default function ParcelManagementTable() {
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}
-                  data-state={row.getIsSelected() && "selected"}>
+                  data-state={row.getIsSelected() && "selected"}
+                  className="border-b dark:border-zinc-700 hover:bg-zinc-100/50 dark:hover:bg-zinc-800/50"
+                >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id} className='last:py-0'>
+                    <TableCell key={cell.id} className="last:py-0">
                       {flexRender(
                         cell.column.columnDef.cell,
-                        cell.getContext()
+                        cell.getContext(),
                       )}
                     </TableCell>
                   ))}
@@ -929,7 +930,8 @@ export default function ParcelManagementTable() {
               <TableRow>
                 <TableCell
                   colSpan={columns.length}
-                  className='h-24 text-center'>
+                  className="h-24 text-center"
+                >
                   No results.
                 </TableCell>
               </TableRow>
@@ -938,22 +940,22 @@ export default function ParcelManagementTable() {
         </Table>
       </div>
 
-      {/* Pagination */}
-      <div className='flex items-center justify-between gap-8'>
-        {/* Results per page */}
-        <div className='flex items-center gap-3'>
-          <Label htmlFor={id} className='max-sm:sr-only'>
+      {/* --- Pagination controls section. --- */}
+      <div className="flex items-center justify-between gap-8">
+        <div className="flex items-center gap-3">
+          <Label htmlFor={id} className="max-sm:sr-only">
             Rows per page
           </Label>
           <Select
             value={table.getState().pagination.pageSize.toString()}
             onValueChange={(value) => {
               table.setPageSize(Number(value));
-            }}>
-            <SelectTrigger id={id} className='w-fit whitespace-nowrap'>
-              <SelectValue placeholder='Select number of results' />
+            }}
+          >
+            <SelectTrigger id={id} className="w-fit whitespace-nowrap">
+              <SelectValue placeholder="Select number of results" />
             </SelectTrigger>
-            <SelectContent className='[&_*[role=option]]:ps-2 [&_*[role=option]]:pe-8 [&_*[role=option]>span]:start-auto [&_*[role=option]>span]:end-2'>
+            <SelectContent className="[&_*[role=option]]:ps-2 [&_*[role=option]]:pe-8 [&_*[role=option]>span]:start-auto [&_*[role=option]>span]:end-2">
               {[5, 10, 25, 50].map((pageSize) => (
                 <SelectItem key={pageSize} value={pageSize.toString()}>
                   {pageSize}
@@ -962,83 +964,77 @@ export default function ParcelManagementTable() {
             </SelectContent>
           </Select>
         </div>
-        {/* Page number information */}
-        <div className='text-muted-foreground flex grow justify-end text-sm whitespace-nowrap'>
+        <div className="text-muted-foreground flex grow justify-end text-sm whitespace-nowrap">
           <p
-            className='text-muted-foreground text-sm whitespace-nowrap'
-            aria-live='polite'>
-            <span className='text-foreground'>
+            className="text-muted-foreground text-sm whitespace-nowrap"
+            aria-live="polite"
+          >
+            <span className="text-foreground">
               {table.getState().pagination.pageIndex *
                 table.getState().pagination.pageSize +
                 1}
               -
               {Math.min(
-                Math.max(
-                  table.getState().pagination.pageIndex *
-                    table.getState().pagination.pageSize +
-                    table.getState().pagination.pageSize,
-                  0
-                ),
-                table.getRowCount()
+                (table.getState().pagination.pageIndex + 1) *
+                  table.getState().pagination.pageSize,
+                table.getRowCount(),
               )}
             </span>{" "}
             of{" "}
-            <span className='text-foreground'>
+            <span className="text-foreground">
               {table.getRowCount().toString()}
             </span>
           </p>
         </div>
-
-        {/* Pagination buttons */}
         <div>
           <Pagination>
             <PaginationContent>
-              {/* First page button */}
               <PaginationItem>
                 <Button
-                  size='icon'
-                  variant='outline'
-                  className='disabled:pointer-events-none disabled:opacity-50'
+                  size="icon"
+                  variant="outline"
+                  className="disabled:pointer-events-none disabled:opacity-50"
                   onClick={() => table.firstPage()}
                   disabled={!table.getCanPreviousPage()}
-                  aria-label='Go to first page'>
-                  <ChevronFirstIcon size={16} aria-hidden='true' />
+                  aria-label="Go to first page"
+                >
+                  <ChevronFirstIcon size={16} aria-hidden="true" />
                 </Button>
               </PaginationItem>
-              {/* Previous page button */}
               <PaginationItem>
                 <Button
-                  size='icon'
-                  variant='outline'
-                  className='disabled:pointer-events-none disabled:opacity-50'
+                  size="icon"
+                  variant="outline"
+                  className="disabled:pointer-events-none disabled:opacity-50"
                   onClick={() => table.previousPage()}
                   disabled={!table.getCanPreviousPage()}
-                  aria-label='Go to previous page'>
-                  <ChevronLeftIcon size={16} aria-hidden='true' />
+                  aria-label="Go to previous page"
+                >
+                  <ChevronLeftIcon size={16} aria-hidden="true" />
                 </Button>
               </PaginationItem>
-              {/* Next page button */}
               <PaginationItem>
                 <Button
-                  size='icon'
-                  variant='outline'
-                  className='disabled:pointer-events-none disabled:opacity-50'
+                  size="icon"
+                  variant="outline"
+                  className="disabled:pointer-events-none disabled:opacity-50"
                   onClick={() => table.nextPage()}
                   disabled={!table.getCanNextPage()}
-                  aria-label='Go to next page'>
-                  <ChevronRightIcon size={16} aria-hidden='true' />
+                  aria-label="Go to next page"
+                >
+                  <ChevronRightIcon size={16} aria-hidden="true" />
                 </Button>
               </PaginationItem>
-              {/* Last page button */}
               <PaginationItem>
                 <Button
-                  size='icon'
-                  variant='outline'
-                  className='disabled:pointer-events-none disabled:opacity-50'
+                  size="icon"
+                  variant="outline"
+                  className="disabled:pointer-events-none disabled:opacity-50"
                   onClick={() => table.lastPage()}
                   disabled={!table.getCanNextPage()}
-                  aria-label='Go to last page'>
-                  <ChevronLastIcon size={16} aria-hidden='true' />
+                  aria-label="Go to last page"
+                >
+                  <ChevronLastIcon size={16} aria-hidden="true" />
                 </Button>
               </PaginationItem>
             </PaginationContent>
@@ -1049,47 +1045,73 @@ export default function ParcelManagementTable() {
   );
 }
 
+// --- This component renders the actions for each table row (e.g., Change Status, Block). ---
 function RowActions({ row }: { row: Row<IParcel> }) {
+  // --- State for controlling the open/close state of the dialogs. ---
   const [open, setOpen] = useState(false);
   const [openBlock, setOpenBlock] = useState(false);
-  const form = useForm<z.infer<typeof updateStatusPersonnelSchema>>({
-    resolver: zodResolver(updateStatusPersonnelSchema),
-    defaultValues: {
-      currentStatus: undefined,
-      currentLocation: undefined,
-      deliveryPersonnelId: undefined,
-    },
-  });
+
+  // --- RTK Query mutations for updating parcel status and blocking a parcel. ---
   const [updateStatusAndPersonnel, { isLoading, isError, error }] =
     useUpdateStatusAndPersonnelMutation();
+  const [
+    blockParcel,
+    { isLoading: isBlocking, isError: isBlockingError, error: blockingError },
+  ] = useBlockParcelMutation();
 
-  // Cancel Parcel
+  // --- Fetch a list of all active delivery personnel to populate the dropdown. ---
+  const { data: deliveryPersonnelData } = useGetAllUsersQuery({
+    limit: 1000,
+    role: Role.DELIVERY_PERSONNEL,
+    isActive: IsActive.ACTIVE,
+  });
+
+  const deliveryPersonnelList = (deliveryPersonnelData?.data as IUser[]) || [];
+
+  // --- Initialize react-hook-form instances for the two forms. ---
+  const form = useForm<z.infer<typeof updateStatusPersonnelSchema>>({
+    resolver: zodResolver(updateStatusPersonnelSchema),
+  });
+
+  const formBlock = useForm<z.infer<typeof updateBlockedStatusSchema>>({
+    resolver: zodResolver(updateBlockedStatusSchema),
+  });
+
+  // --- useEffect to populate the 'Change Status' form with current row data when the dialog is opened. ---
+  useEffect(() => {
+    if (open) {
+      form.reset({
+        currentStatus: row.original.currentStatus,
+        currentLocation: row.original.currentLocation ?? "",
+        deliveryPersonnelId:
+          (row.original.deliveryPersonnel?.[0] as unknown as IUser)?._id ??
+          undefined,
+      });
+    }
+  }, [open, row.original, form]);
+
+  // --- Handler for submitting the 'Change Status' form. ---
   const handleChangeStatus = async (
-    data: z.infer<typeof updateStatusPersonnelSchema>
+    data: z.infer<typeof updateStatusPersonnelSchema>,
   ) => {
     try {
-      console.log("Updating parcel status", data);
       await updateStatusAndPersonnel({
         id: row.original?._id,
         data: {
-          ...data,
           currentStatus: data.currentStatus as ParcelStatus | undefined,
-          currentLocation: data.currentLocation
-            ? data.currentLocation
-            : undefined,
-          deliveryPersonnelId: data.deliveryPersonnelId
-            ? data.deliveryPersonnelId
-            : undefined,
+          currentLocation: data.currentLocation || undefined,
+          deliveryPersonnelId: data.deliveryPersonnelId || undefined,
         },
       }).unwrap();
 
       setOpen(false);
       toast.success("Parcel status updated successfully");
-    } catch (error) {
-      console.error("Failed to update parcel status", error);
+    } catch (err) {
+      console.error("Failed to update parcel status", err);
     }
   };
 
+  // --- useEffect to show a toast notification if the status update fails. ---
   useEffect(() => {
     if (isError) {
       toast.error("Failed to update parcel status", {
@@ -1098,21 +1120,9 @@ function RowActions({ row }: { row: Row<IParcel> }) {
     }
   }, [isError, error]);
 
-  // Block/Unblock Parcel
-  const formBlock = useForm<z.infer<typeof updateBlockedStatusSchema>>({
-    resolver: zodResolver(updateBlockedStatusSchema),
-    defaultValues: {
-      isBlocked: undefined,
-      reason: undefined,
-    },
-  });
-
-  const [
-    blockParcel,
-    { isLoading: isBlocking, isError: isBlockingError, error: blockingError },
-  ] = useBlockParcelMutation();
+  // --- Handler for submitting the 'Block/Unblock' form. ---
   const handleBlockUnblock = async (
-    data: z.infer<typeof updateBlockedStatusSchema>
+    data: z.infer<typeof updateBlockedStatusSchema>,
   ) => {
     const { isBlocked, reason } = data;
     try {
@@ -1125,13 +1135,14 @@ function RowActions({ row }: { row: Row<IParcel> }) {
       toast.success(
         `Parcel ${
           isBlocked === "blocked" ? "blocked" : "unblocked"
-        } successfully`
+        } successfully`,
       );
-    } catch (error) {
-      console.error("Failed to update parcel status", error);
+    } catch (err) {
+      console.error("Failed to update parcel status", err);
     }
   };
 
+  // --- useEffect to show a toast notification if the block/unblock action fails. ---
   useEffect(() => {
     if (isBlockingError) {
       toast.error("Failed to update parcel status", {
@@ -1143,19 +1154,20 @@ function RowActions({ row }: { row: Row<IParcel> }) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <div className='flex justify-end'>
+        <div className="flex justify-end">
           <Button
-            size='icon'
-            variant='ghost'
-            className='shadow-none'
-            aria-label='Edit item'>
-            <EllipsisIcon size={16} aria-hidden='true' />
+            size="icon"
+            variant="ghost"
+            className="shadow-none"
+            aria-label="Edit item"
+          >
+            <EllipsisIcon size={16} aria-hidden="true" />
           </Button>
         </div>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align='end'>
+      <DropdownMenuContent align="end">
         <DropdownMenuGroup>
-          <DropdownMenuItem>
+          <DropdownMenuItem asChild>
             <Link to={`/admin/${row.original?._id}/details`}>
               <span>View Details</span>
             </Link>
@@ -1169,30 +1181,31 @@ function RowActions({ row }: { row: Row<IParcel> }) {
                 <span>Change Status</span>
               </DropdownMenuItem>
             </DialogTrigger>
-            <DialogContent className='sm:max-w-[425px]'>
+            <DialogContent className="sm:max-w-[425px]">
               <DialogHeader>
                 <DialogTitle>Change Status</DialogTitle>
                 <DialogDescription>
-                  Are you sure you want to change the status of parcel{" "}
-                  {row.original?.trackingId}?
+                  Update status for parcel: {row.original?.trackingId}
                 </DialogDescription>
               </DialogHeader>
               <Form {...form}>
                 <form
                   onSubmit={form.handleSubmit(handleChangeStatus)}
-                  className='space-y-4'>
+                  className="space-y-4"
+                >
                   <FormField
                     control={form.control}
-                    name='currentStatus'
+                    name="currentStatus"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Select a status</FormLabel>
                         <Select
                           onValueChange={field.onChange}
-                          defaultValue={field.value}>
-                          <FormControl className='w-full'>
+                          defaultValue={field.value}
+                        >
+                          <FormControl className="w-full">
                             <SelectTrigger>
-                              <SelectValue placeholder='Select a status' />
+                              <SelectValue placeholder="Select a status" />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
@@ -1209,13 +1222,13 @@ function RowActions({ row }: { row: Row<IParcel> }) {
                   />
                   <FormField
                     control={form.control}
-                    name='currentLocation'
+                    name="currentLocation"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Current Location</FormLabel>
                         <FormControl>
                           <Input
-                            placeholder='Enter current location'
+                            placeholder="Enter current location"
                             {...field}
                             value={field.value ?? ""}
                           />
@@ -1224,30 +1237,43 @@ function RowActions({ row }: { row: Row<IParcel> }) {
                       </FormItem>
                     )}
                   />
-
                   <FormField
                     control={form.control}
-                    name='deliveryPersonnelId'
+                    name="deliveryPersonnelId"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Assign Delivery Personnel</FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder='Enter delivery personnel ID'
-                            {...field}
-                          />
-                        </FormControl>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select a personnel" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {deliveryPersonnelList.map((person) => (
+                              <SelectItem
+                                key={person._id}
+                                value={person._id as string}
+                              >
+                                {person.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
                   <DialogFooter>
                     <DialogClose asChild>
-                      <Button variant='outline' type='button'>
+                      <Button variant="outline" type="button">
                         Cancel
                       </Button>
                     </DialogClose>
-                    <Button type='submit' disabled={isLoading}>
+                    <Button type="submit" disabled={isLoading}>
                       {isLoading ? "Updating..." : "Update Status"}
                     </Button>
                   </DialogFooter>
@@ -1264,34 +1290,36 @@ function RowActions({ row }: { row: Row<IParcel> }) {
                 <span>Block / Unblock</span>
               </DropdownMenuItem>
             </DialogTrigger>
-            <DialogContent className='sm:max-w-[425px]'>
+            <DialogContent className="sm:max-w-[425px]">
               <DialogHeader>
                 <DialogTitle>Change Block Status</DialogTitle>
                 <DialogDescription>
-                  Are you sure you want to block/unblock parcel?
+                  Are you sure you want to block/unblock this parcel?
                 </DialogDescription>
               </DialogHeader>
               <Form {...formBlock}>
                 <form
                   onSubmit={formBlock.handleSubmit(handleBlockUnblock)}
-                  className='space-y-4'>
+                  className="space-y-4"
+                >
                   <FormField
                     control={formBlock.control}
-                    name='isBlocked'
+                    name="isBlocked"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Select a status</FormLabel>
                         <Select
                           onValueChange={field.onChange}
-                          defaultValue={field.value}>
-                          <FormControl className='w-full'>
+                          defaultValue={field.value}
+                        >
+                          <FormControl className="w-full">
                             <SelectTrigger>
-                              <SelectValue placeholder='Select a status' />
+                              <SelectValue placeholder="Select a status" />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value='unblock'>Unblock</SelectItem>
-                            <SelectItem value='blocked'>Blocked</SelectItem>
+                            <SelectItem value="unblock">Unblock</SelectItem>
+                            <SelectItem value="blocked">Blocked</SelectItem>
                           </SelectContent>
                         </Select>
                         <FormMessage />
@@ -1300,13 +1328,13 @@ function RowActions({ row }: { row: Row<IParcel> }) {
                   />
                   <FormField
                     control={formBlock.control}
-                    name='reason'
+                    name="reason"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Reason (if blocking)</FormLabel>
                         <FormControl>
                           <Input
-                            placeholder='Enter reason'
+                            placeholder="Enter reason"
                             {...field}
                             value={field.value ?? ""}
                           />
@@ -1317,11 +1345,11 @@ function RowActions({ row }: { row: Row<IParcel> }) {
                   />
                   <DialogFooter>
                     <DialogClose asChild>
-                      <Button variant='outline' type='button'>
+                      <Button variant="outline" type="button">
                         Cancel
                       </Button>
                     </DialogClose>
-                    <Button type='submit' disabled={isLoading}>
+                    <Button type="submit" disabled={isBlocking}>
                       {isBlocking ? "Updating..." : "Update"}
                     </Button>
                   </DialogFooter>
