@@ -721,7 +721,7 @@ export default function UsersTable() {
         {/* Results per page */}
         <div className='flex items-center gap-3'>
           <Label htmlFor={id} className='max-sm:sr-only'>
-            Rows per page
+            Rows Per Page
           </Label>
           <Select
             value={table.getState().pagination.pageSize.toString()}
