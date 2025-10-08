@@ -623,12 +623,12 @@ export default function UsersTable() {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 overflow-x-hidden bg-background dark:bg-gray-800 p-4 md:p-8 rounded-2xl">
       {/* Filters */}
       {content}
 
       {/* Table */}
-      <div className="bg-background rounded-md border overflow-auto">
+      <div className="bg-background rounded-md border overflow-auto dark:bg-gray-800/50 dark:border-zinc-700">
         <Table className="table-auto min-w-full">
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
