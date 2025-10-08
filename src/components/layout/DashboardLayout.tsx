@@ -16,7 +16,6 @@ import { Outlet, useLocation } from "react-router";
 import { ModeToggle } from "./ModeToggler";
 import React from "react";
 
-// Helper function to generate breadcrumbs from the pathname
 const generateBreadcrumbs = (pathname: string) => {
   const pathParts = pathname.split("/").filter((part) => part);
   const dashboardIndex = pathParts.indexOf("dashboard");
@@ -41,7 +40,7 @@ const generateBreadcrumbs = (pathname: string) => {
             <BreadcrumbPage>{text}</BreadcrumbPage>
           ) : (
             <BreadcrumbLink asChild>
-              <span className='text-muted-foreground'>{text}</span>
+              <span className="text-muted-foreground">{text}</span>
             </BreadcrumbLink>
           )}
         </BreadcrumbItem>
@@ -56,33 +55,47 @@ export default function DashboardLayout() {
 
   return (
     <SidebarProvider>
-      <AppSidebar />
-      {/* Change: Updated background colors for a better theme */}
-      <SidebarInset className='bg-slate-100 dark:bg-slate-900'>
-        {/* Change: Updated header background and border */}
-        <header className='flex h-16 shrink-0 items-center gap-4 px-4 md:px-6 sticky top-0 bg-white/80 dark:bg-slate-950/60 backdrop-blur-sm border-b border-slate-200 dark:border-slate-800 z-10'>
-          <div className='flex items-center gap-2'>
-            <SidebarTrigger className='-ml-1' />
-            <Breadcrumb>
-              <BreadcrumbList>
-                <BreadcrumbItem>
-                  <BreadcrumbLink asChild>
-                    <span className='text-muted-foreground'>Dashboard</span>
-                  </BreadcrumbLink>
-                </BreadcrumbItem>
-                {breadcrumbItems}
-              </BreadcrumbList>
-            </Breadcrumb>
-          </div>
-          <div className='ml-auto'>
-            <ModeToggle />
-          </div>
-        </header>
+      <div className="flex min-h-screen w-full overflow-hidden bg-slate-100 dark:bg-slate-900">
+        {/* Sidebar */}
+        <AppSidebar />
 
-        <main className='flex flex-1 flex-col gap-6 p-4 md:p-6'>
-          <Outlet />
-        </main>
-      </SidebarInset>
+        {/* Main content */}
+        <SidebarInset className="flex flex-col flex-1 min-w-0 bg-slate-100 dark:bg-slate-900">
+          {/* Header */}
+          <header className="flex flex-wrap items-center justify-between gap-2 h-16 px-3 sm:px-4 md:px-6 sticky top-0 bg-white/80 dark:bg-slate-950/60 backdrop-blur-sm border-b border-slate-200 dark:border-slate-800 z-10">
+            <div className="flex items-center gap-2 flex-wrap">
+              <SidebarTrigger className="-ml-1" />
+              <Breadcrumb>
+                <BreadcrumbList className="flex flex-wrap text-sm sm:text-base">
+                  <BreadcrumbItem>
+                    <BreadcrumbLink asChild>
+                      <span className="text-muted-foreground">Dashboard</span>
+                    </BreadcrumbLink>
+                  </BreadcrumbItem>
+                  {breadcrumbItems}
+                </BreadcrumbList>
+              </Breadcrumb>
+            </div>
+            <ModeToggle />
+          </header>
+
+          {/* Main Body */}
+          <main
+            className="
+              flex-1
+              w-full
+              overflow-x-auto
+              overflow-y-auto
+              p-2 sm:p-4 md:p-6
+              min-w-0
+            "
+          >
+            <div className="w-full min-w-[600px] sm:min-w-full">
+              <Outlet />
+            </div>
+          </main>
+        </SidebarInset>
+      </div>
     </SidebarProvider>
   );
 }

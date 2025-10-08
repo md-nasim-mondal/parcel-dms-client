@@ -142,6 +142,17 @@ const updateBlockedStatusSchema = z.object({
 
 // --- Define the columns for the Tanstack Table. Each object represents a column. ---
 const columns: ColumnDef<IParcel>[] = [
+  // --- Column for Tracking ID ---
+  {
+    header: "Tracking ID",
+    accessorKey: "trackingId",
+    cell: ({ row }) => (
+      <div className='text-left'>{row.getValue("trackingId")}</div>
+    ),
+    size: 210,
+    enableHiding: true,
+    enableSorting: true,
+  },
   // --- Column for Sender's information ---
   {
     header: "Sender",
@@ -362,17 +373,6 @@ const columns: ColumnDef<IParcel>[] = [
     enableHiding: true,
     enableSorting: true,
   },
-  // --- Column for Tracking ID ---
-  {
-    header: "Tracking ID",
-    accessorKey: "trackingId",
-    cell: ({ row }) => (
-      <div className='text-left'>{row.getValue("trackingId")}</div>
-    ),
-    size: 210,
-    enableHiding: true,
-    enableSorting: true,
-  },
   // --- Column for Assigned Delivery Personnel ---
   {
     header: "Delivery Personnel",
@@ -423,7 +423,7 @@ const columns: ColumnDef<IParcel>[] = [
   // --- Column for Row Actions (Edit, Delete, etc.) ---
   {
     id: "actions",
-    header: () => <span className='sr-only'>Actions</span>,
+    header: () => <span>Actions</span>,
     cell: ({ row }) => <RowActions row={row} />,
     size: 60,
     enableHiding: false,
@@ -448,7 +448,7 @@ export default function ParcelManagementTable() {
     currentLocation: false,
     cancelledAt: false,
     coupon: false,
-    isPaid: false,
+    isPaid: false
   });
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
@@ -844,11 +844,11 @@ export default function ParcelManagementTable() {
 
   // --- Render the main layout, including filters, the table, and pagination. ---
   return (
-    <div className='space-y-4'>
+    <div className='space-y-4 overflow-x-hidden bg-background dark:bg-gray-800 p-4 md:p-8 rounded-2xl'>
       {content}
-      <div className='rounded-md border bg-background dark:bg-zinc-900/50 dark:border-zinc-700 overflow-auto'>
+      <div className='rounded-md border bg-background dark:bg-gray-800/50 dark:border-zinc-700 overflow-auto'>
         <Table className='table-auto min-w-full'>
-          <TableHeader>
+          <TableHeader className="px-8">
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow
                 key={headerGroup.id}
@@ -1044,8 +1044,8 @@ function RowActions({ row }: { row: Row<IParcel> }) {
   // --- Fetch a list of all active delivery personnel to populate the dropdown. ---
   const { data: deliveryPersonnelData } = useGetAllUsersQuery({
     limit: 1000,
-    role: Role.DELIVERY_PERSONNEL,
-    isActive: IsActive.ACTIVE,
+    role: [Role.DELIVERY_PERSONNEL],
+    isActive: [IsActive.ACTIVE],
   });
 
   const deliveryPersonnelList = (deliveryPersonnelData?.data as IUser[]) || [];

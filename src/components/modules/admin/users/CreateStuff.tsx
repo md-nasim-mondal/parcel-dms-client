@@ -22,7 +22,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import Password from "@/components/ui/password";
 import {
   Select,
   SelectContent,
@@ -37,6 +36,7 @@ import {
 import { toast } from "sonner";
 import { registerSchema } from "../../authentication/RegisterForm";
 import { Role } from "@/types/user.type";
+import Password from "@/components/ui/password";
 
 const createStuffZodSchema = registerSchema.omit({ role: true }).safeExtend({
   role: z.literal([Role.ADMIN, Role.DELIVERY_PERSONNEL]),
