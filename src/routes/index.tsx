@@ -14,7 +14,6 @@ import SenderDashboard from "@/pages/sender/dashboard/SenderDashboard";
 import ReceiverDashboard from "@/pages/receiver/dashboard/ReceiverDashboard";
 import AdminDashboard from "@/pages/admin/dashboard/AdminDashboard";
 import Verify from "@/pages/public/authentication/Verify";
-import CreateParcel from "@/pages/sender/dashboard/CreateParcel";
 import MyParcels from "@/pages/sender/dashboard/MyParcels";
 import ReceiverParcels from "@/pages/receiver/dashboard/ReceiverParcels";
 import ManageUsers from "@/pages/admin/dashboard/ManageUsers";
@@ -100,11 +99,7 @@ export const router = createBrowserRouter([
       {
         path: "my-parcels",
         Component: MyParcels,
-      },
-      {
-        path: "create-parcel",
-        Component: CreateParcel,
-      },
+      }
     ],
   },
   {

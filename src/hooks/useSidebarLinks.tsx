@@ -3,10 +3,9 @@ import { useMemo } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import {
   Package,
-  PackagePlus,
   Truck,
-  Users, // This import was missing
-  History, // This import was missing
+  Users,
+  History,
   LayoutGrid,
   type LucideIcon,
 } from "lucide-react";
@@ -49,12 +48,6 @@ export const navLinkGroups: NavLinkGroup[] = [
         url: "/manage-parcels",
         icon: Package,
         roles: [Role.SUPER_ADMIN, Role.ADMIN],
-      },
-      {
-        title: "Create Parcel",
-        url: "/create-parcel",
-        icon: PackagePlus,
-        roles: [Role.SENDER],
       },
       {
         title: "My Parcels",

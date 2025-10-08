@@ -448,7 +448,7 @@ export default function ParcelManagementTable() {
     currentLocation: false,
     cancelledAt: false,
     coupon: false,
-    isPaid: false
+    isPaid: false,
   });
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
@@ -844,11 +844,11 @@ export default function ParcelManagementTable() {
 
   // --- Render the main layout, including filters, the table, and pagination. ---
   return (
-    <div className='space-y-4 overflow-x-hidden bg-background dark:bg-gray-800 p-4 md:p-8 rounded-2xl'>
+    <div className='space-y-4 overflow-x-hidden bg-card p-4 md:p-8 rounded-2xl'>
       {content}
-      <div className='rounded-md border bg-background dark:bg-gray-800/50 dark:border-zinc-700 overflow-auto'>
+      <div className='rounded-md border bg-card/50 dark:border-zinc-700 overflow-auto'>
         <Table className='table-auto min-w-full'>
-          <TableHeader className="px-8">
+          <TableHeader className='px-8'>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow
                 key={headerGroup.id}

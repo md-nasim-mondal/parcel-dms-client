@@ -30,13 +30,17 @@ import {
   EllipsisIcon,
   FilterIcon,
   InfoIcon,
+  Package,
   PlusIcon,
+  Scale,
   SearchIcon,
+  Truck,
   XIcon,
 } from "lucide-react";
 import { useEffect, useId, useState } from "react";
 import { useForm } from "react-hook-form";
 
+import DeleteConfirmation from "@/components/DeleteConformation";
 import Error from "@/components/Error";
 import Information from "@/components/Information";
 import Loading from "@/components/Loading";
@@ -58,8 +62,10 @@ import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
@@ -96,34 +102,36 @@ import {
 } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import {
-  useBlockUserByIdMutation,
-  useGetAllUsersQuery,
-} from "@/redux/features/user/user.api";
+  useCancelParcelMutation,
+  useDeleteParcelMutation,
+  useGetSenderParcelsQuery,
+} from "@/redux/features/parcel/parcel.api";
+import type { IParcel } from "@/types/sender.parcel.type";
+import { ParcelStatus } from "@/types/sender.parcel.type";
 import { getNameInitials } from "@/utils/getNameInitials";
-import { getUserIsActiveStatusColor } from "@/utils/getStatusColor";
+import { getStatusColor } from "@/utils/getStatusColor";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
+import { Link } from "react-router";
 import { toast } from "sonner";
 import z from "zod";
-import { CreateStuffDialog } from "./CreateStuff";
-import {
-  IsActive,
-  type IUser,
-  type Role,
-  Role as UserRoles,
-} from "@/types/user.type";
+import { CreateParcelDialog } from "./SendParcelModal";
 
-// schema for isActive
-const isActiveSchema = z.object({
-  isActive: z.literal([IsActive.ACTIVE, IsActive.INACTIVE, IsActive.BLOCKED]),
+// schema for cancel note
+const cancelNoteSchema = z.object({
+  note: z
+    .string()
+    .min(5, { message: "Reason too short" })
+    .max(200, { message: "Reason too long" })
+    .trim(),
 });
 
-const columns: ColumnDef<IUser>[] = [
+const columns: ColumnDef<IParcel>[] = [
   {
-    header: "Name",
-    accessorKey: "name",
+    header: "Sender",
+    accessorKey: "sender",
     cell: ({ row }) => {
-      const name = row.original?.name;
+      const name = row.original?.sender?.name;
       const initials = getNameInitials(name);
 
       return (
@@ -133,49 +141,84 @@ const columns: ColumnDef<IUser>[] = [
           </Avatar>
           <div className='space-y-1'>
             <div className='font-medium'>{name}</div>
+            <div className='text-sm text-muted-foreground'>
+              {row.original?.pickupAddress}
+            </div>
+            <div className='text-sm text-muted-foreground'>
+              {row.original?.sender?.email}
+            </div>
+            <div className='text-sm text-muted-foreground'>
+              {row.original?.sender?.phone}
+            </div>
           </div>
         </div>
       );
     },
     size: 210,
     enableHiding: true,
-    enableSorting: true,
+    enableSorting: false,
   },
   {
-    header: "Email",
-    accessorKey: "email",
-    cell: ({ row }) => <div>{row.getValue("email")}</div>,
+    header: "Receiver",
+    accessorKey: "receiver",
+    cell: ({ row }) => {
+      const name = row.original?.receiver?.name;
+      const initials = getNameInitials(name);
+      return (
+        <div className='flex items-start gap-3'>
+          <Avatar className='h-8 w-8 rounded-lg grayscale'>
+            <AvatarFallback className='rounded-lg'>{initials}</AvatarFallback>
+          </Avatar>
+          <div className='space-y-1'>
+            <div className='font-medium'>{row.original?.receiver?.name}</div>
+            <div className='text-sm text-muted-foreground'>
+              {row.original?.deliveryAddress}
+            </div>
+            <div className='text-sm text-muted-foreground'>
+              {row.original?.receiver?.email}
+            </div>
+            <div className='text-sm text-muted-foreground'>
+              {row.original?.receiver?.phone}
+            </div>
+          </div>
+        </div>
+      );
+    },
+    size: 210,
+    enableHiding: true,
+    enableSorting: false,
+  },
+  {
+    header: "Estimated Delivery",
+    accessorKey: "estimatedDelivery",
+    cell: ({ row }) => (
+      <div>{format(row.getValue("estimatedDelivery"), "PPP")}</div>
+    ),
     size: 165,
     enableHiding: true,
     enableSorting: true,
   },
   {
-    header: "Address",
-    accessorKey: "defaultAddress",
+    header: "Delivered At",
+    accessorKey: "deliveredAt",
     cell: ({ row }) => {
-      const defaultAddress = row.getValue("defaultAddress");
-      return <div>{`${defaultAddress ? defaultAddress : "-"}`}</div>;
+      const deliveredAt = row.getValue("deliveredAt");
+      return (
+        <div>{deliveredAt ? format(deliveredAt as Date, "PPP") : "-"}</div>
+      );
     },
     size: 165,
     enableHiding: true,
     enableSorting: true,
   },
   {
-    header: "Phone",
-    accessorKey: "phone",
+    header: "Cancelled At",
+    accessorKey: "cancelledAt",
     cell: ({ row }) => {
-      const phone = row.getValue("phone");
-      return <div>{`${phone ? phone : "-"}`}</div>;
-    },
-    size: 165,
-    enableHiding: true,
-    enableSorting: true,
-  },
-  {
-    header: "Role",
-    accessorKey: "role",
-    cell: ({ row }) => {
-      return <div>{row.getValue("role")}</div>;
+      const cancelledAt = row.getValue("cancelledAt");
+      return (
+        <div>{cancelledAt ? format(cancelledAt as Date, "PPP") : "-"}</div>
+      );
     },
     size: 165,
     enableHiding: true,
@@ -183,43 +226,97 @@ const columns: ColumnDef<IUser>[] = [
   },
 
   {
-    header: "IsVerified",
-    accessorKey: "isVerified",
+    header: "Parcel Info",
+    accessorKey: "weight",
     cell: ({ row }) => {
-      return <div>{row.original?.isVerified ? "Yes" : "No"}</div>;
-    },
-    size: 100,
-    enableHiding: true,
-    enableSorting: true,
-  },
-  {
-    header: "IsActive",
-    accessorKey: "isActive",
-    cell: ({ row }) => (
-      <Badge className={getUserIsActiveStatusColor(row.getValue("isActive"))}>
-        {row.getValue("isActive")}
-      </Badge>
-    ),
-    size: 100,
-    enableHiding: true,
-    enableSorting: true,
-  },
-  {
-    header: "IsDeleted",
-    accessorKey: "isDeleted",
-    cell: ({ row }) => {
+      const packageType = `${row.original?.type
+        .charAt(0)
+        .toUpperCase()}${row.original?.type.slice(1)}`;
+      const shippingType = `${row.original?.shippingType
+        .charAt(0)
+        .toUpperCase()}${row.original?.shippingType.slice(1)}`;
       return (
-        <>
-          {row.getValue("isDeleted") ? (
-            <Badge className='bg-red-100 text-red-800'>
-              {row.getValue("isDeleted")}
-            </Badge>
-          ) : (
-            "-"
-          )}
-        </>
+        <div className='space-y-1'>
+          <div className='font-medium flex items-center gap-2'>
+            <Scale className='h-4 w-4' />
+            {row.original?.weight} {row.original?.weightUnit}
+          </div>
+          <div className='text-sm text-muted-foreground flex items-center gap-2'>
+            <Package className='h-4 w-4' />
+            {packageType}
+          </div>
+          <div className='text-sm text-muted-foreground flex items-center gap-2'>
+            <Truck className='h-4 w-4' />
+            {shippingType}
+          </div>
+        </div>
       );
     },
+    size: 130,
+    enableHiding: true,
+    enableSorting: true,
+  },
+  {
+    header: "Cost",
+    accessorKey: "fee",
+    cell: ({ row }) => {
+      const amount = parseFloat(row.getValue("fee"));
+      const formatted = new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: "BDT",
+        minimumFractionDigits: 0,
+      }).format(amount);
+      return (
+        <div className='space-y-1'>
+          <div>{formatted.slice(4)}</div>
+          <div className='text-sm text-muted-foreground'>BDT</div>
+        </div>
+      );
+    },
+    size: 130,
+    enableHiding: true,
+    enableSorting: true,
+  },
+  {
+    header: "Paid",
+    accessorKey: "isPaid",
+    cell: ({ row }) => {
+      return <div>{row.original?.isPaid ? "Yes" : "No"}</div>;
+    },
+    size: 100,
+    enableHiding: true,
+    enableSorting: true,
+  },
+  {
+    header: "Current Location",
+    accessorKey: "currentLocation",
+    cell: ({ row }) => {
+      const currentLocation = row.getValue("currentLocation");
+      return <div>{currentLocation ? (currentLocation as string) : "-"}</div>;
+    },
+    size: 160,
+    enableHiding: true,
+    enableSorting: true,
+  },
+  {
+    header: "Tracking ID",
+    accessorKey: "trackingId",
+    cell: ({ row }) => (
+      <div className='text-left'>{row.getValue("trackingId")}</div>
+    ),
+    size: 210,
+    enableHiding: true,
+    enableSorting: true,
+  },
+
+  {
+    header: "Status",
+    accessorKey: "currentStatus",
+    cell: ({ row }) => (
+      <Badge className={getStatusColor(row.getValue("currentStatus"))}>
+        {row.getValue("currentStatus")}
+      </Badge>
+    ),
     size: 100,
     enableHiding: true,
     enableSorting: true,
@@ -236,24 +333,23 @@ const columns: ColumnDef<IUser>[] = [
   },
   {
     id: "actions",
-    header: () => <span className='sr-only'>Actions</span>,
+    header: () => <span>Actions</span>,
     cell: ({ row }) => <RowActions row={row} />,
     size: 60,
     enableHiding: false,
   },
 ];
 
-export default function UsersTable() {
+export default function SenderParcelTable() {
   const id = useId();
   const [open, setOpen] = useState(false);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-  const [roleFilter, setRoleFilter] = useState<Role[]>([]);
-  const [verifiedFilter, setVerifiedFilter] = useState<boolean | undefined>(
-    undefined
-  );
-  const [statusFilter, setStatusFilter] = useState<IsActive[]>([]);
+  const [statusFilter, setStatusFilter] = useState<string[]>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({
+    sender: false,
+    currentLocation: false,
     createdAt: false,
+    cancelledAt: false,
   });
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
@@ -271,16 +367,16 @@ export default function UsersTable() {
     page: pagination.pageIndex + 1,
     limit: pagination.pageSize,
     sort: sorting.length > 0 ? sorting[0].id : "-createdAt",
-    role: roleFilter.length > 0 ? [...roleFilter] : undefined,
-    isActive: statusFilter.length > 0 ? [...statusFilter] : undefined,
-    isVerified: verifiedFilter !== undefined ? verifiedFilter : undefined,
+    currentStatus: statusFilter.length > 0 ? [...statusFilter] : undefined,
   };
 
   const {
-    data: usersData,
-    isLoading: isLoadingUsers,
-    isError: isErrorUsers,
-  } = useGetAllUsersQuery({ ...currentQuery });
+    data: senderParcels,
+    isLoading: isLoadingSenderParcels,
+    isError: isErrorSenderParcels,
+  } = useGetSenderParcelsQuery({
+    ...currentQuery,
+  });
 
   // Search handlers
   const handleSearch = () => {
@@ -294,20 +390,8 @@ export default function UsersTable() {
     setPagination((prev) => ({ ...prev, pageIndex: 0 }));
   };
 
-  // handleRoleChange function
-  const handleRoleChange = (checked: boolean, value: Role) => {
-    setRoleFilter((prev) => {
-      if (checked) {
-        return [...prev, value];
-      } else {
-        return prev.filter((role) => role !== value);
-      }
-    });
-    setPagination((prev) => ({ ...prev, pageIndex: 0 }));
-  };
-
   // handleStatusChange function
-  const handleStatusChange = (checked: boolean, value: IsActive) => {
+  const handleStatusChange = (checked: boolean, value: ParcelStatus) => {
     setStatusFilter((prev) => {
       if (checked) {
         return [...prev, value];
@@ -318,20 +402,13 @@ export default function UsersTable() {
     setPagination((prev) => ({ ...prev, pageIndex: 0 }));
   };
 
-  // handleIsVerifiedChange function
-  const handleIsVerifiedChange = (checked: boolean, value: boolean) => {
-    const newValue = value ? true : false;
-    setVerifiedFilter(checked ? newValue : undefined);
-    setPagination((prev) => ({ ...prev, pageIndex: 0 }));
-  };
-
   const table = useReactTable({
-    data: usersData?.data || [],
+    data: senderParcels?.data || [],
     columns,
     // Server-side pagination configuration
     manualPagination: true,
-    pageCount: usersData?.meta?.totalPage,
-    rowCount: usersData?.meta?.total,
+    pageCount: senderParcels?.meta?.totalPage,
+    rowCount: senderParcels?.meta?.total,
 
     // Server-side sorting configuration
     manualSorting: true,
@@ -366,18 +443,18 @@ export default function UsersTable() {
     },
   });
 
-  if (isLoadingUsers) {
-    return <Loading message='Loading users data...' />;
+  if (isLoadingSenderParcels) {
+    return <Loading message='Loading parcels data...' />;
   }
 
-  if (!isLoadingUsers && isErrorUsers) {
+  if (!isLoadingSenderParcels && isErrorSenderParcels) {
     return <Error />;
   }
 
   const content = (
     <div className='flex flex-wrap items-center justify-between gap-3'>
       <div className='flex flex-wrap items-center gap-3'>
-        {/* search */}
+        {/* Filter by tracking id */}
         <div className='relative'>
           <Input
             // id={id}
@@ -418,57 +495,11 @@ export default function UsersTable() {
                 <InfoIcon size={14} />
               </TooltipTrigger>
               <TooltipContent>
-                <p>
-                  Search by name, email, address, phone, role, verified status
-                </p>
+                <p>Search by tracking ID or address</p>
               </TooltipContent>
             </Tooltip>
           </div>
         </div>
-
-        {/* Filter by Role */}
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button variant='outline'>
-              <FilterIcon
-                className='-ms-1 opacity-60'
-                size={16}
-                aria-hidden='true'
-              />
-              Role
-              {roleFilter.length > 0 && (
-                <span className='bg-background text-muted-foreground/70 -me-1 inline-flex h-5 max-h-full items-center rounded border px-1 font-[inherit] text-[0.625rem] font-medium'>
-                  {roleFilter.length}
-                </span>
-              )}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className='w-auto min-w-36 p-3' align='start'>
-            <div className='space-y-3'>
-              <div className='text-muted-foreground text-xs font-medium'>
-                Filters
-              </div>
-              <div className='space-y-3'>
-                {Object.values(UserRoles).map((value, i) => (
-                  <div key={value} className='flex items-center gap-2'>
-                    <Checkbox
-                      id={`role-${i}`}
-                      checked={roleFilter.includes(value)}
-                      onCheckedChange={(checked: boolean) =>
-                        handleRoleChange(checked, value)
-                      }
-                    />
-                    <Label
-                      htmlFor={`role-${i}`}
-                      className='flex grow justify-between gap-2 font-normal'>
-                      {value}
-                    </Label>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </PopoverContent>
-        </Popover>
 
         {/* Filter by status */}
         <Popover>
@@ -479,7 +510,7 @@ export default function UsersTable() {
                 size={16}
                 aria-hidden='true'
               />
-              Active Status
+              Status
               {statusFilter.length > 0 && (
                 <span className='bg-background text-muted-foreground/70 -me-1 inline-flex h-5 max-h-full items-center rounded border px-1 font-[inherit] text-[0.625rem] font-medium'>
                   {statusFilter.length}
@@ -493,7 +524,7 @@ export default function UsersTable() {
                 Filters
               </div>
               <div className='space-y-3'>
-                {Object.values(IsActive).map((value, i) => (
+                {Object.values(ParcelStatus).map((value, i) => (
                   <div key={value} className='flex items-center gap-2'>
                     <Checkbox
                       id={`status-${i}`}
@@ -504,50 +535,6 @@ export default function UsersTable() {
                     />
                     <Label
                       htmlFor={`status-${i}`}
-                      className='flex grow justify-between gap-2 font-normal'>
-                      {value}
-                    </Label>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </PopoverContent>
-        </Popover>
-
-        {/* Filter by isVerified */}
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button variant='outline'>
-              <FilterIcon
-                className='-ms-1 opacity-60'
-                size={16}
-                aria-hidden='true'
-              />
-              Verified Status
-              {verifiedFilter !== undefined && (
-                <span className='bg-background text-muted-foreground/70 -me-1 inline-flex h-5 max-h-full items-center rounded border px-1 font-[inherit] text-[0.625rem] font-medium'>
-                  {verifiedFilter ? "Yes" : "No"}
-                </span>
-              )}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className='w-auto min-w-36 p-3' align='start'>
-            <div className='space-y-3'>
-              <div className='text-muted-foreground text-xs font-medium'>
-                Filters
-              </div>
-              <div className='space-y-3'>
-                {["Yes", "No"].map((value, i) => (
-                  <div key={value} className='flex items-center gap-2'>
-                    <Checkbox
-                      id={`isVerified-${i}`}
-                      checked={verifiedFilter === (value === "Yes")}
-                      onCheckedChange={(checked: boolean) =>
-                        handleIsVerifiedChange(checked, value === "Yes")
-                      }
-                    />
-                    <Label
-                      htmlFor={`isVerified-${i}`}
                       className='flex grow justify-between gap-2 font-normal'>
                       {value}
                     </Label>
@@ -591,41 +578,41 @@ export default function UsersTable() {
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-
       <div className='flex flex-wrap items-center gap-3'>
-        {/* Create button */}
+        {/* Send parcel button */}
         <Button
           onClick={() => setOpen(true)}
-          className='ml-auto'>
+          className='ml-auto'
+          variant='outline'>
           <PlusIcon className='-ms-1 opacity-60' size={16} aria-hidden='true' />
-          Create Stuff
+          Send Parcel
         </Button>
-        <CreateStuffDialog open={open} onOpenChange={setOpen} />
+        <CreateParcelDialog open={open} onOpenChange={setOpen} />
       </div>
     </div>
   );
 
   if (
-    !isLoadingUsers &&
-    !isErrorUsers &&
-    usersData &&
-    usersData?.data.length === 0
+    !isLoadingSenderParcels &&
+    !isErrorSenderParcels &&
+    senderParcels &&
+    senderParcels?.data.length === 0
   ) {
     return (
       <>
         {content}
-        <Information message='No user data available' />
+        <Information message='No parcel data available' />
       </>
     );
   }
 
   return (
-    <div className='space-y-4 overflow-x-hidden bg-card p-4 md:p-8 rounded-2xl'>
+    <div className='space-y-4  overflow-x-hidden bg-card p-4 md:p-8 rounded-2xl'>
       {/* Filters */}
       {content}
 
       {/* Table */}
-      <div className='bg-background rounded-md border overflow-auto dark:bg-gray-800/50 dark:border-zinc-700'>
+      <div className='bg-card rounded-md border overflow-auto'>
         <Table className='table-auto min-w-full'>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -717,11 +704,11 @@ export default function UsersTable() {
       </div>
 
       {/* Pagination */}
-      <div className='flex items-center justify-between gap-1 md:gap-8'>
+      <div className='flex items-center justify-between gap-8'>
         {/* Results per page */}
         <div className='flex items-center gap-3'>
           <Label htmlFor={id} className='max-sm:sr-only'>
-            Rows Per Page
+            Rows per page
           </Label>
           <Select
             value={table.getState().pagination.pageSize.toString()}
@@ -827,38 +814,77 @@ export default function UsersTable() {
   );
 }
 
-function RowActions({ row }: { row: Row<IUser> }) {
+function RowActions({ row }: { row: Row<IParcel> }) {
   const [open, setOpen] = useState(false);
-  const form = useForm<z.infer<typeof isActiveSchema>>({
-    resolver: zodResolver(isActiveSchema),
-    defaultValues: { isActive: IsActive.ACTIVE },
+  const form = useForm<z.infer<typeof cancelNoteSchema>>({
+    resolver: zodResolver(cancelNoteSchema),
+    defaultValues: { note: "" },
   });
-  const [blockUser, { isLoading, isError, error }] = useBlockUserByIdMutation();
+  const [cancelParcel, { isLoading, isError, error }] =
+    useCancelParcelMutation();
+  const [
+    deleteParcel,
+    { isLoading: isDeleting, isError: isDeleteError, error: deleteError },
+  ] = useDeleteParcelMutation();
 
-  // Block User
-  const handleBlock = async (data: z.infer<typeof isActiveSchema>) => {
+  // Cancel Parcel
+  const handleCancel = async (data: z.infer<typeof cancelNoteSchema>) => {
     try {
-      const res = await blockUser({
+      await cancelParcel({
         id: row.original?._id,
-        data,
+        note: data.note,
       }).unwrap();
 
-      if (res.success) {
-        setOpen(false);
-        toast.success("User blocked successfully");
-      }
+      setOpen(false);
+      toast.success("Parcel canceled successfully");
     } catch (error) {
-      console.error("Failed to change status", error);
+      console.error("Failed to cancel parcel", error);
     }
   };
 
   useEffect(() => {
     if (isError) {
-      toast.error("Failed to change status", {
-        description: (error as { data?: { message?: string } })?.data?.message,
+      toast.error("Failed to cancel parcel", {
+        description:
+          error &&
+          typeof error === "object" &&
+          error !== null &&
+          "data" in error &&
+          typeof error.data === "object" &&
+          error.data !== null &&
+          "message" in error.data
+            ? String((error.data as { message?: unknown }).message)
+            : undefined,
       });
     }
   }, [isError, error]);
+
+  // Delete Parcel
+  const handleDelete = async (row: Row<IParcel>) => {
+    try {
+      await deleteParcel(row.original?._id).unwrap();
+      toast.success("Parcel deleted successfully");
+    } catch (error) {
+      console.error("Failed to delete parcel", error);
+    }
+  };
+
+  useEffect(() => {
+    if (isDeleteError) {
+      toast.error("Failed to delete parcel", {
+        description:
+          deleteError &&
+          typeof deleteError === "object" &&
+          deleteError !== null &&
+          "data" in deleteError &&
+          typeof deleteError.data === "object" &&
+          deleteError.data !== null &&
+          "message" in deleteError.data
+            ? String((deleteError.data as { message?: unknown }).message)
+            : undefined,
+      });
+    }
+  }, [isDeleteError, deleteError]);
 
   return (
     <DropdownMenu>
@@ -874,45 +900,42 @@ function RowActions({ row }: { row: Row<IUser> }) {
         </div>
       </DropdownMenuTrigger>
       <DropdownMenuContent align='end'>
+        <DropdownMenuGroup>
+          <DropdownMenuItem>
+            <Link to={`/sender/${row.original?._id}/status`}>
+              <span>Show Status</span>
+            </Link>
+          </DropdownMenuItem>
+        </DropdownMenuGroup>
+        <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
               <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                <span>Active Status</span>
+                <span>Cancel</span>
               </DropdownMenuItem>
             </DialogTrigger>
             <DialogContent className='sm:max-w-[425px]'>
               <DialogHeader>
-                <DialogTitle>Change Active Status</DialogTitle>
+                <DialogTitle>Confirm Cancellation</DialogTitle>
                 <DialogDescription>
-                  Are you sure you want to change the active status of user{" "}
-                  {row.original?.name}?
+                  Are you sure you want to cancel this parcel? This action
+                  cannot be undone.
                 </DialogDescription>
               </DialogHeader>
               <Form {...form}>
                 <form
-                  onSubmit={form.handleSubmit(handleBlock)}
+                  onSubmit={form.handleSubmit(handleCancel)}
                   className='space-y-4'>
                   <FormField
                     control={form.control}
-                    name='isActive'
+                    name='note'
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Select a status</FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}>
-                          <FormControl className='w-full'>
-                            <SelectTrigger>
-                              <SelectValue placeholder='Select a status' />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value='ACTIVE'>Active</SelectItem>
-                            <SelectItem value='INACTIVE'>Inactive</SelectItem>
-                            <SelectItem value='BLOCKED'>Blocked</SelectItem>
-                          </SelectContent>
-                        </Select>
+                        <FormLabel>Reason</FormLabel>
+                        <FormControl>
+                          <Input {...field} placeholder='Enter reason' />
+                        </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -920,17 +943,35 @@ function RowActions({ row }: { row: Row<IUser> }) {
                   <DialogFooter>
                     <DialogClose asChild>
                       <Button variant='outline' type='button'>
-                        Cancel
+                        Don't Cancel
                       </Button>
                     </DialogClose>
                     <Button type='submit' disabled={isLoading}>
-                      {isLoading ? "Updating..." : "Update Status"}
+                      {isLoading ? "Cancelling..." : "Cancel Parcel"}
                     </Button>
                   </DialogFooter>
                 </form>
               </Form>
             </DialogContent>
           </Dialog>
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem asChild>
+          <DeleteConfirmation
+            trigger={
+              <DropdownMenuItem
+                className='text-destructive focus:text-destructive'
+                onSelect={(e) => e.preventDefault()}>
+                <span>Delete</span>
+              </DropdownMenuItem>
+            }
+            title='Are you absolutely sure?'
+            description={`This action cannot be undone. This will permanently delete the parcel`}
+            onConfirm={() => {
+              handleDelete(row);
+            }}
+            isLoading={isDeleting}
+          />
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
