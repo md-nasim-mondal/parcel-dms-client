@@ -1,3 +1,6 @@
+// FILE: ParcelManagementTable.tsx
+
+// --- Import necessary dependencies from React, libraries, and local files. ---
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   Form,
@@ -105,12 +108,14 @@ import {
   useGetAllParcelsQuery,
   useUpdateStatusAndPersonnelMutation,
 } from "@/redux/features/parcel/parcel.api";
+import { useGetAllUsersQuery } from "@/redux/features/user/user.api";
 import {
   ParcelStatus,
   ParcelType,
   ShippingType,
   type IParcel,
 } from "@/types/sender.parcel.type";
+import { IsActive, Role, type IUser } from "@/types/user.type";
 import { getNameInitials } from "@/utils/getNameInitials";
 import { getStatusColor } from "@/utils/getStatusColor";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -121,6 +126,7 @@ import { toast } from "sonner";
 import z from "zod";
 import { AdminCreateParcelDialog } from "./AdminParcelModal";
 
+// --- Define Zod schemas for form validation. ---
 const updateStatusPersonnelSchema = z.object({
   currentStatus: z.enum(Object.values(ParcelStatus) as [string]).optional(),
   currentLocation: z.string().nullable().optional(),
@@ -134,7 +140,9 @@ const updateBlockedStatusSchema = z.object({
   reason: z.string().optional(),
 });
 
+// --- Define the columns for the Tanstack Table. Each object represents a column. ---
 const columns: ColumnDef<IParcel>[] = [
+  // --- Column for Sender's information ---
   {
     header: "Sender",
     accessorKey: "sender",
@@ -166,6 +174,7 @@ const columns: ColumnDef<IParcel>[] = [
     enableHiding: true,
     enableSorting: false,
   },
+  // --- Column for Receiver's information ---
   {
     header: "Receiver",
     accessorKey: "receiver",
@@ -196,43 +205,50 @@ const columns: ColumnDef<IParcel>[] = [
     enableHiding: true,
     enableSorting: false,
   },
+  // --- Column for Estimated Delivery Date ---
   {
     header: "Estimated Delivery",
     accessorKey: "estimatedDelivery",
     cell: ({ row }) => (
-      <div>{format(row.getValue("estimatedDelivery"), "PPP")}</div>
+      <div>{format(new Date(row.getValue("estimatedDelivery")), "PPP")}</div>
     ),
     size: 165,
     enableHiding: true,
     enableSorting: true,
   },
+  // --- Column for Actual Delivery Date ---
   {
     header: "Delivered At",
     accessorKey: "deliveredAt",
     cell: ({ row }) => {
       const deliveredAt = row.getValue("deliveredAt");
       return (
-        <div>{deliveredAt ? format(deliveredAt as Date, "PPP") : "-"}</div>
+        <div>
+          {deliveredAt ? format(new Date(deliveredAt as string), "PPP") : "-"}
+        </div>
       );
     },
     size: 165,
     enableHiding: true,
     enableSorting: true,
   },
+  // --- Column for Cancellation Date ---
   {
     header: "Cancelled At",
     accessorKey: "cancelledAt",
     cell: ({ row }) => {
       const cancelledAt = row.getValue("cancelledAt");
       return (
-        <div>{cancelledAt ? format(cancelledAt as Date, "PPP") : "-"}</div>
+        <div>
+          {cancelledAt ? format(new Date(cancelledAt as string), "PPP") : "-"}
+        </div>
       );
     },
     size: 165,
     enableHiding: true,
     enableSorting: true,
   },
-
+  // --- Column for Parcel Information (Weight, Type, Shipping) ---
   {
     header: "Parcel Info",
     accessorKey: "weight",
@@ -264,6 +280,7 @@ const columns: ColumnDef<IParcel>[] = [
     enableHiding: true,
     enableSorting: true,
   },
+  // --- Column for Delivery Cost ---
   {
     header: "Cost",
     accessorKey: "fee",
@@ -285,6 +302,7 @@ const columns: ColumnDef<IParcel>[] = [
     enableHiding: true,
     enableSorting: true,
   },
+  // --- Column for Payment Status ---
   {
     header: "Paid",
     accessorKey: "isPaid",
@@ -295,6 +313,7 @@ const columns: ColumnDef<IParcel>[] = [
     enableHiding: true,
     enableSorting: true,
   },
+  // --- Column for Blocked Status ---
   {
     header: "Blocked",
     accessorKey: "isBlocked",
@@ -303,8 +322,10 @@ const columns: ColumnDef<IParcel>[] = [
       return (
         <Badge
           className={cn(
-            { "bg-green-100 text-green-800": !isBlocked },
-            { "bg-red-100 text-red-800": isBlocked }
+            "dark:text-white",
+            !isBlocked
+              ? "bg-green-100 text-green-800 dark:bg-green-800/40"
+              : "bg-red-100 text-red-800 dark:bg-red-800/40"
           )}>
           {isBlocked ? "Yes" : "No"}
         </Badge>
@@ -314,6 +335,7 @@ const columns: ColumnDef<IParcel>[] = [
     enableHiding: true,
     enableSorting: true,
   },
+  // --- Column for Current Location ---
   {
     header: "Current Location",
     accessorKey: "currentLocation",
@@ -325,6 +347,7 @@ const columns: ColumnDef<IParcel>[] = [
     enableHiding: true,
     enableSorting: true,
   },
+  // --- Column for Applied Coupon ---
   {
     header: "Coupon",
     accessorKey: "coupon",
@@ -339,6 +362,7 @@ const columns: ColumnDef<IParcel>[] = [
     enableHiding: true,
     enableSorting: true,
   },
+  // --- Column for Tracking ID ---
   {
     header: "Tracking ID",
     accessorKey: "trackingId",
@@ -349,7 +373,7 @@ const columns: ColumnDef<IParcel>[] = [
     enableHiding: true,
     enableSorting: true,
   },
-
+  // --- Column for Assigned Delivery Personnel ---
   {
     header: "Delivery Personnel",
     accessorKey: "deliveryPersonnel",
@@ -372,17 +396,18 @@ const columns: ColumnDef<IParcel>[] = [
     enableHiding: true,
     enableSorting: true,
   },
+  // --- Column for Creation Date ---
   {
     header: "Created At",
     accessorKey: "createdAt",
     cell: ({ row }) => {
-      return <div>{format(row.getValue("createdAt") as Date, "PPP")}</div>;
+      return <div>{format(new Date(row.getValue("createdAt")), "PPP")}</div>;
     },
     size: 180,
     enableHiding: true,
     enableSorting: true,
   },
-
+  // --- Column for Current Parcel Status ---
   {
     header: "Status",
     accessorKey: "currentStatus",
@@ -395,7 +420,7 @@ const columns: ColumnDef<IParcel>[] = [
     enableHiding: true,
     enableSorting: true,
   },
-
+  // --- Column for Row Actions (Edit, Delete, etc.) ---
   {
     id: "actions",
     header: () => <span className='sr-only'>Actions</span>,
@@ -405,7 +430,9 @@ const columns: ColumnDef<IParcel>[] = [
   },
 ];
 
+// --- This is the main table component. It manages state for filters, sorting, and pagination. ---
 export default function ParcelManagementTable() {
+  // --- State management for component functionalities like dialogs, filters, and table state. ---
   const id = useId();
   const [open, setOpen] = useState(false);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -419,45 +446,40 @@ export default function ParcelManagementTable() {
   const [statusFilter, setStatusFilter] = useState<string[]>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({
     currentLocation: false,
-    trackingId: false,
     cancelledAt: false,
     coupon: false,
     isPaid: false,
-    // deliveryPersonnel: false,
   });
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: 10,
   });
-
-  // Add search states
   const [searchTerm, setSearchTerm] = useState("");
   const [appliedSearchTerm, setAppliedSearchTerm] = useState("");
-
   const [sorting, setSorting] = useState<SortingState>([]);
 
-  const currentQuery = {
+  // --- Construct the query object to fetch data based on the current state of filters, search, and pagination. ---
+  const currentQuery: any = {
     searchTerm: appliedSearchTerm || undefined,
     page: pagination.pageIndex + 1,
     limit: pagination.pageSize,
     sort: sorting.length > 0 ? sorting[0].id : "-createdAt",
-    currentStatus: statusFilter.length > 0 ? [...statusFilter] : undefined,
-    type: typeFilter.length > 0 ? [...typeFilter] : undefined,
+    currentStatus: statusFilter.length > 0 ? statusFilter : undefined,
+    type: typeFilter.length > 0 ? typeFilter : undefined,
     shippingType:
-      shippingTypeFilter.length > 0 ? [...shippingTypeFilter] : undefined,
+      shippingTypeFilter.length > 0 ? shippingTypeFilter : undefined,
     isBlocked:
       blockedParcelFilter !== undefined ? blockedParcelFilter : undefined,
   };
 
+  // --- Fetch parcel data using the RTK Query hook. This hook handles fetching, caching, and re-fetching. ---
   const {
     data: parcelsData,
     isLoading: isLoadingParcels,
     isError: isErrorParcels,
-  } = useGetAllParcelsQuery({
-    ...currentQuery,
-  });
+  } = useGetAllParcelsQuery(currentQuery);
 
-  // Search handlers
+  // --- Handler functions to update state for search and filters. ---
   const handleSearch = () => {
     setAppliedSearchTerm(searchTerm);
     setPagination((prev) => ({ ...prev, pageIndex: 0 }));
@@ -469,7 +491,6 @@ export default function ParcelManagementTable() {
     setPagination((prev) => ({ ...prev, pageIndex: 0 }));
   };
 
-  // handleStatusChange function
   const handleStatusChange = (checked: boolean, value: ParcelStatus) => {
     setStatusFilter((prev) => {
       if (checked) {
@@ -508,36 +529,23 @@ export default function ParcelManagementTable() {
     setPagination((prev) => ({ ...prev, pageIndex: 0 }));
   };
 
+  // --- Initialize the table instance using the useReactTable hook with server-side options for pagination, sorting, and filtering. ---
   const table = useReactTable({
     data: parcelsData?.data || [],
     columns,
-    // Server-side pagination configuration
     manualPagination: true,
     pageCount: parcelsData?.meta?.totalPage,
     rowCount: parcelsData?.meta?.total,
-
-    // Server-side sorting configuration
     manualSorting: true,
     enableSortingRemoval: true,
     enableMultiSort: false,
-
-    // manual filtering
     manualFiltering: true,
-
     getCoreRowModel: getCoreRowModel(),
-    // getSortedRowModel: getSortedRowModel(),
-
-    // onSortingChange: setSorting,
-    // getPaginationRowModel: getPaginationRowModel(),
-    // onPaginationChange: setPagination,
     onColumnFiltersChange: setColumnFilters,
     onColumnVisibilityChange: setColumnVisibility,
-    // getFilteredRowModel: getFilteredRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
-    // Event handlers
     onSortingChange: (updater) => {
-      setSorting(updater);
-      // Reset to first page when sorting changes
+      setSorting(updater as SortingState);
       setPagination((prev) => ({ ...prev, pageIndex: 0 }));
     },
     onPaginationChange: setPagination,
@@ -549,6 +557,7 @@ export default function ParcelManagementTable() {
     },
   });
 
+  // --- Display loading or error states before rendering the table. ---
   if (isLoadingParcels) {
     return <Loading message='Loading parcels data...' />;
   }
@@ -557,15 +566,14 @@ export default function ParcelManagementTable() {
     return <Error />;
   }
 
+  // --- JSX for the filter controls area (search, status filter, etc.). ---
   const content = (
     <div className='flex flex-wrap items-center justify-between gap-3'>
       <div className='flex items-center gap-3'>
-        {/* Filter by tracking id */}
         <div className='relative'>
           <Input
-            // id={id}
             className='peer ps-9 pe-9'
-            placeholder='Search...'
+            placeholder='Search By TrackingId...'
             type='text'
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -586,15 +594,13 @@ export default function ParcelManagementTable() {
               <XIcon size={16} aria-hidden='true' />
             </button>
           )}
-          {
-            <button
-              onClick={handleSearch}
-              className='text-muted-foreground/80 hover:text-foreground focus-visible:border-ring focus-visible:ring-ring/50 absolute inset-y-0 end-0 flex h-full w-9 items-center justify-center rounded-e-md transition-[color,box-shadow] outline-none focus:z-10 focus-visible:ring-[3px] disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50'
-              aria-label='Submit search'
-              type='submit'>
-              <ArrowRightIcon size={16} aria-hidden='true' />
-            </button>
-          }
+          <button
+            onClick={handleSearch}
+            className='text-muted-foreground/80 hover:text-foreground focus-visible:border-ring focus-visible:ring-ring/50 absolute inset-y-0 end-0 flex h-full w-9 items-center justify-center rounded-e-md transition-[color,box-shadow] outline-none focus:z-10 focus-visible:ring-[3px] disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50'
+            aria-label='Submit search'
+            type='submit'>
+            <ArrowRightIcon size={16} aria-hidden='true' />
+          </button>
           <div className='absolute -inset-y-4 -start-2 text-muted-foreground/80'>
             <Tooltip>
               <TooltipTrigger>
@@ -607,7 +613,6 @@ export default function ParcelManagementTable() {
           </div>
         </div>
 
-        {/* Filter by status */}
         <Popover>
           <PopoverTrigger asChild>
             <Button variant='outline'>
@@ -650,7 +655,7 @@ export default function ParcelManagementTable() {
             </div>
           </PopoverContent>
         </Popover>
-        {/* Filter by parcel type */}
+
         <Popover>
           <PopoverTrigger asChild>
             <Button variant='outline'>
@@ -693,7 +698,7 @@ export default function ParcelManagementTable() {
             </div>
           </PopoverContent>
         </Popover>
-        {/* Filter by shipping type */}
+
         <Popover>
           <PopoverTrigger asChild>
             <Button variant='outline'>
@@ -736,7 +741,7 @@ export default function ParcelManagementTable() {
             </div>
           </PopoverContent>
         </Popover>
-        {/* Filter by blocked parcels */}
+
         <Popover>
           <PopoverTrigger asChild>
             <Button variant='outline'>
@@ -779,7 +784,7 @@ export default function ParcelManagementTable() {
             </div>
           </PopoverContent>
         </Popover>
-        {/* Toggle columns visibility */}
+
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant='outline'>
@@ -814,11 +819,7 @@ export default function ParcelManagementTable() {
         </DropdownMenu>
       </div>
       <div className='flex items-center gap-3'>
-        {/* Send parcel button */}
-        <Button
-          onClick={() => setOpen(true)}
-          className='ml-auto'
-          variant='outline'>
+        <Button onClick={() => setOpen(true)} className='ml-auto text-white'>
           <PlusIcon className='-ms-1 opacity-60' size={16} aria-hidden='true' />
           Create Parcel
         </Button>
@@ -841,17 +842,17 @@ export default function ParcelManagementTable() {
     );
   }
 
+  // --- Render the main layout, including filters, the table, and pagination. ---
   return (
     <div className='space-y-4'>
-      {/* Filters */}
       {content}
-
-      {/* Table */}
-      <div className='bg-background rounded-md border overflow-auto'>
+      <div className='rounded-md border bg-background dark:bg-zinc-900/50 dark:border-zinc-700 overflow-auto'>
         <Table className='table-auto min-w-full'>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id} className='hover:bg-transparent'>
+              <TableRow
+                key={headerGroup.id}
+                className='border-b dark:border-zinc-700 hover:bg-zinc-100/50 dark:hover:bg-zinc-800/50'>
                 {headerGroup.headers.map((header) => {
                   return (
                     <TableHead
@@ -861,21 +862,9 @@ export default function ParcelManagementTable() {
                       {header.isPlaceholder ? null : header.column.getCanSort() ? (
                         <div
                           className={cn(
-                            header.column.getCanSort() &&
-                              "flex h-full cursor-pointer items-center justify-between gap-2 select-none"
+                            "flex h-full cursor-pointer items-center justify-between gap-2 select-none"
                           )}
-                          onClick={header.column.getToggleSortingHandler()}
-                          onKeyDown={(e) => {
-                            // Enhanced keyboard handling for sorting
-                            if (
-                              header.column.getCanSort() &&
-                              (e.key === "Enter" || e.key === " ")
-                            ) {
-                              e.preventDefault();
-                              header.column.getToggleSortingHandler()?.(e);
-                            }
-                          }}
-                          tabIndex={header.column.getCanSort() ? 0 : undefined}>
+                          onClick={header.column.getToggleSortingHandler()}>
                           {flexRender(
                             header.column.columnDef.header,
                             header.getContext()
@@ -914,7 +903,8 @@ export default function ParcelManagementTable() {
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}
-                  data-state={row.getIsSelected() && "selected"}>
+                  data-state={row.getIsSelected() && "selected"}
+                  className='border-b dark:border-zinc-700 hover:bg-zinc-100/50 dark:hover:bg-zinc-800/50'>
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id} className='last:py-0'>
                       {flexRender(
@@ -938,9 +928,8 @@ export default function ParcelManagementTable() {
         </Table>
       </div>
 
-      {/* Pagination */}
+      {/* --- Pagination controls section. --- */}
       <div className='flex items-center justify-between gap-8'>
-        {/* Results per page */}
         <div className='flex items-center gap-3'>
           <Label htmlFor={id} className='max-sm:sr-only'>
             Rows per page
@@ -962,7 +951,6 @@ export default function ParcelManagementTable() {
             </SelectContent>
           </Select>
         </div>
-        {/* Page number information */}
         <div className='text-muted-foreground flex grow justify-end text-sm whitespace-nowrap'>
           <p
             className='text-muted-foreground text-sm whitespace-nowrap'
@@ -973,12 +961,8 @@ export default function ParcelManagementTable() {
                 1}
               -
               {Math.min(
-                Math.max(
-                  table.getState().pagination.pageIndex *
-                    table.getState().pagination.pageSize +
-                    table.getState().pagination.pageSize,
-                  0
-                ),
+                (table.getState().pagination.pageIndex + 1) *
+                  table.getState().pagination.pageSize,
                 table.getRowCount()
               )}
             </span>{" "}
@@ -988,12 +972,9 @@ export default function ParcelManagementTable() {
             </span>
           </p>
         </div>
-
-        {/* Pagination buttons */}
         <div>
           <Pagination>
             <PaginationContent>
-              {/* First page button */}
               <PaginationItem>
                 <Button
                   size='icon'
@@ -1005,7 +986,6 @@ export default function ParcelManagementTable() {
                   <ChevronFirstIcon size={16} aria-hidden='true' />
                 </Button>
               </PaginationItem>
-              {/* Previous page button */}
               <PaginationItem>
                 <Button
                   size='icon'
@@ -1017,7 +997,6 @@ export default function ParcelManagementTable() {
                   <ChevronLeftIcon size={16} aria-hidden='true' />
                 </Button>
               </PaginationItem>
-              {/* Next page button */}
               <PaginationItem>
                 <Button
                   size='icon'
@@ -1029,7 +1008,6 @@ export default function ParcelManagementTable() {
                   <ChevronRightIcon size={16} aria-hidden='true' />
                 </Button>
               </PaginationItem>
-              {/* Last page button */}
               <PaginationItem>
                 <Button
                   size='icon'
@@ -1049,47 +1027,76 @@ export default function ParcelManagementTable() {
   );
 }
 
+// --- This component renders the actions for each table row (e.g., Change Status, Block). ---
 function RowActions({ row }: { row: Row<IParcel> }) {
+  // --- State for controlling the open/close state of the dialogs. ---
   const [open, setOpen] = useState(false);
   const [openBlock, setOpenBlock] = useState(false);
-  const form = useForm<z.infer<typeof updateStatusPersonnelSchema>>({
-    resolver: zodResolver(updateStatusPersonnelSchema),
-    defaultValues: {
-      currentStatus: undefined,
-      currentLocation: undefined,
-      deliveryPersonnelId: undefined,
-    },
-  });
+
+  // --- RTK Query mutations for updating parcel status and blocking a parcel. ---
   const [updateStatusAndPersonnel, { isLoading, isError, error }] =
     useUpdateStatusAndPersonnelMutation();
+  const [
+    blockParcel,
+    { isLoading: isBlocking, isError: isBlockingError, error: blockingError },
+  ] = useBlockParcelMutation();
 
-  // Cancel Parcel
+  // --- Fetch a list of all active delivery personnel to populate the dropdown. ---
+  const { data: deliveryPersonnelData } = useGetAllUsersQuery({
+    limit: 1000,
+    role: Role.DELIVERY_PERSONNEL,
+    isActive: IsActive.ACTIVE,
+  });
+
+  const deliveryPersonnelList = (deliveryPersonnelData?.data as IUser[]) || [];
+
+  // --- Initialize react-hook-form instances for the two forms. ---
+  const form = useForm<z.infer<typeof updateStatusPersonnelSchema>>({
+    resolver: zodResolver(updateStatusPersonnelSchema),
+  });
+
+  const formBlock = useForm<z.infer<typeof updateBlockedStatusSchema>>({
+    resolver: zodResolver(updateBlockedStatusSchema),
+  });
+
+  // --- useEffect to populate the 'Change Status' form with current row data when the dialog is opened. ---
+  useEffect(() => {
+    if (open) {
+      form.reset({
+        currentStatus: row.original.currentStatus,
+        currentLocation: row.original.currentLocation ?? "",
+        deliveryPersonnelId:
+          (row.original.deliveryPersonnel?.[0] as unknown as IUser)?._id ??
+          undefined,
+      });
+    }
+  }, [open, row.original, form]);
+
+  // --- Handler for submitting the 'Change Status' form. ---
   const handleChangeStatus = async (
     data: z.infer<typeof updateStatusPersonnelSchema>
   ) => {
     try {
-      console.log("Updating parcel status", data);
       await updateStatusAndPersonnel({
         id: row.original?._id,
         data: {
-          ...data,
-          currentStatus: data.currentStatus as ParcelStatus | undefined,
-          currentLocation: data.currentLocation
-            ? data.currentLocation
-            : undefined,
-          deliveryPersonnelId: data.deliveryPersonnelId
-            ? data.deliveryPersonnelId
-            : undefined,
+          currentStatus:
+            row.original.currentStatus === data.currentStatus
+              ? undefined
+              : (data.currentStatus as ParcelStatus | undefined),
+          currentLocation: data.currentLocation || undefined,
+          deliveryPersonnelId: data.deliveryPersonnelId || undefined,
         },
       }).unwrap();
 
       setOpen(false);
       toast.success("Parcel status updated successfully");
-    } catch (error) {
-      console.error("Failed to update parcel status", error);
+    } catch (err) {
+      console.error("Failed to update parcel status", err);
     }
   };
 
+  // --- useEffect to show a toast notification if the status update fails. ---
   useEffect(() => {
     if (isError) {
       toast.error("Failed to update parcel status", {
@@ -1098,19 +1105,7 @@ function RowActions({ row }: { row: Row<IParcel> }) {
     }
   }, [isError, error]);
 
-  // Block/Unblock Parcel
-  const formBlock = useForm<z.infer<typeof updateBlockedStatusSchema>>({
-    resolver: zodResolver(updateBlockedStatusSchema),
-    defaultValues: {
-      isBlocked: undefined,
-      reason: undefined,
-    },
-  });
-
-  const [
-    blockParcel,
-    { isLoading: isBlocking, isError: isBlockingError, error: blockingError },
-  ] = useBlockParcelMutation();
+  // --- Handler for submitting the 'Block/Unblock' form. ---
   const handleBlockUnblock = async (
     data: z.infer<typeof updateBlockedStatusSchema>
   ) => {
@@ -1127,11 +1122,12 @@ function RowActions({ row }: { row: Row<IParcel> }) {
           isBlocked === "blocked" ? "blocked" : "unblocked"
         } successfully`
       );
-    } catch (error) {
-      console.error("Failed to update parcel status", error);
+    } catch (err) {
+      console.error("Failed to update parcel status", err);
     }
   };
 
+  // --- useEffect to show a toast notification if the block/unblock action fails. ---
   useEffect(() => {
     if (isBlockingError) {
       toast.error("Failed to update parcel status", {
@@ -1155,7 +1151,7 @@ function RowActions({ row }: { row: Row<IParcel> }) {
       </DropdownMenuTrigger>
       <DropdownMenuContent align='end'>
         <DropdownMenuGroup>
-          <DropdownMenuItem>
+          <DropdownMenuItem asChild>
             <Link to={`/admin/${row.original?._id}/details`}>
               <span>View Details</span>
             </Link>
@@ -1173,8 +1169,7 @@ function RowActions({ row }: { row: Row<IParcel> }) {
               <DialogHeader>
                 <DialogTitle>Change Status</DialogTitle>
                 <DialogDescription>
-                  Are you sure you want to change the status of parcel{" "}
-                  {row.original?.trackingId}?
+                  Update status for parcel: {row.original?.trackingId}
                 </DialogDescription>
               </DialogHeader>
               <Form {...form}>
@@ -1224,19 +1219,30 @@ function RowActions({ row }: { row: Row<IParcel> }) {
                       </FormItem>
                     )}
                   />
-
                   <FormField
                     control={form.control}
                     name='deliveryPersonnelId'
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Assign Delivery Personnel</FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder='Enter delivery personnel ID'
-                            {...field}
-                          />
-                        </FormControl>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder='Select a personnel' />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {deliveryPersonnelList.map((person) => (
+                              <SelectItem
+                                key={person._id}
+                                value={person._id as string}>
+                                {person.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -1268,7 +1274,7 @@ function RowActions({ row }: { row: Row<IParcel> }) {
               <DialogHeader>
                 <DialogTitle>Change Block Status</DialogTitle>
                 <DialogDescription>
-                  Are you sure you want to block/unblock parcel?
+                  Are you sure you want to block/unblock this parcel?
                 </DialogDescription>
               </DialogHeader>
               <Form {...formBlock}>
@@ -1321,7 +1327,7 @@ function RowActions({ row }: { row: Row<IParcel> }) {
                         Cancel
                       </Button>
                     </DialogClose>
-                    <Button type='submit' disabled={isLoading}>
+                    <Button type='submit' disabled={isBlocking}>
                       {isBlocking ? "Updating..." : "Update"}
                     </Button>
                   </DialogFooter>

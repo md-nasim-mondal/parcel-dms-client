@@ -54,7 +54,7 @@ export const navLinkGroups: NavLinkGroup[] = [
         title: "Create Parcel",
         url: "/create-parcel",
         icon: PackagePlus,
-        roles: [Role.SENDER, Role.ADMIN, Role.SUPER_ADMIN],
+        roles: [Role.SENDER],
       },
       {
         title: "My Parcels",
@@ -123,11 +123,10 @@ export function useSidebarLinks() {
       ]),
     };
 
-    const filteredGroups = navLinkGroups.map((group) =>({
+    const filteredGroups = navLinkGroups
+      .map((group) => ({
         ...group,
-        links: group.links.filter((link) =>
-          link.roles.includes(userRole)
-        ),
+        links: group.links.filter((link) => link.roles.includes(userRole)),
       }))
       .filter((group) => group.links.length > 0)
       .map((group) => ({

@@ -300,7 +300,7 @@ export function AdminCreateParcelDialog({
 
             <DialogFooter className='flex justify-between items-center'>
               {isLoading && <Spinner variant={"circle-filled"} />}
-              <Button type='submit' disabled={isLoading}>
+              <Button className="text-white" type='submit' disabled={isLoading}>
                 Submit
               </Button>
             </DialogFooter>

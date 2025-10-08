@@ -1,5 +1,4 @@
-// hooks/useAuth.ts
-import { useUserInfoQuery } from '@/redux/features/auth/auth.api';
+import { useUserInfoQuery } from '@/redux/features/user/user.api';
 import { logout, setLoading, setUser } from '@/redux/features/auth/auth.slice';
 import type { RootState } from '@/redux/store';
 import { useEffect } from 'react';

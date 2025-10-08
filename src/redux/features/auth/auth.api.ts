@@ -1,6 +1,6 @@
 import { baseApi } from "@/redux/baseApi";
 import type { IResponse } from "@/types";
-import type { IForgotPassword, ILoginResponse, IResetPassword, ISendOtp, IUser } from "@/types/auth.type";
+import type { IForgotPassword, ILoginResponse, IResetPassword, ISendOtp} from "@/types/auth.type";
 
 export const authApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
@@ -40,13 +40,6 @@ export const authApi = baseApi.injectEndpoints({
         }),
       }
     ),
-    userInfo: builder.query<{ success: boolean; data: IUser }, void>({
-      query: () => ({
-        url: "/users/me",
-        method: "GET",
-      }),
-      providesTags: ["USER"],
-    }),
     logout: builder.mutation<{ success: boolean; message: string }, void>({
       query: () => ({
         url: "/auth/logout",
@@ -76,7 +69,6 @@ export const {
   useRegisterMutation,
   useSendOtpMutation,
   useVerifyOtpMutation,
-  useUserInfoQuery,
   useLogoutMutation,
   useForgotPasswordMutation,
   useResetPasswordMutation,
