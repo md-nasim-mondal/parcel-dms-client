@@ -8,7 +8,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useUserInfoQuery } from "@/redux/features/auth/auth.api";
+import { useUserInfoQuery } from "@/redux/features/user/user.api";
 import { useUpdateProfileMutation } from "@/redux/features/user/user.api";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect } from "react";
@@ -193,12 +193,12 @@ const Profile = () => {
               <div className='flex items-center'>
                 <span
                   className={`inline-block w-2 h-2 rounded-full mr-2 ${
-                    userData?.data.status === "active"
+                    userData?.data.isActive === "active"
                       ? "bg-green-500"
                       : "bg-red-500"
                   }`}></span>
                 <p className='font-medium text-gray-900 dark:text-white capitalize'>
-                  {userData?.data.status}
+                  {userData?.data.isActive}
                 </p>
               </div>
             </div>
