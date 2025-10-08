@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { baseApi } from "@/redux/baseApi";
+import { baseApi } from "@/redux/api/baseApi";
 
 export const statsApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({

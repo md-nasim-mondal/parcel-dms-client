@@ -1,4 +1,4 @@
-import { baseApi } from "@/redux/baseApi";
+import { baseApi } from "@/redux/api/baseApi";
 import type { IAnalyticsData, IResponse } from "@/types";
 import type { IParcelTrackData } from "@/types/parcel.type";
 import type { IParcel, IParcelParams } from "@/types/sender.parcel.type";

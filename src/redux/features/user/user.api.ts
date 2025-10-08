@@ -1,4 +1,4 @@
-import { baseApi } from "@/redux/baseApi";
+import { baseApi } from "@/redux/api/baseApi";
 import type { IResponse } from "@/types";
 import type { IUser, IUserParams } from "@/types/user.type";
 
