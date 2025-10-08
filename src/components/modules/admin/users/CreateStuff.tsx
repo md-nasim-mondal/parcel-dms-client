@@ -1,4 +1,3 @@
-
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -77,7 +76,9 @@ export function CreateStuffDialog({ open, onOpenChange }: CreateDialogProps) {
       } catch (error) {
         console.error("Failed to create delivery personnel:", error);
         toast.error("Failed to create delivery personnel", {
-          description: (error as { data?: { message?: string } })?.data?.message || "Please try again.",
+          description:
+            (error as { data?: { message?: string } })?.data?.message ||
+            "Please try again.",
         });
       }
     } else {
@@ -88,8 +89,10 @@ export function CreateStuffDialog({ open, onOpenChange }: CreateDialogProps) {
         toast.success("Admin created successfully");
       } catch (error) {
         console.error("Failed to create admin:", error);
-       toast.error("Failed to create admin!", {
-          description: (error as { data?: { message?: string } })?.data?.message || "Please try again.",
+        toast.error("Failed to create admin!", {
+          description:
+            (error as { data?: { message?: string } })?.data?.message ||
+            "Please try again.",
         });
       }
     }
@@ -97,7 +100,7 @@ export function CreateStuffDialog({ open, onOpenChange }: CreateDialogProps) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className='max-h-[80%] overflow-y-auto'>
         <DialogHeader>
           <DialogTitle>Create Stuff</DialogTitle>
           <DialogDescription>
@@ -106,17 +109,17 @@ export function CreateStuffDialog({ open, onOpenChange }: CreateDialogProps) {
         </DialogHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
             <FormField
               control={form.control}
-              name="name"
+              name='name'
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Name</FormLabel>
                   <FormControl>
-                    <Input placeholder="John Doe" {...field} />
+                    <Input placeholder='John Doe' {...field} />
                   </FormControl>
-                  <FormDescription className="sr-only">
+                  <FormDescription className='sr-only'>
                     This is your public display name.
                   </FormDescription>
                   <FormMessage />
@@ -125,18 +128,18 @@ export function CreateStuffDialog({ open, onOpenChange }: CreateDialogProps) {
             />
             <FormField
               control={form.control}
-              name="email"
+              name='email'
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Email</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="john.doe@company.com"
-                      type="email"
+                      placeholder='john.doe@company.com'
+                      type='email'
                       {...field}
                     />
                   </FormControl>
-                  <FormDescription className="sr-only">
+                  <FormDescription className='sr-only'>
                     This is your email input.
                   </FormDescription>
                   <FormMessage />
@@ -145,14 +148,14 @@ export function CreateStuffDialog({ open, onOpenChange }: CreateDialogProps) {
             />
             <FormField
               control={form.control}
-              name="password"
+              name='password'
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Password</FormLabel>
                   <FormControl>
                     <Password {...field} />
                   </FormControl>
-                  <FormDescription className="sr-only">
+                  <FormDescription className='sr-only'>
                     This is your password input.
                   </FormDescription>
                   <FormMessage />
@@ -161,14 +164,14 @@ export function CreateStuffDialog({ open, onOpenChange }: CreateDialogProps) {
             />
             <FormField
               control={form.control}
-              name="confirmPassword"
+              name='confirmPassword'
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Confirm Password</FormLabel>
                   <FormControl>
                     <Password {...field} />
                   </FormControl>
-                  <FormDescription className="sr-only">
+                  <FormDescription className='sr-only'>
                     This is your confirm password input.
                   </FormDescription>
                   <FormMessage />
@@ -177,27 +180,26 @@ export function CreateStuffDialog({ open, onOpenChange }: CreateDialogProps) {
             />
             <FormField
               control={form.control}
-              name="role"
+              name='role'
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Select Your Role</FormLabel>
                   <Select
                     onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    <FormControl className="w-full">
+                    defaultValue={field.value}>
+                    <FormControl className='w-full'>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select a role" />
+                        <SelectValue placeholder='Select a role' />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="ADMIN">Admin</SelectItem>
-                      <SelectItem value="DELIVERY_PERSONNEL">
+                      <SelectItem value={Role.ADMIN}>Admin</SelectItem>
+                      <SelectItem value={Role.DELIVERY_PERSONNEL}>
                         Delivery Personnel
                       </SelectItem>
                     </SelectContent>
                   </Select>
-                  <FormDescription className="sr-only">
+                  <FormDescription className='sr-only'>
                     This is your role selection.
                   </FormDescription>
                   <FormMessage />
@@ -207,14 +209,14 @@ export function CreateStuffDialog({ open, onOpenChange }: CreateDialogProps) {
 
             <FormField
               control={form.control}
-              name="defaultAddress"
+              name='defaultAddress'
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Address</FormLabel>
                   <FormControl>
-                    <Input placeholder="123 Main St" type="text" {...field} />
+                    <Input placeholder='123 Main St' type='text' {...field} />
                   </FormControl>
-                  <FormDescription className="sr-only">
+                  <FormDescription className='sr-only'>
                     This is your address input.
                   </FormDescription>
                   <FormMessage />
@@ -223,14 +225,14 @@ export function CreateStuffDialog({ open, onOpenChange }: CreateDialogProps) {
             />
             <FormField
               control={form.control}
-              name="phone"
+              name='phone'
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Phone</FormLabel>
                   <FormControl>
-                    <Input placeholder="01717112233" type="text" {...field} />
+                    <Input placeholder='01717112233' type='text' {...field} />
                   </FormControl>
-                  <FormDescription className="sr-only">
+                  <FormDescription className='sr-only'>
                     This is your phone number input.
                   </FormDescription>
                   <FormMessage />
@@ -238,7 +240,7 @@ export function CreateStuffDialog({ open, onOpenChange }: CreateDialogProps) {
               )}
             />
 
-            <Button type="submit" className="w-full">
+            <Button type='submit' className='w-full'>
               Submit
             </Button>
           </form>

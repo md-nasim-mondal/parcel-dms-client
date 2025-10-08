@@ -19,7 +19,7 @@ export const getRoleBasedPathPrefix = (
   if (!userRole) return "";
   switch (userRole) {
     case Role.SUPER_ADMIN:
-      return "/ADMIN";
+      return "/admin";
     case Role.DELIVERY_PERSONNEL:
       return "/delivery-personnel";
     default:

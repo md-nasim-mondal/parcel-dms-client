@@ -106,7 +106,12 @@ import { format } from "date-fns";
 import { toast } from "sonner";
 import z from "zod";
 import { CreateStuffDialog } from "./CreateStuff";
-import { IsActive, type IUser, type Role, Role as UserRoles } from "@/types/user.type";
+import {
+  IsActive,
+  type IUser,
+  type Role,
+  Role as UserRoles,
+} from "@/types/user.type";
 
 // schema for isActive
 const isActiveSchema = z.object({
@@ -122,12 +127,12 @@ const columns: ColumnDef<IUser>[] = [
       const initials = getNameInitials(name);
 
       return (
-        <div className="flex items-start gap-3">
-          <Avatar className="h-8 w-8 rounded-lg grayscale">
-            <AvatarFallback className="rounded-lg">{initials}</AvatarFallback>
+        <div className='flex items-start gap-3'>
+          <Avatar className='h-8 w-8 rounded-lg grayscale'>
+            <AvatarFallback className='rounded-lg'>{initials}</AvatarFallback>
           </Avatar>
-          <div className="space-y-1">
-            <div className="font-medium">{name}</div>
+          <div className='space-y-1'>
+            <div className='font-medium'>{name}</div>
           </div>
         </div>
       );
@@ -178,7 +183,7 @@ const columns: ColumnDef<IUser>[] = [
   },
 
   {
-    header: "Is Verified",
+    header: "IsVerified",
     accessorKey: "isVerified",
     cell: ({ row }) => {
       return <div>{row.original?.isVerified ? "Yes" : "No"}</div>;
@@ -188,7 +193,7 @@ const columns: ColumnDef<IUser>[] = [
     enableSorting: true,
   },
   {
-    header: "Is Active",
+    header: "IsActive",
     accessorKey: "isActive",
     cell: ({ row }) => (
       <Badge className={getUserIsActiveStatusColor(row.getValue("isActive"))}>
@@ -200,13 +205,13 @@ const columns: ColumnDef<IUser>[] = [
     enableSorting: true,
   },
   {
-    header: "Is Deleted",
+    header: "IsDeleted",
     accessorKey: "isDeleted",
     cell: ({ row }) => {
       return (
         <>
           {row.getValue("isDeleted") ? (
-            <Badge className="bg-red-100 text-red-800">
+            <Badge className='bg-red-100 text-red-800'>
               {row.getValue("isDeleted")}
             </Badge>
           ) : (
@@ -231,7 +236,7 @@ const columns: ColumnDef<IUser>[] = [
   },
   {
     id: "actions",
-    header: () => <span className="sr-only">Actions</span>,
+    header: () => <span className='sr-only'>Actions</span>,
     cell: ({ row }) => <RowActions row={row} />,
     size: 60,
     enableHiding: false,
@@ -362,7 +367,7 @@ export default function UsersTable() {
   });
 
   if (isLoadingUsers) {
-    return <Loading message="Loading users data..." />;
+    return <Loading message='Loading users data...' />;
   }
 
   if (!isLoadingUsers && isErrorUsers) {
@@ -370,15 +375,15 @@ export default function UsersTable() {
   }
 
   const content = (
-    <div className="flex flex-wrap items-center justify-between gap-3">
-      <div className="flex items-center gap-3">
+    <div className='flex flex-wrap items-center justify-between gap-3'>
+      <div className='flex flex-wrap items-center gap-3'>
         {/* search */}
-        <div className="relative">
+        <div className='relative'>
           <Input
             // id={id}
-            className="peer ps-9 pe-9"
-            placeholder="Search..."
-            type="text"
+            className='peer ps-9 pe-9'
+            placeholder='Search...'
+            type='text'
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             onKeyDown={(e) => {
@@ -387,29 +392,27 @@ export default function UsersTable() {
               }
             }}
           />
-          <div className="text-muted-foreground/80 pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 peer-disabled:opacity-50">
+          <div className='text-muted-foreground/80 pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 peer-disabled:opacity-50'>
             <SearchIcon size={16} />
           </div>
           {searchTerm && (
             <button
-              className="text-muted-foreground/80 hover:text-foreground focus-visible:border-ring focus-visible:ring-ring/50 absolute inset-y-0 end-5 flex h-full w-9 items-center justify-center rounded-e-md transition-[color,box-shadow] outline-none focus:z-10 focus-visible:ring-[3px] disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50"
-              aria-label="Clear input"
-              onClick={handleClearSearch}
-            >
-              <XIcon size={16} aria-hidden="true" />
+              className='text-muted-foreground/80 hover:text-foreground focus-visible:border-ring focus-visible:ring-ring/50 absolute inset-y-0 end-5 flex h-full w-9 items-center justify-center rounded-e-md transition-[color,box-shadow] outline-none focus:z-10 focus-visible:ring-[3px] disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50'
+              aria-label='Clear input'
+              onClick={handleClearSearch}>
+              <XIcon size={16} aria-hidden='true' />
             </button>
           )}
           {
             <button
               onClick={handleSearch}
-              className="text-muted-foreground/80 hover:text-foreground focus-visible:border-ring focus-visible:ring-ring/50 absolute inset-y-0 end-0 flex h-full w-9 items-center justify-center rounded-e-md transition-[color,box-shadow] outline-none focus:z-10 focus-visible:ring-[3px] disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50"
-              aria-label="Submit search"
-              type="submit"
-            >
-              <ArrowRightIcon size={16} aria-hidden="true" />
+              className='text-muted-foreground/80 hover:text-foreground focus-visible:border-ring focus-visible:ring-ring/50 absolute inset-y-0 end-0 flex h-full w-9 items-center justify-center rounded-e-md transition-[color,box-shadow] outline-none focus:z-10 focus-visible:ring-[3px] disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50'
+              aria-label='Submit search'
+              type='submit'>
+              <ArrowRightIcon size={16} aria-hidden='true' />
             </button>
           }
-          <div className="absolute -inset-y-4 -start-2 text-muted-foreground/80">
+          <div className='absolute -inset-y-4 -start-2 text-muted-foreground/80'>
             <Tooltip>
               <TooltipTrigger>
                 <InfoIcon size={14} />
@@ -426,28 +429,28 @@ export default function UsersTable() {
         {/* Filter by Role */}
         <Popover>
           <PopoverTrigger asChild>
-            <Button variant="outline">
+            <Button variant='outline'>
               <FilterIcon
-                className="-ms-1 opacity-60"
+                className='-ms-1 opacity-60'
                 size={16}
-                aria-hidden="true"
+                aria-hidden='true'
               />
               Role
               {roleFilter.length > 0 && (
-                <span className="bg-background text-muted-foreground/70 -me-1 inline-flex h-5 max-h-full items-center rounded border px-1 font-[inherit] text-[0.625rem] font-medium">
+                <span className='bg-background text-muted-foreground/70 -me-1 inline-flex h-5 max-h-full items-center rounded border px-1 font-[inherit] text-[0.625rem] font-medium'>
                   {roleFilter.length}
                 </span>
               )}
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-auto min-w-36 p-3" align="start">
-            <div className="space-y-3">
-              <div className="text-muted-foreground text-xs font-medium">
+          <PopoverContent className='w-auto min-w-36 p-3' align='start'>
+            <div className='space-y-3'>
+              <div className='text-muted-foreground text-xs font-medium'>
                 Filters
               </div>
-              <div className="space-y-3">
+              <div className='space-y-3'>
                 {Object.values(UserRoles).map((value, i) => (
-                  <div key={value} className="flex items-center gap-2">
+                  <div key={value} className='flex items-center gap-2'>
                     <Checkbox
                       id={`role-${i}`}
                       checked={roleFilter.includes(value)}
@@ -457,8 +460,7 @@ export default function UsersTable() {
                     />
                     <Label
                       htmlFor={`role-${i}`}
-                      className="flex grow justify-between gap-2 font-normal"
-                    >
+                      className='flex grow justify-between gap-2 font-normal'>
                       {value}
                     </Label>
                   </div>
@@ -471,28 +473,28 @@ export default function UsersTable() {
         {/* Filter by status */}
         <Popover>
           <PopoverTrigger asChild>
-            <Button variant="outline">
+            <Button variant='outline'>
               <FilterIcon
-                className="-ms-1 opacity-60"
+                className='-ms-1 opacity-60'
                 size={16}
-                aria-hidden="true"
+                aria-hidden='true'
               />
               Active Status
               {statusFilter.length > 0 && (
-                <span className="bg-background text-muted-foreground/70 -me-1 inline-flex h-5 max-h-full items-center rounded border px-1 font-[inherit] text-[0.625rem] font-medium">
+                <span className='bg-background text-muted-foreground/70 -me-1 inline-flex h-5 max-h-full items-center rounded border px-1 font-[inherit] text-[0.625rem] font-medium'>
                   {statusFilter.length}
                 </span>
               )}
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-auto min-w-36 p-3" align="start">
-            <div className="space-y-3">
-              <div className="text-muted-foreground text-xs font-medium">
+          <PopoverContent className='w-auto min-w-36 p-3' align='start'>
+            <div className='space-y-3'>
+              <div className='text-muted-foreground text-xs font-medium'>
                 Filters
               </div>
-              <div className="space-y-3">
+              <div className='space-y-3'>
                 {Object.values(IsActive).map((value, i) => (
-                  <div key={value} className="flex items-center gap-2">
+                  <div key={value} className='flex items-center gap-2'>
                     <Checkbox
                       id={`status-${i}`}
                       checked={statusFilter.includes(value)}
@@ -502,8 +504,7 @@ export default function UsersTable() {
                     />
                     <Label
                       htmlFor={`status-${i}`}
-                      className="flex grow justify-between gap-2 font-normal"
-                    >
+                      className='flex grow justify-between gap-2 font-normal'>
                       {value}
                     </Label>
                   </div>
@@ -516,28 +517,28 @@ export default function UsersTable() {
         {/* Filter by isVerified */}
         <Popover>
           <PopoverTrigger asChild>
-            <Button variant="outline">
+            <Button variant='outline'>
               <FilterIcon
-                className="-ms-1 opacity-60"
+                className='-ms-1 opacity-60'
                 size={16}
-                aria-hidden="true"
+                aria-hidden='true'
               />
               Verified Status
               {verifiedFilter !== undefined && (
-                <span className="bg-background text-muted-foreground/70 -me-1 inline-flex h-5 max-h-full items-center rounded border px-1 font-[inherit] text-[0.625rem] font-medium">
+                <span className='bg-background text-muted-foreground/70 -me-1 inline-flex h-5 max-h-full items-center rounded border px-1 font-[inherit] text-[0.625rem] font-medium'>
                   {verifiedFilter ? "Yes" : "No"}
                 </span>
               )}
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-auto min-w-36 p-3" align="start">
-            <div className="space-y-3">
-              <div className="text-muted-foreground text-xs font-medium">
+          <PopoverContent className='w-auto min-w-36 p-3' align='start'>
+            <div className='space-y-3'>
+              <div className='text-muted-foreground text-xs font-medium'>
                 Filters
               </div>
-              <div className="space-y-3">
+              <div className='space-y-3'>
                 {["Yes", "No"].map((value, i) => (
-                  <div key={value} className="flex items-center gap-2">
+                  <div key={value} className='flex items-center gap-2'>
                     <Checkbox
                       id={`isVerified-${i}`}
                       checked={verifiedFilter === (value === "Yes")}
@@ -547,8 +548,7 @@ export default function UsersTable() {
                     />
                     <Label
                       htmlFor={`isVerified-${i}`}
-                      className="flex grow justify-between gap-2 font-normal"
-                    >
+                      className='flex grow justify-between gap-2 font-normal'>
                       {value}
                     </Label>
                   </div>
@@ -560,16 +560,16 @@ export default function UsersTable() {
         {/* Toggle columns visibility */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline">
+            <Button variant='outline'>
               <Columns3Icon
-                className="-ms-1 opacity-60"
+                className='-ms-1 opacity-60'
                 size={16}
-                aria-hidden="true"
+                aria-hidden='true'
               />
               View
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
+          <DropdownMenuContent align='end'>
             <DropdownMenuLabel>Toggle columns</DropdownMenuLabel>
             {table
               .getAllColumns()
@@ -578,13 +578,12 @@ export default function UsersTable() {
                 return (
                   <DropdownMenuCheckboxItem
                     key={column.id}
-                    className="capitalize"
+                    className='capitalize'
                     checked={column.getIsVisible()}
                     onCheckedChange={(value) =>
                       column.toggleVisibility(!!value)
                     }
-                    onSelect={(event) => event.preventDefault()}
-                  >
+                    onSelect={(event) => event.preventDefault()}>
                     {column.id}
                   </DropdownMenuCheckboxItem>
                 );
@@ -593,14 +592,12 @@ export default function UsersTable() {
         </DropdownMenu>
       </div>
 
-      <div className="flex items-center gap-3">
+      <div className='flex flex-wrap items-center gap-3'>
         {/* Create button */}
         <Button
           onClick={() => setOpen(true)}
-          className="ml-auto"
-          variant="outline"
-        >
-          <PlusIcon className="-ms-1 opacity-60" size={16} aria-hidden="true" />
+          className='ml-auto'>
+          <PlusIcon className='-ms-1 opacity-60' size={16} aria-hidden='true' />
           Create Stuff
         </Button>
         <CreateStuffDialog open={open} onOpenChange={setOpen} />
@@ -617,29 +614,28 @@ export default function UsersTable() {
     return (
       <>
         {content}
-        <Information message="No user data available" />
+        <Information message='No user data available' />
       </>
     );
   }
 
   return (
-    <div className="space-y-4 overflow-x-hidden bg-background dark:bg-gray-800 p-4 md:p-8 rounded-2xl">
+    <div className='space-y-4 overflow-x-hidden bg-background dark:bg-gray-800 p-4 md:p-8 rounded-2xl'>
       {/* Filters */}
       {content}
 
       {/* Table */}
-      <div className="bg-background rounded-md border overflow-auto dark:bg-gray-800/50 dark:border-zinc-700">
-        <Table className="table-auto min-w-full">
+      <div className='bg-background rounded-md border overflow-auto dark:bg-gray-800/50 dark:border-zinc-700'>
+        <Table className='table-auto min-w-full'>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id} className="hover:bg-transparent">
+              <TableRow key={headerGroup.id} className='hover:bg-transparent'>
                 {headerGroup.headers.map((header) => {
                   return (
                     <TableHead
                       key={header.id}
                       style={{ width: `${header.getSize()}px` }}
-                      className="h-11"
-                    >
+                      className='h-11'>
                       {header.isPlaceholder ? null : header.column.getCanSort() ? (
                         <div
                           className={cn(
@@ -657,8 +653,7 @@ export default function UsersTable() {
                               header.column.getToggleSortingHandler()?.(e);
                             }
                           }}
-                          tabIndex={header.column.getCanSort() ? 0 : undefined}
-                        >
+                          tabIndex={header.column.getCanSort() ? 0 : undefined}>
                           {flexRender(
                             header.column.columnDef.header,
                             header.getContext()
@@ -666,16 +661,16 @@ export default function UsersTable() {
                           {{
                             asc: (
                               <ChevronUpIcon
-                                className="shrink-0 opacity-60"
+                                className='shrink-0 opacity-60'
                                 size={16}
-                                aria-hidden="true"
+                                aria-hidden='true'
                               />
                             ),
                             desc: (
                               <ChevronDownIcon
-                                className="shrink-0 opacity-60"
+                                className='shrink-0 opacity-60'
                                 size={16}
-                                aria-hidden="true"
+                                aria-hidden='true'
                               />
                             ),
                           }[header.column.getIsSorted() as string] ?? null}
@@ -697,10 +692,9 @@ export default function UsersTable() {
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                >
+                  data-state={row.getIsSelected() && "selected"}>
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id} className="last:py-0">
+                    <TableCell key={cell.id} className='last:py-0'>
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext()
@@ -713,8 +707,7 @@ export default function UsersTable() {
               <TableRow>
                 <TableCell
                   colSpan={columns.length}
-                  className="h-24 text-center"
-                >
+                  className='h-24 text-center'>
                   No results.
                 </TableCell>
               </TableRow>
@@ -724,22 +717,21 @@ export default function UsersTable() {
       </div>
 
       {/* Pagination */}
-      <div className="flex items-center justify-between gap-8">
+      <div className='flex items-center justify-between gap-1 md:gap-8'>
         {/* Results per page */}
-        <div className="flex items-center gap-3">
-          <Label htmlFor={id} className="max-sm:sr-only">
+        <div className='flex items-center gap-3'>
+          <Label htmlFor={id} className='max-sm:sr-only'>
             Rows per page
           </Label>
           <Select
             value={table.getState().pagination.pageSize.toString()}
             onValueChange={(value) => {
               table.setPageSize(Number(value));
-            }}
-          >
-            <SelectTrigger id={id} className="w-fit whitespace-nowrap">
-              <SelectValue placeholder="Select number of results" />
+            }}>
+            <SelectTrigger id={id} className='w-fit whitespace-nowrap'>
+              <SelectValue placeholder='Select number of results' />
             </SelectTrigger>
-            <SelectContent className="[&_*[role=option]]:ps-2 [&_*[role=option]]:pe-8 [&_*[role=option]>span]:start-auto [&_*[role=option]>span]:end-2">
+            <SelectContent className='[&_*[role=option]]:ps-2 [&_*[role=option]]:pe-8 [&_*[role=option]>span]:start-auto [&_*[role=option]>span]:end-2'>
               {[5, 10, 25, 50].map((pageSize) => (
                 <SelectItem key={pageSize} value={pageSize.toString()}>
                   {pageSize}
@@ -749,12 +741,11 @@ export default function UsersTable() {
           </Select>
         </div>
         {/* Page number information */}
-        <div className="text-muted-foreground flex grow justify-end text-sm whitespace-nowrap">
+        <div className='text-muted-foreground flex grow justify-end text-sm whitespace-nowrap'>
           <p
-            className="text-muted-foreground text-sm whitespace-nowrap"
-            aria-live="polite"
-          >
-            <span className="text-foreground">
+            className='text-muted-foreground text-sm whitespace-nowrap'
+            aria-live='polite'>
+            <span className='text-foreground'>
               {table.getState().pagination.pageIndex *
                 table.getState().pagination.pageSize +
                 1}
@@ -770,7 +761,7 @@ export default function UsersTable() {
               )}
             </span>{" "}
             of{" "}
-            <span className="text-foreground">
+            <span className='text-foreground'>
               {table.getRowCount().toString()}
             </span>
           </p>
@@ -783,53 +774,49 @@ export default function UsersTable() {
               {/* First page button */}
               <PaginationItem>
                 <Button
-                  size="icon"
-                  variant="outline"
-                  className="disabled:pointer-events-none disabled:opacity-50"
+                  size='icon'
+                  variant='outline'
+                  className='disabled:pointer-events-none disabled:opacity-50'
                   onClick={() => table.firstPage()}
                   disabled={!table.getCanPreviousPage()}
-                  aria-label="Go to first page"
-                >
-                  <ChevronFirstIcon size={16} aria-hidden="true" />
+                  aria-label='Go to first page'>
+                  <ChevronFirstIcon size={16} aria-hidden='true' />
                 </Button>
               </PaginationItem>
               {/* Previous page button */}
               <PaginationItem>
                 <Button
-                  size="icon"
-                  variant="outline"
-                  className="disabled:pointer-events-none disabled:opacity-50"
+                  size='icon'
+                  variant='outline'
+                  className='disabled:pointer-events-none disabled:opacity-50'
                   onClick={() => table.previousPage()}
                   disabled={!table.getCanPreviousPage()}
-                  aria-label="Go to previous page"
-                >
-                  <ChevronLeftIcon size={16} aria-hidden="true" />
+                  aria-label='Go to previous page'>
+                  <ChevronLeftIcon size={16} aria-hidden='true' />
                 </Button>
               </PaginationItem>
               {/* Next page button */}
               <PaginationItem>
                 <Button
-                  size="icon"
-                  variant="outline"
-                  className="disabled:pointer-events-none disabled:opacity-50"
+                  size='icon'
+                  variant='outline'
+                  className='disabled:pointer-events-none disabled:opacity-50'
                   onClick={() => table.nextPage()}
                   disabled={!table.getCanNextPage()}
-                  aria-label="Go to next page"
-                >
-                  <ChevronRightIcon size={16} aria-hidden="true" />
+                  aria-label='Go to next page'>
+                  <ChevronRightIcon size={16} aria-hidden='true' />
                 </Button>
               </PaginationItem>
               {/* Last page button */}
               <PaginationItem>
                 <Button
-                  size="icon"
-                  variant="outline"
-                  className="disabled:pointer-events-none disabled:opacity-50"
+                  size='icon'
+                  variant='outline'
+                  className='disabled:pointer-events-none disabled:opacity-50'
                   onClick={() => table.lastPage()}
                   disabled={!table.getCanNextPage()}
-                  aria-label="Go to last page"
-                >
-                  <ChevronLastIcon size={16} aria-hidden="true" />
+                  aria-label='Go to last page'>
+                  <ChevronLastIcon size={16} aria-hidden='true' />
                 </Button>
               </PaginationItem>
             </PaginationContent>
@@ -876,18 +863,17 @@ function RowActions({ row }: { row: Row<IUser> }) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <div className="flex justify-end">
+        <div className='flex justify-end'>
           <Button
-            size="icon"
-            variant="ghost"
-            className="shadow-none"
-            aria-label="Edit item"
-          >
-            <EllipsisIcon size={16} aria-hidden="true" />
+            size='icon'
+            variant='ghost'
+            className='shadow-none'
+            aria-label='Edit item'>
+            <EllipsisIcon size={16} aria-hidden='true' />
           </Button>
         </div>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
+      <DropdownMenuContent align='end'>
         <DropdownMenuItem asChild>
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
@@ -895,7 +881,7 @@ function RowActions({ row }: { row: Row<IUser> }) {
                 <span>Active Status</span>
               </DropdownMenuItem>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
+            <DialogContent className='sm:max-w-[425px]'>
               <DialogHeader>
                 <DialogTitle>Change Active Status</DialogTitle>
                 <DialogDescription>
@@ -906,27 +892,25 @@ function RowActions({ row }: { row: Row<IUser> }) {
               <Form {...form}>
                 <form
                   onSubmit={form.handleSubmit(handleBlock)}
-                  className="space-y-4"
-                >
+                  className='space-y-4'>
                   <FormField
                     control={form.control}
-                    name="isActive"
+                    name='isActive'
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Select a status</FormLabel>
                         <Select
                           onValueChange={field.onChange}
-                          defaultValue={field.value}
-                        >
-                          <FormControl className="w-full">
+                          defaultValue={field.value}>
+                          <FormControl className='w-full'>
                             <SelectTrigger>
-                              <SelectValue placeholder="Select a status" />
+                              <SelectValue placeholder='Select a status' />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="ACTIVE">Active</SelectItem>
-                            <SelectItem value="INACTIVE">Inactive</SelectItem>
-                            <SelectItem value="BLOCKED">Blocked</SelectItem>
+                            <SelectItem value='ACTIVE'>Active</SelectItem>
+                            <SelectItem value='INACTIVE'>Inactive</SelectItem>
+                            <SelectItem value='BLOCKED'>Blocked</SelectItem>
                           </SelectContent>
                         </Select>
                         <FormMessage />
@@ -935,11 +919,11 @@ function RowActions({ row }: { row: Row<IUser> }) {
                   />
                   <DialogFooter>
                     <DialogClose asChild>
-                      <Button variant="outline" type="button">
+                      <Button variant='outline' type='button'>
                         Cancel
                       </Button>
                     </DialogClose>
-                    <Button type="submit" disabled={isLoading}>
+                    <Button type='submit' disabled={isLoading}>
                       {isLoading ? "Updating..." : "Update Status"}
                     </Button>
                   </DialogFooter>

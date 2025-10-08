@@ -90,7 +90,7 @@ export default function DashboardLayout() {
               min-w-0
             "
           >
-            <div className="w-full min-w-[600px] sm:min-w-full">
+            <div className="w-full md:min-w-[600px] min-w-full">
               <Outlet />
             </div>
           </main>

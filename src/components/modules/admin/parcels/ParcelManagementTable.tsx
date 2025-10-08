@@ -569,7 +569,7 @@ export default function ParcelManagementTable() {
   // --- JSX for the filter controls area (search, status filter, etc.). ---
   const content = (
     <div className='flex flex-wrap items-center justify-between gap-3'>
-      <div className='flex items-center gap-3'>
+      <div className='flex flex-wrap items-center gap-3'>
         <div className='relative'>
           <Input
             className='peer ps-9 pe-9'
@@ -818,7 +818,7 @@ export default function ParcelManagementTable() {
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-      <div className='flex items-center gap-3'>
+      <div className='flex flex-wrap items-center gap-3'>
         <Button onClick={() => setOpen(true)} className='ml-auto text-white'>
           <PlusIcon className='-ms-1 opacity-60' size={16} aria-hidden='true' />
           Create Parcel
@@ -929,7 +929,7 @@ export default function ParcelManagementTable() {
       </div>
 
       {/* --- Pagination controls section. --- */}
-      <div className='flex items-center justify-between gap-8'>
+      <div className='flex items-center justify-between gap-1 md:gap-8'>
         <div className='flex items-center gap-3'>
           <Label htmlFor={id} className='max-sm:sr-only'>
             Rows per page
