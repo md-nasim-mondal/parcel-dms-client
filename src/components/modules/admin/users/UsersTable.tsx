@@ -618,16 +618,18 @@ export default function UsersTable() {
   }
 
   return (
-    <div className='space-y-4 overflow-x-hidden bg-card p-4 md:p-8 rounded-2xl'>
+    <div className='space-y-4 overflow-x-hidden p-2 md:p-6 rounded-2xl'>
       {/* Filters */}
       {content}
 
       {/* Table */}
-      <div className='bg-background rounded-md border overflow-auto dark:bg-gray-800/50 dark:border-zinc-700'>
+      <div className='bg-background rounded-md border overflow-auto dark:border-zinc-700'>
         <Table className='table-auto min-w-full'>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id} className='hover:bg-transparent'>
+              <TableRow
+                className='dark:bg-slate-900 dark:hover:bg-slate-800 dark:even:bg-slate-800/50'
+                key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
                   return (
                     <TableHead
@@ -689,6 +691,7 @@ export default function UsersTable() {
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow
+                  className='dark:bg-slate-900 dark:hover:bg-slate-800 dark:even:bg-slate-800/50'
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}>
                   {row.getVisibleCells().map((cell) => (
@@ -702,7 +705,7 @@ export default function UsersTable() {
                 </TableRow>
               ))
             ) : (
-              <TableRow>
+              <TableRow className='dark:bg-slate-900 dark:hover:bg-slate-800 dark:even:bg-slate-800/50'>
                 <TableCell
                   colSpan={columns.length}
                   className='h-24 text-center'>

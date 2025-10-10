@@ -844,15 +844,15 @@ export default function ParcelManagementTable() {
 
   // --- Render the main layout, including filters, the table, and pagination. ---
   return (
-    <div className='space-y-4 overflow-x-hidden bg-card p-4 md:p-8 rounded-2xl'>
+    <div className='space-y-4 overflow-x-hidden p-2 md:p-6 rounded-2xl'>
       {content}
-      <div className='rounded-md border bg-card/50 dark:border-zinc-700 overflow-auto'>
+      <div className='rounded-md border dark:border-zinc-700 overflow-auto'>
         <Table className='table-auto min-w-full'>
           <TableHeader className='px-8'>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow
                 key={headerGroup.id}
-                className='border-b dark:border-zinc-700 hover:bg-zinc-100/50 dark:hover:bg-zinc-800/50'>
+                className='dark:bg-slate-900 dark:hover:bg-slate-800 dark:even:bg-slate-800/50'>
                 {headerGroup.headers.map((header) => {
                   return (
                     <TableHead
@@ -904,7 +904,7 @@ export default function ParcelManagementTable() {
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
-                  className='border-b dark:border-zinc-700 hover:bg-zinc-100/50 dark:hover:bg-zinc-800/50'>
+                  className='dark:bg-slate-900 dark:hover:bg-slate-800 dark:even:bg-slate-800/50'>
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id} className='last:py-0'>
                       {flexRender(
@@ -916,7 +916,7 @@ export default function ParcelManagementTable() {
                 </TableRow>
               ))
             ) : (
-              <TableRow>
+              <TableRow className='dark:bg-slate-900 dark:hover:bg-slate-800 dark:even:bg-slate-800/50'>
                 <TableCell
                   colSpan={columns.length}
                   className='h-24 text-center'>
