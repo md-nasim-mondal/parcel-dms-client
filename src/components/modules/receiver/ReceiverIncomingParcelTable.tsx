@@ -98,19 +98,19 @@ const columns: ColumnDef<IParcel>[] = [
       const initials = getNameInitials(name);
 
       return (
-        <div className="flex items-start gap-3">
-          <Avatar className="h-8 w-8 rounded-lg grayscale">
-            <AvatarFallback className="rounded-lg">{initials}</AvatarFallback>
+        <div className='flex items-start gap-3'>
+          <Avatar className='h-8 w-8 rounded-lg grayscale'>
+            <AvatarFallback className='rounded-lg'>{initials}</AvatarFallback>
           </Avatar>
-          <div className="space-y-1">
-            <div className="font-medium">{name}</div>
-            <div className="text-sm text-muted-foreground">
+          <div className='space-y-1'>
+            <div className='font-medium'>{name}</div>
+            <div className='text-sm text-muted-foreground'>
               {row.original?.pickupAddress}
             </div>
-            <div className="text-sm text-muted-foreground">
+            <div className='text-sm text-muted-foreground'>
               {row.original?.sender?.email}
             </div>
-            <div className="text-sm text-muted-foreground">
+            <div className='text-sm text-muted-foreground'>
               {row.original?.sender?.phone}
             </div>
           </div>
@@ -128,19 +128,19 @@ const columns: ColumnDef<IParcel>[] = [
       const name = row.original?.receiver?.name;
       const initials = getNameInitials(name);
       return (
-        <div className="flex items-start gap-3">
-          <Avatar className="h-8 w-8 rounded-lg grayscale">
-            <AvatarFallback className="rounded-lg">{initials}</AvatarFallback>
+        <div className='flex items-start gap-3'>
+          <Avatar className='h-8 w-8 rounded-lg grayscale'>
+            <AvatarFallback className='rounded-lg'>{initials}</AvatarFallback>
           </Avatar>
-          <div className="space-y-1">
-            <div className="font-medium">{row.original?.receiver?.name}</div>
-            <div className="text-sm text-muted-foreground">
+          <div className='space-y-1'>
+            <div className='font-medium'>{row.original?.receiver?.name}</div>
+            <div className='text-sm text-muted-foreground'>
               {row.original?.deliveryAddress}
             </div>
-            <div className="text-sm text-muted-foreground">
+            <div className='text-sm text-muted-foreground'>
               {row.original?.receiver?.email}
             </div>
-            <div className="text-sm text-muted-foreground">
+            <div className='text-sm text-muted-foreground'>
               {row.original?.receiver?.phone}
             </div>
           </div>
@@ -199,13 +199,13 @@ const columns: ColumnDef<IParcel>[] = [
         .charAt(0)
         .toUpperCase()}${row.original?.shippingType.slice(1)}`;
       return (
-        <div className="space-y-1">
-          <div className="text-sm text-muted-foreground flex items-center gap-2">
-            <Package className="h-4 w-4" />
+        <div className='space-y-1'>
+          <div className='text-sm text-muted-foreground flex items-center gap-2'>
+            <Package className='h-4 w-4' />
             {packageType}
           </div>
-          <div className="text-sm text-muted-foreground flex items-center gap-2">
-            <Truck className="h-4 w-4" />
+          <div className='text-sm text-muted-foreground flex items-center gap-2'>
+            <Truck className='h-4 w-4' />
             {shippingType}
           </div>
         </div>
@@ -240,7 +240,7 @@ const columns: ColumnDef<IParcel>[] = [
     header: "Tracking ID",
     accessorKey: "trackingId",
     cell: ({ row }) => (
-      <div className="text-left">{row.getValue("trackingId")}</div>
+      <div className='text-left'>{row.getValue("trackingId")}</div>
     ),
     size: 210,
     enableHiding: true,
@@ -271,7 +271,7 @@ const columns: ColumnDef<IParcel>[] = [
   },
   {
     id: "actions",
-    header: () => <span className="sr-only">Actions</span>,
+    header: () => <span className='sr-only'>Actions</span>,
     cell: ({ row }) => <RowActions row={row} />,
     size: 60,
     enableHiding: false,
@@ -381,7 +381,7 @@ export default function ReceiverIncomingParcelTable() {
   });
 
   if (isLoadingIncomingParcels) {
-    return <Loading message="Loading parcels data..." />;
+    return <Loading message='Loading parcels data...' />;
   }
 
   if (!isLoadingIncomingParcels && isErrorIncomingParcels) {
@@ -394,21 +394,21 @@ export default function ReceiverIncomingParcelTable() {
     incomingParcels &&
     incomingParcels?.data.length === 0
   ) {
-    return <Information message="No parcel data available" />;
+    return <Information message='No parcel data available' />;
   }
 
   return (
-    <div className="space-y-4 overflow-x-hidden bg-card p-4 md:p-8 rounded-2xl">
+    <div className='space-y-4 overflow-x-hidden p-4 md:p-8 rounded-2xl'>
       {/* Filters */}
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-3">
+      <div className='flex flex-wrap items-center justify-between gap-3'>
+        <div className='flex items-center gap-3'>
           {/* Filter by tracking id / address */}
-          <div className="relative">
+          <div className='relative'>
             <Input
               // id={id}
-              className="peer ps-9 pe-9"
-              placeholder="Search..."
-              type="text"
+              className='peer ps-9 pe-9'
+              placeholder='Search...'
+              type='text'
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               onKeyDown={(e) => {
@@ -417,29 +417,27 @@ export default function ReceiverIncomingParcelTable() {
                 }
               }}
             />
-            <div className="text-muted-foreground/80 pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 peer-disabled:opacity-50">
+            <div className='text-muted-foreground/80 pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 peer-disabled:opacity-50'>
               <SearchIcon size={16} />
             </div>
             {searchTerm && (
               <button
-                className="text-muted-foreground/80 hover:text-foreground focus-visible:border-ring focus-visible:ring-ring/50 absolute inset-y-0 end-5 flex h-full w-9 items-center justify-center rounded-e-md transition-[color,box-shadow] outline-none focus:z-10 focus-visible:ring-[3px] disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50"
-                aria-label="Clear input"
-                onClick={handleClearSearch}
-              >
-                <XIcon size={16} aria-hidden="true" />
+                className='text-muted-foreground/80 hover:text-foreground focus-visible:border-ring focus-visible:ring-ring/50 absolute inset-y-0 end-5 flex h-full w-9 items-center justify-center rounded-e-md transition-[color,box-shadow] outline-none focus:z-10 focus-visible:ring-[3px] disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50'
+                aria-label='Clear input'
+                onClick={handleClearSearch}>
+                <XIcon size={16} aria-hidden='true' />
               </button>
             )}
             {
               <button
                 onClick={handleSearch}
-                className="text-muted-foreground/80 hover:text-foreground focus-visible:border-ring focus-visible:ring-ring/50 absolute inset-y-0 end-0 flex h-full w-9 items-center justify-center rounded-e-md transition-[color,box-shadow] outline-none focus:z-10 focus-visible:ring-[3px] disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50"
-                aria-label="Submit search"
-                type="submit"
-              >
-                <ArrowRightIcon size={16} aria-hidden="true" />
+                className='text-muted-foreground/80 hover:text-foreground focus-visible:border-ring focus-visible:ring-ring/50 absolute inset-y-0 end-0 flex h-full w-9 items-center justify-center rounded-e-md transition-[color,box-shadow] outline-none focus:z-10 focus-visible:ring-[3px] disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50'
+                aria-label='Submit search'
+                type='submit'>
+                <ArrowRightIcon size={16} aria-hidden='true' />
               </button>
             }
-            <div className="absolute -inset-y-4 -start-2 text-muted-foreground/80">
+            <div className='absolute -inset-y-4 -start-2 text-muted-foreground/80'>
               <Tooltip>
                 <TooltipTrigger>
                   <InfoIcon size={14} />
@@ -454,28 +452,28 @@ export default function ReceiverIncomingParcelTable() {
           {/* Filter by status */}
           <Popover>
             <PopoverTrigger asChild>
-              <Button variant="outline">
+              <Button variant='outline'>
                 <FilterIcon
-                  className="-ms-1 opacity-60"
+                  className='-ms-1 opacity-60'
                   size={16}
-                  aria-hidden="true"
+                  aria-hidden='true'
                 />
                 Status
                 {statusFilter.length > 0 && (
-                  <span className="bg-background text-muted-foreground/70 -me-1 inline-flex h-5 max-h-full items-center rounded border px-1 font-[inherit] text-[0.625rem] font-medium">
+                  <span className='bg-background text-muted-foreground/70 -me-1 inline-flex h-5 max-h-full items-center rounded border px-1 font-[inherit] text-[0.625rem] font-medium'>
                     {statusFilter.length}
                   </span>
                 )}
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-auto min-w-36 p-3" align="start">
-              <div className="space-y-3">
-                <div className="text-muted-foreground text-xs font-medium">
+            <PopoverContent className='w-auto min-w-36 p-3' align='start'>
+              <div className='space-y-3'>
+                <div className='text-muted-foreground text-xs font-medium'>
                   Filters
                 </div>
-                <div className="space-y-3">
+                <div className='space-y-3'>
                   {Object.values(ParcelStatus).map((value, i) => (
-                    <div key={value} className="flex items-center gap-2">
+                    <div key={value} className='flex items-center gap-2'>
                       <Checkbox
                         id={`status-${i}`}
                         checked={statusFilter.includes(value)}
@@ -485,8 +483,7 @@ export default function ReceiverIncomingParcelTable() {
                       />
                       <Label
                         htmlFor={`status-${i}`}
-                        className="flex grow justify-between gap-2 font-normal"
-                      >
+                        className='flex grow justify-between gap-2 font-normal'>
                         {value}
                       </Label>
                     </div>
@@ -498,16 +495,16 @@ export default function ReceiverIncomingParcelTable() {
           {/* Toggle columns visibility */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline">
+              <Button variant='outline'>
                 <Columns3Icon
-                  className="-ms-1 opacity-60"
+                  className='-ms-1 opacity-60'
                   size={16}
-                  aria-hidden="true"
+                  aria-hidden='true'
                 />
                 View
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
+            <DropdownMenuContent align='end'>
               <DropdownMenuLabel>Toggle columns</DropdownMenuLabel>
               {table
                 .getAllColumns()
@@ -516,13 +513,12 @@ export default function ReceiverIncomingParcelTable() {
                   return (
                     <DropdownMenuCheckboxItem
                       key={column.id}
-                      className="capitalize"
+                      className='capitalize'
                       checked={column.getIsVisible()}
                       onCheckedChange={(value) =>
                         column.toggleVisibility(!!value)
                       }
-                      onSelect={(event) => event.preventDefault()}
-                    >
+                      onSelect={(event) => event.preventDefault()}>
                       {column.id}
                     </DropdownMenuCheckboxItem>
                   );
@@ -533,18 +529,19 @@ export default function ReceiverIncomingParcelTable() {
       </div>
 
       {/* Table */}
-      <div className="bg-card rounded-md border overflow-auto">
-        <Table className="table-auto min-w-full">
+      <div className='rounded-md border overflow-auto'>
+        <Table className='table-auto min-w-full'>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id} className="hover:bg-transparent">
+              <TableRow
+                className='dark:bg-slate-900 dark:hover:bg-slate-800 dark:even:bg-slate-800/50'
+                key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
                   return (
                     <TableHead
                       key={header.id}
                       style={{ width: `${header.getSize()}px` }}
-                      className="h-11"
-                    >
+                      className='h-11'>
                       {header.isPlaceholder ? null : header.column.getCanSort() ? (
                         <div
                           className={cn(
@@ -562,8 +559,7 @@ export default function ReceiverIncomingParcelTable() {
                               header.column.getToggleSortingHandler()?.(e);
                             }
                           }}
-                          tabIndex={header.column.getCanSort() ? 0 : undefined}
-                        >
+                          tabIndex={header.column.getCanSort() ? 0 : undefined}>
                           {flexRender(
                             header.column.columnDef.header,
                             header.getContext()
@@ -571,16 +567,16 @@ export default function ReceiverIncomingParcelTable() {
                           {{
                             asc: (
                               <ChevronUpIcon
-                                className="shrink-0 opacity-60"
+                                className='shrink-0 opacity-60'
                                 size={16}
-                                aria-hidden="true"
+                                aria-hidden='true'
                               />
                             ),
                             desc: (
                               <ChevronDownIcon
-                                className="shrink-0 opacity-60"
+                                className='shrink-0 opacity-60'
                                 size={16}
-                                aria-hidden="true"
+                                aria-hidden='true'
                               />
                             ),
                           }[header.column.getIsSorted() as string] ?? null}
@@ -601,11 +597,11 @@ export default function ReceiverIncomingParcelTable() {
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow
+                  className='dark:bg-slate-900 dark:hover:bg-slate-800 dark:even:bg-slate-800/50'
                   key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                >
+                  data-state={row.getIsSelected() && "selected"}>
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id} className="last:py-0">
+                    <TableCell key={cell.id} className='last:py-0'>
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext()
@@ -615,11 +611,10 @@ export default function ReceiverIncomingParcelTable() {
                 </TableRow>
               ))
             ) : (
-              <TableRow>
+              <TableRow className='dark:bg-slate-900 dark:hover:bg-slate-800 dark:even:bg-slate-800/50'>
                 <TableCell
                   colSpan={columns.length}
-                  className="h-24 text-center"
-                >
+                  className='h-24 text-center'>
                   No results.
                 </TableCell>
               </TableRow>
@@ -629,22 +624,21 @@ export default function ReceiverIncomingParcelTable() {
       </div>
 
       {/* Pagination */}
-      <div className="flex items-center justify-between gap-8">
+      <div className='flex items-center justify-between gap-8'>
         {/* Results per page */}
-        <div className="flex items-center gap-3">
-          <Label htmlFor={id} className="max-sm:sr-only">
+        <div className='flex items-center gap-3'>
+          <Label htmlFor={id} className='max-sm:sr-only'>
             Rows per page
           </Label>
           <Select
             value={table.getState().pagination.pageSize.toString()}
             onValueChange={(value) => {
               table.setPageSize(Number(value));
-            }}
-          >
-            <SelectTrigger id={id} className="w-fit whitespace-nowrap">
-              <SelectValue placeholder="Select number of results" />
+            }}>
+            <SelectTrigger id={id} className='w-fit whitespace-nowrap'>
+              <SelectValue placeholder='Select number of results' />
             </SelectTrigger>
-            <SelectContent className="[&_*[role=option]]:ps-2 [&_*[role=option]]:pe-8 [&_*[role=option]>span]:start-auto [&_*[role=option]>span]:end-2">
+            <SelectContent className='[&_*[role=option]]:ps-2 [&_*[role=option]]:pe-8 [&_*[role=option]>span]:start-auto [&_*[role=option]>span]:end-2'>
               {[5, 10, 25, 50].map((pageSize) => (
                 <SelectItem key={pageSize} value={pageSize.toString()}>
                   {pageSize}
@@ -654,12 +648,11 @@ export default function ReceiverIncomingParcelTable() {
           </Select>
         </div>
         {/* Page number information */}
-        <div className="text-muted-foreground flex grow justify-end text-sm whitespace-nowrap">
+        <div className='text-muted-foreground flex grow justify-end text-sm whitespace-nowrap'>
           <p
-            className="text-muted-foreground text-sm whitespace-nowrap"
-            aria-live="polite"
-          >
-            <span className="text-foreground">
+            className='text-muted-foreground text-sm whitespace-nowrap'
+            aria-live='polite'>
+            <span className='text-foreground'>
               {table.getState().pagination.pageIndex *
                 table.getState().pagination.pageSize +
                 1}
@@ -675,7 +668,7 @@ export default function ReceiverIncomingParcelTable() {
               )}
             </span>{" "}
             of{" "}
-            <span className="text-foreground">
+            <span className='text-foreground'>
               {table.getRowCount().toString()}
             </span>
           </p>
@@ -688,53 +681,49 @@ export default function ReceiverIncomingParcelTable() {
               {/* First page button */}
               <PaginationItem>
                 <Button
-                  size="icon"
-                  variant="outline"
-                  className="disabled:pointer-events-none disabled:opacity-50"
+                  size='icon'
+                  variant='outline'
+                  className='disabled:pointer-events-none disabled:opacity-50'
                   onClick={() => table.firstPage()}
                   disabled={!table.getCanPreviousPage()}
-                  aria-label="Go to first page"
-                >
-                  <ChevronFirstIcon size={16} aria-hidden="true" />
+                  aria-label='Go to first page'>
+                  <ChevronFirstIcon size={16} aria-hidden='true' />
                 </Button>
               </PaginationItem>
               {/* Previous page button */}
               <PaginationItem>
                 <Button
-                  size="icon"
-                  variant="outline"
-                  className="disabled:pointer-events-none disabled:opacity-50"
+                  size='icon'
+                  variant='outline'
+                  className='disabled:pointer-events-none disabled:opacity-50'
                   onClick={() => table.previousPage()}
                   disabled={!table.getCanPreviousPage()}
-                  aria-label="Go to previous page"
-                >
-                  <ChevronLeftIcon size={16} aria-hidden="true" />
+                  aria-label='Go to previous page'>
+                  <ChevronLeftIcon size={16} aria-hidden='true' />
                 </Button>
               </PaginationItem>
               {/* Next page button */}
               <PaginationItem>
                 <Button
-                  size="icon"
-                  variant="outline"
-                  className="disabled:pointer-events-none disabled:opacity-50"
+                  size='icon'
+                  variant='outline'
+                  className='disabled:pointer-events-none disabled:opacity-50'
                   onClick={() => table.nextPage()}
                   disabled={!table.getCanNextPage()}
-                  aria-label="Go to next page"
-                >
-                  <ChevronRightIcon size={16} aria-hidden="true" />
+                  aria-label='Go to next page'>
+                  <ChevronRightIcon size={16} aria-hidden='true' />
                 </Button>
               </PaginationItem>
               {/* Last page button */}
               <PaginationItem>
                 <Button
-                  size="icon"
-                  variant="outline"
-                  className="disabled:pointer-events-none disabled:opacity-50"
+                  size='icon'
+                  variant='outline'
+                  className='disabled:pointer-events-none disabled:opacity-50'
                   onClick={() => table.lastPage()}
                   disabled={!table.getCanNextPage()}
-                  aria-label="Go to last page"
-                >
-                  <ChevronLastIcon size={16} aria-hidden="true" />
+                  aria-label='Go to last page'>
+                  <ChevronLastIcon size={16} aria-hidden='true' />
                 </Button>
               </PaginationItem>
             </PaginationContent>
@@ -775,35 +764,33 @@ function RowActions({ row }: { row: Row<IParcel> }) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <div className="flex justify-end">
+        <div className='flex justify-end'>
           <Button
-            size="icon"
-            variant="ghost"
-            className="shadow-none"
-            aria-label="Edit item"
-          >
-            <EllipsisIcon size={16} aria-hidden="true" />
+            size='icon'
+            variant='ghost'
+            className='shadow-none'
+            aria-label='Edit item'>
+            <EllipsisIcon size={16} aria-hidden='true' />
           </Button>
         </div>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
+      <DropdownMenuContent align='end'>
         <DropdownMenuItem asChild>
           <DeleteConfirmation
             trigger={
               <DropdownMenuItem
-                className="focus:text-destructive"
-                onSelect={(e) => e.preventDefault()}
-              >
+                className='focus:text-destructive'
+                onSelect={(e) => e.preventDefault()}>
                 <span>Confirm Delivery</span>
               </DropdownMenuItem>
             }
-            title="Are you sure?"
+            title='Are you sure?'
             description={`Are you sure you want to confirm this parcel delivery?`}
             onConfirm={() => {
               handleConfirmDelivery(row);
             }}
             isLoading={isConfirming}
-            confirmText="Yes, confirm"
+            confirmText='Yes, confirm'
           />
         </DropdownMenuItem>
       </DropdownMenuContent>

@@ -361,7 +361,7 @@ export default function ReceiverHistoryParcelTable() {
   }
 
   return (
-    <div className='space-y-4 overflow-x-hidden bg-card p-4 md:p-8 rounded-2xl'>
+    <div className='space-y-4 overflow-x-hidden p-4 md:p-8 rounded-2xl'>
       {/* Filters */}
       <div className='flex flex-wrap items-center justify-between gap-3'>
         <div className='flex items-center gap-3'>
@@ -449,11 +449,11 @@ export default function ReceiverHistoryParcelTable() {
       </div>
 
       {/* Table */}
-      <div className='bg-card rounded-md border overflow-auto'>
+      <div className='rounded-md border overflow-auto'>
         <Table className='table-auto min-w-full'>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id} className='hover:bg-transparent'>
+              <TableRow  className="dark:bg-slate-900 dark:hover:bg-slate-800 dark:even:bg-slate-800/50" key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
                   return (
                     <TableHead
@@ -514,7 +514,7 @@ export default function ReceiverHistoryParcelTable() {
           <TableBody>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow
+                <TableRow  className="dark:bg-slate-900 dark:hover:bg-slate-800 dark:even:bg-slate-800/50"
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}>
                   {row.getVisibleCells().map((cell) => (
@@ -528,7 +528,7 @@ export default function ReceiverHistoryParcelTable() {
                 </TableRow>
               ))
             ) : (
-              <TableRow>
+              <TableRow  className="dark:bg-slate-900 dark:hover:bg-slate-800 dark:even:bg-slate-800/50">
                 <TableCell
                   colSpan={columns.length}
                   className='h-24 text-center'>
