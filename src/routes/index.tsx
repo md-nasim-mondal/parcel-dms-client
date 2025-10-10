@@ -15,13 +15,13 @@ import ReceiverDashboard from "@/pages/receiver/dashboard/ReceiverDashboard";
 import AdminDashboard from "@/pages/admin/dashboard/AdminDashboard";
 import Verify from "@/pages/public/authentication/Verify";
 import MyParcels from "@/pages/sender/dashboard/MyParcels";
-import ReceiverParcels from "@/pages/receiver/dashboard/ReceiverParcels";
 import ManageUsers from "@/pages/admin/dashboard/ManageUsers";
 import ManageParcels from "@/pages/admin/dashboard/ManageParcels";
 import ForgotPassword from "@/pages/public/authentication/ForgotPassword";
 import ResetPassword from "@/pages/public/authentication/ResetPassword";
 import Profile from "@/pages/shared/Profile";
-import ParcelHistory from "@/pages/receiver/dashboard/ParcelHistory";
+import DeliveryHistory from "@/pages/receiver/dashboard/DeliveryHistory";
+import IncomingParcels from "@/pages/receiver/dashboard/IncomingParcels";
 
 export const router = createBrowserRouter([
   {
@@ -99,7 +99,7 @@ export const router = createBrowserRouter([
       {
         path: "my-parcels",
         Component: MyParcels,
-      }
+      },
     ],
   },
   {
@@ -123,11 +123,11 @@ export const router = createBrowserRouter([
       },
       {
         path: "incoming-parcels",
-        Component: ReceiverParcels,
+        Component: IncomingParcels,
       },
       {
         path: "delivery-history",
-        Component: ParcelHistory,
+        Component: DeliveryHistory,
       },
     ],
   },
