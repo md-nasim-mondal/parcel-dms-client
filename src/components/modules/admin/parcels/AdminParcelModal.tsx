@@ -220,17 +220,7 @@ export function AdminCreateParcelDialog({
                 <FormItem>
                   <FormLabel>Weight (kg)</FormLabel>
                   <FormControl>
-                    <Input
-                      type='number'
-                      step='0.1'
-                      min='0.1'
-                      {...field}
-                      value={
-                        typeof field.value === "number"
-                          ? field.value
-                          : Number(field.value) || 0.1
-                      }
-                    />
+                    <Input type='number' step='0.1' min='0.1' {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -300,7 +290,7 @@ export function AdminCreateParcelDialog({
 
             <DialogFooter className='flex justify-between items-center'>
               {isLoading && <Spinner variant={"circle-filled"} />}
-              <Button className="text-white" type='submit' disabled={isLoading}>
+              <Button className='text-white' type='submit' disabled={isLoading}>
                 Submit
               </Button>
             </DialogFooter>
