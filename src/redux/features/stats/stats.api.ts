@@ -17,13 +17,6 @@ export const statsApi = baseApi.injectEndpoints({
       }),
       providesTags: ["USER", "USERS", "STATS"],
     }),
-    getAdminStats: builder.query<any, void>({
-      query: () => ({
-        url: "/stats/admin",
-        method: "GET",
-      }),
-      providesTags: ["STATS"],
-    }),
     getSenderStats: builder.query<any, void>({
       query: () => ({
         url: "/stats/sender",
@@ -44,7 +37,6 @@ export const statsApi = baseApi.injectEndpoints({
 export const {
   useGetParcelStatsQuery,
   useGetUserStatsQuery,
-  useGetAdminStatsQuery,
   useGetSenderStatsQuery,
   useGetReceiverStatsQuery,
 } = statsApi;
