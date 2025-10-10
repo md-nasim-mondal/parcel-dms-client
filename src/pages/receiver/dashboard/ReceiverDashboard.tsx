@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useGetReceiverStatsQuery } from "@/redux/features/stats/stats.api";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Package, CheckCircle, Truck, MapPin } from "lucide-react";
 import {
@@ -11,6 +11,8 @@ import {
 import { ParcelStatus } from "@/types/sender.parcel.type";
 
 const ReceiverDashboard = () => {
+  const navigate = useNavigate();
+
   const {
     data: statsData,
     isLoading,
@@ -219,7 +221,12 @@ const ReceiverDashboard = () => {
                         : "N/A"}
                     </p>
                   </div>
-                  <Button size='sm' variant='outline'>
+                  <Button
+                    onClick={() =>
+                      navigate(`/tracking?trackingId=${parcel.trackingId}`)
+                    }
+                    size='sm'
+                    variant='outline'>
                     Track
                   </Button>
                 </div>

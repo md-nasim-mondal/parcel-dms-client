@@ -55,7 +55,7 @@ export default function DashboardLayout() {
 
   return (
     <SidebarProvider>
-      <div className="flex min-h-screen w-full overflow-hidden bg-slate-100 dark:bg-slate-900">
+      <div className="flex min-h-screen w-full overflow-x-hidden bg-slate-100 dark:bg-slate-900">
         {/* Sidebar */}
         <AppSidebar />
 
