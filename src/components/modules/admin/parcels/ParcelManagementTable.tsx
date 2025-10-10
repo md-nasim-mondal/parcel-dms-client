@@ -1152,7 +1152,7 @@ function RowActions({ row }: { row: Row<IParcel> }) {
       <DropdownMenuContent align='end'>
         <DropdownMenuGroup>
           <DropdownMenuItem asChild>
-            <Link to={`/admin/${row.original?._id}/details`}>
+            <Link to={`/admin/dashboard/parcel/details/${row.original?._id}`}>
               <span>View Details</span>
             </Link>
           </DropdownMenuItem>

@@ -22,6 +22,7 @@ import ResetPassword from "@/pages/public/authentication/ResetPassword";
 import Profile from "@/pages/shared/Profile";
 import DeliveryHistory from "@/pages/receiver/dashboard/DeliveryHistory";
 import IncomingParcels from "@/pages/receiver/dashboard/IncomingParcels";
+import ViewParcelDetails from "@/pages/admin/dashboard/ViewParcelDetails";
 
 export const router = createBrowserRouter([
   {
@@ -160,6 +161,10 @@ export const router = createBrowserRouter([
       {
         path: "manage-parcels",
         Component: ManageParcels,
+      },
+      {
+        path: "parcel/details/:id",
+        Component: ViewParcelDetails,
       },
     ],
   },
