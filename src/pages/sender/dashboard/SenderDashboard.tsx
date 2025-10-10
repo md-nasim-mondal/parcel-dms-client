@@ -1,171 +1,333 @@
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useGetSenderStatsQuery } from "@/redux/features/stats/stats.api";
+import React, { useMemo, type FC } from "react";
 import { Link } from "react-router";
-import { Skeleton } from "@/components/ui/skeleton";
+import { useGetSenderStatsQuery } from "@/redux/features/stats/stats.api";
 import {
   Package,
   Truck,
   CheckCircle,
   Clock,
   Plus,
+  PieChart as PieIcon,
+  BarChart2,
 } from "lucide-react";
-import { BarChart, PieChart } from "recharts";
+import {
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+  Tooltip,
+  Legend,
+  Bar,
+  XAxis,
+  YAxis,
+  BarChart,
+} from "recharts";
 
-const SenderDashboard = () => {
-  const { data: stats, isLoading } = useGetSenderStatsQuery();
+// ShadCN UI Components
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { cn } from "@/lib/utils";
 
-  const statusCounts = stats?.data?.statusCounts || {
-    pending: 0,
-    processing: 0,
-    shipped: 0,
-    delivered: 0,
-    cancelled: 0,
-  };
+// ========= TypeScript Interfaces for API Data =========
+interface CountById {
+  _id: string;
+  count: number;
+}
 
-  const totalParcels = Object.values(statusCounts).reduce(
-    (acc: number, curr) => acc + (curr as number),
-    0
-  );
+// ========= Reusable Components with Proper Types =========
+const StatCard: FC<{
+  title: string;
+  value: string | number;
+  icon: React.ElementType;
+  details?: string;
+  className?: string;
+}> = ({ title, value, icon: Icon, details, className }) => (
+  <Card className={cn("border-0 text-white", className)}>
+    <CardContent className='p-5'>
+      <div className='flex items-center justify-between'>
+        <p className='text-sm font-medium text-white/80'>{title}</p>
+        <div className='p-2 bg-white/20 rounded-lg'>
+          <Icon className='w-5 h-5' />
+        </div>
+      </div>
+      <p className='text-3xl font-bold mt-2'>{value}</p>
+      {details && <p className='text-xs text-white/70 mt-1'>{details}</p>}
+    </CardContent>
+  </Card>
+);
 
-  const chartData = [
-    { name: "Pending", value: statusCounts.pending },
-    { name: "Processing", value: statusCounts.processing },
-    { name: "Shipped", value: statusCounts.shipped },
-    { name: "Delivered", value: statusCounts.delivered },
-    { name: "Cancelled", value: statusCounts.cancelled },
-  ];
+const formatChartData = (data: CountById[] | undefined) =>
+  data?.map((item) => ({
+    name: item._id.replace("_", " ").replace(/\b\w/g, (c) => c.toUpperCase()),
+    value: item.count,
+  })) || [];
 
-  const monthlyData = stats?.data?.monthlyParcels || [];
+// ========= Main Sender Dashboard Component =========
+const SenderDashboard: FC = () => {
+  // ✅ FIX: Removed the incorrect generic type from the hook call.
+  const { data: statsData, isLoading } = useGetSenderStatsQuery(undefined);
+
+  // ✅ FIX: Access the nested 'data' property correctly.
+  const stats = statsData?.data;
+
+  // Calculate stats from the fetched data
+  const { deliveredCount, inTransitCount, requestedCount } = useMemo(() => {
+    if (!stats?.parcelsByStatus) {
+      return { deliveredCount: 0, inTransitCount: 0, requestedCount: 0 };
+    }
+    const findCount = (status: string) =>
+      stats.parcelsByStatus.find((s: CountById) => s._id === status)?.count ||
+      0;
+
+    const delivered = findCount("delivered");
+    const requested = findCount("requested");
+    const inTransit = ["dispatched", "in-transit", "picked", "approved"].reduce(
+      (acc, status) => acc + findCount(status),
+      0
+    );
+
+    return {
+      deliveredCount: delivered,
+      inTransitCount: inTransit,
+      requestedCount: requested,
+    };
+  }, [stats]);
+
+  if (isLoading) {
+    return (
+      <div className='space-y-6'>
+        <div className='flex justify-between items-center'>
+          <Skeleton className='h-10 w-64' />
+          <Skeleton className='h-10 w-40' />
+        </div>
+        <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-4'>
+          {[...Array(4)].map((_, i) => (
+            <Skeleton key={i} className='h-28' />
+          ))}
+        </div>
+        <div className='grid gap-4 md:grid-cols-2'>
+          {[...Array(2)].map((_, i) => (
+            <Skeleton key={i} className='h-80' />
+          ))}
+        </div>
+        <Skeleton className='h-64' />
+      </div>
+    );
+  }
 
   return (
     <div className='space-y-6'>
-      <div className='flex items-center justify-between'>
-        <div className='flex items-center gap-2'>
-          <div className='p-2 bg-blue-100 rounded-lg dark:bg-blue-900'>
-            <Package className='h-6 w-6 text-blue-600 dark:text-blue-400' />
-          </div>
-          <h2 className='text-3xl font-bold tracking-tight'>
+      <div className='flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4'>
+        <div>
+          <h1 className='text-3xl font-bold text-slate-900 dark:text-white'>
             Sender Dashboard
-          </h2>
+          </h1>
+          <p className='text-slate-600 dark:text-slate-400 mt-1'>
+            Here's an overview of your parcel activities.
+          </p>
         </div>
-        <Button asChild>
-          <Link to='/sender/parcels/create'>
-            <Plus className='mr-2 h-4 w-4' /> Create New Parcel
+        <Button asChild className='w-full sm:w-auto'>
+          <Link
+            to='/sender/dashboard/create-parcel'
+            className='flex items-center gap-2'>
+            <Plus className='mr-2 h-4 w-4' /> Send New Parcel
           </Link>
         </Button>
       </div>
 
-      {/* Stats Cards */}
       <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-4'>
-        {isLoading ? (
-          <>
-            <Skeleton className='h-32' />
-            <Skeleton className='h-32' />
-            <Skeleton className='h-32' />
-            <Skeleton className='h-32' />
-          </>
-        ) : (
-          <>
-            <Card>
-              <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-                <CardTitle className='text-sm font-medium'>
-                  Total Parcels
-                </CardTitle>
-                <Package className='h-4 w-4 text-muted-foreground' />
-              </CardHeader>
-              <CardContent>
-                <div className='text-2xl font-bold'>{totalParcels}</div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-                <CardTitle className='text-sm font-medium'>
-                  In Transit
-                </CardTitle>
-                <Truck className='h-4 w-4 text-blue-500' />
-              </CardHeader>
-              <CardContent>
-                <div className='text-2xl font-bold'>
-                  {statusCounts.processing + statusCounts.shipped}
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-                <CardTitle className='text-sm font-medium'>Delivered</CardTitle>
-                <CheckCircle className='h-4 w-4 text-green-500' />
-              </CardHeader>
-              <CardContent>
-                <div className='text-2xl font-bold'>
-                  {statusCounts.delivered}
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-                <CardTitle className='text-sm font-medium'>Pending</CardTitle>
-                <Clock className='h-4 w-4 text-yellow-500' />
-              </CardHeader>
-              <CardContent>
-                <div className='text-2xl font-bold'>{statusCounts.pending}</div>
-              </CardContent>
-            </Card>
-          </>
-        )}
+        <StatCard
+          title='Total Parcels'
+          value={stats?.totalParcels ?? 0}
+          icon={Package}
+          details={`+${stats?.parcelsLast30Days ?? 0} in last 30 days`}
+          className='bg-gradient-to-br from-blue-500 to-blue-700'
+        />
+        <StatCard
+          title='Delivered'
+          value={deliveredCount}
+          icon={CheckCircle}
+          className='bg-gradient-to-br from-emerald-500 to-emerald-700'
+        />
+        <StatCard
+          title='In Transit'
+          value={inTransitCount}
+          icon={Truck}
+          className='bg-gradient-to-br from-violet-500 to-violet-700'
+        />
+        <StatCard
+          title='Requested'
+          value={requestedCount}
+          icon={Clock}
+          className='bg-gradient-to-br from-amber-500 to-amber-600'
+        />
       </div>
 
-      {/* Charts */}
-      <div className='grid gap-4 md:grid-cols-2'>
-        <Card className='col-span-1'>
+      <div className='grid gap-6 md:grid-cols-2'>
+        <Card>
           <CardHeader>
-            <CardTitle>Parcel Status Distribution</CardTitle>
+            <CardTitle className='flex items-center'>
+              <PieIcon className='w-5 h-5 mr-2' />
+              Parcel Status
+            </CardTitle>
           </CardHeader>
-          <CardContent className='pl-2'>
-            {isLoading ? (
-              <Skeleton className='h-80' />
-            ) : (
-              <PieChart data={chartData} />
-            )}
+          <CardContent>
+            <ResponsiveContainer width='100%' height={300}>
+              <PieChart>
+                <Pie
+                  data={formatChartData(stats?.parcelsByStatus)}
+                  dataKey='value'
+                  nameKey='name'
+                  cx='50%'
+                  cy='50%'
+                  outerRadius={90}
+                  label>
+                  {formatChartData(stats?.parcelsByStatus).map((_, index) => (
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={
+                        ["#10B981", "#3B82F6", "#8B5CF6", "#F97316"][index % 4]
+                      }
+                    />
+                  ))}
+                </Pie>
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: "#1e293b",
+                    border: "none",
+                    borderRadius: "0.5rem",
+                  }}
+                  itemStyle={{ color: "#cbd5e1" }}
+                />
+                <Legend />
+              </PieChart>
+            </ResponsiveContainer>
           </CardContent>
         </Card>
 
-        <Card className='col-span-1'>
+        <Card>
           <CardHeader>
-            <CardTitle>Monthly Shipments</CardTitle>
+            <CardTitle className='flex items-center'>
+              <BarChart2 className='w-5 h-5 mr-2' />
+              Parcel Breakdown
+            </CardTitle>
           </CardHeader>
-          <CardContent className='pl-2'>
-            {isLoading ? (
-              <Skeleton className='h-80' />
-            ) : (
-              <BarChart data={monthlyData} />
-            )}
+          <CardContent>
+            <Tabs defaultValue='type'>
+              <TabsList className='grid w-full grid-cols-2'>
+                <TabsTrigger value='type'>By Type</TabsTrigger>
+                <TabsTrigger value='shipping'>By Shipping</TabsTrigger>
+              </TabsList>
+              <TabsContent value='type'>
+                <ResponsiveContainer width='100%' height={250}>
+                  <BarChart
+                    data={formatChartData(stats?.parcelsByType)}
+                    margin={{ top: 20, right: 20, left: -10, bottom: 5 }}>
+                    <XAxis
+                      dataKey='name'
+                      stroke='#a1a1aa'
+                      fontSize={12}
+                      tickLine={false}
+                      axisLine={false}
+                    />
+                    <YAxis
+                      stroke='#a1a1aa'
+                      fontSize={12}
+                      tickLine={false}
+                      axisLine={false}
+                    />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: "#1e293b",
+                        border: "none",
+                        borderRadius: "0.5rem",
+                      }}
+                      cursor={{ fill: "rgba(100, 116, 139, 0.1)" }}
+                    />
+                    <Bar dataKey='value' fill='#3B82F6' radius={[4, 4, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </TabsContent>
+              <TabsContent value='shipping'>
+                <ResponsiveContainer width='100%' height={250}>
+                  <BarChart
+                    data={formatChartData(stats?.parcelsByShippingType)}
+                    margin={{ top: 20, right: 20, left: -10, bottom: 5 }}>
+                    <XAxis
+                      dataKey='name'
+                      stroke='#a1a1aa'
+                      fontSize={12}
+                      tickLine={false}
+                      axisLine={false}
+                    />
+                    <YAxis
+                      stroke='#a1a1aa'
+                      fontSize={12}
+                      tickLine={false}
+                      axisLine={false}
+                    />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: "#1e293b",
+                        border: "none",
+                        borderRadius: "0.5rem",
+                      }}
+                      cursor={{ fill: "rgba(100, 116, 139, 0.1)" }}
+                    />
+                    <Bar dataKey='value' fill='#10B981' radius={[4, 4, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </TabsContent>
+            </Tabs>
           </CardContent>
         </Card>
       </div>
 
-      {/* Recent Parcels */}
       <Card>
-        <CardHeader className='flex flex-row items-center justify-between'>
-          <CardTitle>Recent Parcels</CardTitle>
+        <CardHeader>
+          <CardTitle>Top Receivers</CardTitle>
+          <CardDescription>
+            List of receivers you've sent the most parcels to.
+          </CardDescription>
         </CardHeader>
         <CardContent>
-          {isLoading ? (
-            <div className='space-y-2'>
-              <Skeleton className='h-10 w-full' />
-              <Skeleton className='h-10 w-full' />
-              <Skeleton className='h-10 w-full' />
-            </div>
-          ) : (
-            <div className='text-center py-4'>
-              <Button asChild>
-                <Link to='/sender/parcels'>View All Parcels</Link>
-              </Button>
-            </div>
-          )}
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Receiver ID</TableHead>
+                <TableHead className='text-right'>Parcels Sent</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {/* ✅ FIX: Added type for the 'receiver' parameter */}
+              {stats?.parcelsPerReceiver?.map((receiver: CountById) => (
+                <TableRow key={receiver._id}>
+                  <TableCell className='font-mono text-xs'>
+                    {receiver._id}
+                  </TableCell>
+                  <TableCell className='text-right font-semibold'>
+                    {receiver.count}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         </CardContent>
       </Card>
     </div>
