@@ -4,11 +4,47 @@ import { useGetReceiverStatsQuery } from "@/redux/features/stats/stats.api";
 import { Link } from "react-router";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Package, CheckCircle, Truck, MapPin } from "lucide-react";
+import {
+  useGetIncomingParcelsQuery,
+  useGetReceiverParcelHistoryQuery,
+} from "@/redux/features/parcel/parcel.api";
+import { ParcelStatus } from "@/types/sender.parcel.type";
 
 const ReceiverDashboard = () => {
-  const { data: stats, isLoading } = useGetReceiverStatsQuery();
+  const {
+    data: statsData,
+    isLoading,
+    error: statsError,
+  } = useGetReceiverStatsQuery();
+  const currentQuery = {
+    page: 1,
+    limit: 2,
+    sort: "-createdAt",
+  };
 
-  const statusCounts = stats?.data?.statusCounts || {
+  const {
+    data: incomingParcelsData,
+    isLoading: isLoadingIncomingParcels,
+    isError: isErrorIncomingParcels,
+    error: incomingParcelsError,
+  } = useGetIncomingParcelsQuery({
+    ...currentQuery,
+  });
+  const {
+    data: deliveredParcels,
+    isLoading: isLoadingDeliveredParcels,
+    isError: isErrorDeliveredParcels,
+    error: deliveredParcelsError,
+  } = useGetReceiverParcelHistoryQuery({
+    ...currentQuery,
+    currentStatus: [ParcelStatus.DELIVERED],
+  });
+
+  const recentDeliveries = deliveredParcels?.data || [];
+
+  const incomingParcels = incomingParcelsData?.data || [];
+
+  const stats = statsData?.data || {
     pending: 0,
     processing: 0,
     shipped: 0,
@@ -16,43 +52,7 @@ const ReceiverDashboard = () => {
     cancelled: 0,
   };
 
-  const incomingParcels = [
-    {
-      id: 1,
-      trackingId: "TRK123459",
-      sender: "Alice Brown",
-      status: "in-transit",
-      estimatedDelivery: "2024-01-18",
-      from: "789 Market St, City",
-    },
-    {
-      id: 2,
-      trackingId: "TRK123460",
-      sender: "Bob Wilson",
-      status: "pending",
-      estimatedDelivery: "2024-01-20",
-      from: "321 Elm St, Town",
-    },
-  ];
-
-  const recentDeliveries = [
-    {
-      id: 1,
-      trackingId: "TRK123458",
-      sender: "Mike Johnson",
-      deliveredAt: "2024-01-10",
-      status: "delivered",
-    },
-    {
-      id: 2,
-      trackingId: "TRK123457",
-      sender: "Sarah Smith",
-      deliveredAt: "2024-01-08",
-      status: "delivered",
-    },
-  ];
-
-  if (isLoading) {
+  if (isLoading || isLoadingIncomingParcels || isLoadingDeliveredParcels) {
     return (
       <div className='space-y-6'>
         <Skeleton className='h-10 w-64' />
@@ -84,6 +84,39 @@ const ReceiverDashboard = () => {
     );
   }
 
+  if (statsError || isErrorIncomingParcels || isErrorDeliveredParcels) {
+    return (
+      <div className='space-y-6'>
+        <div className='flex justify-between items-center'>
+          <div>
+            <h1 className='text-3xl font-bold text-gray-900 dark:text-white'>
+              Receiver Dashboard
+            </h1>
+            <p className='text-gray-600 dark:text-gray-400 mt-1'>
+              Track incoming parcels and manage deliveries
+            </p>
+          </div>
+        </div>
+        <Card className='border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20'>
+          <CardContent className='p-6'>
+            <p className='text-red-700 dark:text-red-300 font-medium'>
+              Something went wrong while loading the dashboard.
+            </p>
+            <p className='text-sm text-red-600 dark:text-red-400 mt-1'>
+              {statsError ? "Failed to load statistics. " : null}
+              {incomingParcelsError
+                ? `Incoming parcels: ${incomingParcelsError} `
+                : null}
+              {deliveredParcelsError
+                ? `Delivery history: ${deliveredParcelsError}`
+                : null}
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className='space-y-6'>
       {/* Header */}
@@ -108,7 +141,7 @@ const ReceiverDashboard = () => {
                   Incoming
                 </p>
                 <p className='text-2xl font-bold text-gray-900 dark:text-white mt-1'>
-                  {incomingParcels.length}
+                  {stats.totalIncomingParcels}
                 </p>
               </div>
               <div className='w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center'>
@@ -126,10 +159,7 @@ const ReceiverDashboard = () => {
                   In Transit
                 </p>
                 <p className='text-2xl font-bold text-gray-900 dark:text-white mt-1'>
-                  {
-                    incomingParcels.filter((p) => p.status === "in-transit")
-                      .length
-                  }
+                  {stats.totalInTransitParcels}
                 </p>
               </div>
               <div className='w-12 h-12 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg flex items-center justify-center'>
@@ -147,7 +177,7 @@ const ReceiverDashboard = () => {
                   Delivered
                 </p>
                 <p className='text-2xl font-bold text-gray-900 dark:text-white mt-1'>
-                  {statusCounts.delivered}
+                  {stats.totalDeliveredParcels}
                 </p>
               </div>
               <div className='w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center'>
@@ -169,19 +199,24 @@ const ReceiverDashboard = () => {
           </CardHeader>
           <CardContent>
             <div className='space-y-4'>
-              {incomingParcels.map((parcel) => (
+              {incomingParcels?.map((parcel) => (
                 <div
-                  key={parcel.id}
+                  key={parcel?._id}
                   className='flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg'>
                   <div>
                     <p className='font-medium text-gray-900 dark:text-white'>
                       {parcel.trackingId}
                     </p>
                     <p className='text-sm text-gray-600 dark:text-gray-300'>
-                      From: {parcel.sender}
+                      From: {parcel?.sender?.name || "N/A"}
                     </p>
                     <p className='text-xs text-gray-500 dark:text-gray-400'>
-                      Est: {parcel.estimatedDelivery}
+                      Est:{" "}
+                      {parcel.estimatedDelivery
+                        ? new Date(
+                            parcel.estimatedDelivery
+                          ).toLocaleDateString()
+                        : "N/A"}
                     </p>
                   </div>
                   <Button size='sm' variant='outline'>
@@ -192,7 +227,9 @@ const ReceiverDashboard = () => {
             </div>
             <div className='mt-4 text-center'>
               <Button asChild variant='outline'>
-                <Link to='/receiver/parcels'>View All Incoming</Link>
+                <Link to='/receiver/dashboard/incoming-parcels'>
+                  View All Incoming
+                </Link>
               </Button>
             </div>
           </CardContent>
@@ -210,17 +247,20 @@ const ReceiverDashboard = () => {
             <div className='space-y-4'>
               {recentDeliveries.map((delivery) => (
                 <div
-                  key={delivery.id}
+                  key={delivery._id}
                   className='flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg'>
                   <div>
                     <p className='font-medium text-gray-900 dark:text-white'>
                       {delivery.trackingId}
                     </p>
                     <p className='text-sm text-gray-600 dark:text-gray-300'>
-                      From: {delivery.sender}
+                      From: {delivery?.sender?.name || "N/A"}
                     </p>
                     <p className='text-xs text-gray-500 dark:text-gray-400'>
-                      Delivered: {delivery.deliveredAt}
+                      Delivered:{" "}
+                      {delivery.deliveredAt
+                        ? new Date(delivery.deliveredAt).toLocaleDateString()
+                        : "N/A"}
                     </p>
                   </div>
                   <span className='px-2 py-1 text-xs bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400 rounded-full'>
@@ -231,7 +271,9 @@ const ReceiverDashboard = () => {
             </div>
             <div className='mt-4 text-center'>
               <Button asChild variant='outline'>
-                <Link to='/receiver/history'>View Full History</Link>
+                <Link to='/receiver/dashboard/delivery-history'>
+                  View Full History
+                </Link>
               </Button>
             </div>
           </CardContent>
