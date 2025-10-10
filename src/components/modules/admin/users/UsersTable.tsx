@@ -594,9 +594,7 @@ export default function UsersTable() {
 
       <div className='flex flex-wrap items-center gap-3'>
         {/* Create button */}
-        <Button
-          onClick={() => setOpen(true)}
-          className='ml-auto'>
+        <Button onClick={() => setOpen(true)} className='ml-auto'>
           <PlusIcon className='-ms-1 opacity-60' size={16} aria-hidden='true' />
           Create Stuff
         </Button>
@@ -908,9 +906,15 @@ function RowActions({ row }: { row: Row<IUser> }) {
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value='ACTIVE'>Active</SelectItem>
-                            <SelectItem value='INACTIVE'>Inactive</SelectItem>
-                            <SelectItem value='BLOCKED'>Blocked</SelectItem>
+                            <SelectItem value={IsActive.ACTIVE}>
+                              Active
+                            </SelectItem>
+                            <SelectItem value={IsActive.INACTIVE}>
+                              Inactive
+                            </SelectItem>
+                            <SelectItem value={IsActive.BLOCKED}>
+                              Blocked
+                            </SelectItem>
                           </SelectContent>
                         </Select>
                         <FormMessage />
