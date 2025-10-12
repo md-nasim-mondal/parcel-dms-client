@@ -28,6 +28,7 @@ export interface IForgotPassword {
 export interface IResetPassword {
   id: string;
   newPassword: string;
+  resetToken: string;
 }
 
 export interface ISendOtp {
