@@ -4,14 +4,14 @@ import type { IUser, IUserParams } from "@/types/user.type";
 
 export const userApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    updateUserStatus: builder.mutation<
+    updateUserRole: builder.mutation<
       IResponse<null>,
-      { id: string; status: string }
+      { id: string; role: string }
     >({
-      query: ({ id, status }) => ({
+      query: ({ id, role }) => ({
         url: `/users/${id}`,
         method: "PUT",
-        data: { status },
+        data: { role },
       }),
       invalidatesTags: ["USER", "USERS"],
     }),
@@ -71,14 +71,6 @@ export const userApi = baseApi.injectEndpoints({
       }),
       providesTags: ["USER", "USERS"],
     }),
-    updateUserById: builder.mutation({
-      query: ({ id, data }) => ({
-        url: `/users/${id}`,
-        method: "PATCH",
-        data,
-      }),
-      invalidatesTags: ["USER", "USERS"],
-    }),
     blockUserById: builder.mutation({
       query: ({ id, data }) => ({
         url: `/users/block-user/${id}`,
@@ -94,7 +86,7 @@ export const {
   useGetAllUsersQuery,
   useGetUserByIdQuery,
   useUserInfoQuery,
-  useUpdateUserStatusMutation,
+  useUpdateUserRoleMutation,
   useUpdateProfileMutation,
   useGetMeQuery,
   useCreateAdminMutation,

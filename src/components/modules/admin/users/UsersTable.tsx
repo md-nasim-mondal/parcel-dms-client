@@ -34,7 +34,7 @@ import {
   SearchIcon,
   XIcon,
 } from "lucide-react";
-import { useEffect, useId, useState } from "react";
+import { useId, useState } from "react";
 import { useForm } from "react-hook-form";
 
 import Error from "@/components/Error";
@@ -52,7 +52,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import {
   DropdownMenu,
@@ -98,6 +97,7 @@ import { cn } from "@/lib/utils";
 import {
   useBlockUserByIdMutation,
   useGetAllUsersQuery,
+  useUpdateUserRoleMutation,
 } from "@/redux/features/user/user.api";
 import { getNameInitials } from "@/utils/getNameInitials";
 import { getUserIsActiveStatusColor } from "@/utils/getStatusColor";
@@ -594,9 +594,7 @@ export default function UsersTable() {
 
       <div className='flex flex-wrap items-center gap-3'>
         {/* Create button */}
-        <Button
-          onClick={() => setOpen(true)}
-          className='ml-auto'>
+        <Button onClick={() => setOpen(true)} className='ml-auto'>
           <PlusIcon className='-ms-1 opacity-60' size={16} aria-hidden='true' />
           Create Stuff
         </Button>
@@ -620,16 +618,18 @@ export default function UsersTable() {
   }
 
   return (
-    <div className='space-y-4 overflow-x-hidden bg-card p-4 md:p-8 rounded-2xl'>
+    <div className='space-y-4 overflow-x-hidden p-2 md:p-6 rounded-2xl'>
       {/* Filters */}
       {content}
 
       {/* Table */}
-      <div className='bg-background rounded-md border overflow-auto dark:bg-gray-800/50 dark:border-zinc-700'>
+      <div className='bg-background rounded-md border overflow-auto dark:border-zinc-700'>
         <Table className='table-auto min-w-full'>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id} className='hover:bg-transparent'>
+              <TableRow
+                className='dark:bg-slate-900 dark:hover:bg-slate-800 dark:even:bg-slate-800/50'
+                key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
                   return (
                     <TableHead
@@ -691,6 +691,7 @@ export default function UsersTable() {
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow
+                  className='dark:bg-slate-900 dark:hover:bg-slate-800 dark:even:bg-slate-800/50'
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}>
                   {row.getVisibleCells().map((cell) => (
@@ -704,7 +705,7 @@ export default function UsersTable() {
                 </TableRow>
               ))
             ) : (
-              <TableRow>
+              <TableRow className='dark:bg-slate-900 dark:hover:bg-slate-800 dark:even:bg-slate-800/50'>
                 <TableCell
                   colSpan={columns.length}
                   className='h-24 text-center'>
@@ -717,9 +718,9 @@ export default function UsersTable() {
       </div>
 
       {/* Pagination */}
-      <div className='flex items-center justify-between gap-1 md:gap-8'>
+      <div className='flex flex-wrap items-center justify-between gap-1 md:gap-8'>
         {/* Results per page */}
-        <div className='flex items-center gap-3'>
+        <div className='flex flex-wrap items-center gap-3'>
           <Label htmlFor={id} className='max-sm:sr-only'>
             Rows Per Page
           </Label>
@@ -827,112 +828,204 @@ export default function UsersTable() {
   );
 }
 
-function RowActions({ row }: { row: Row<IUser> }) {
-  const [open, setOpen] = useState(false);
-  const form = useForm<z.infer<typeof isActiveSchema>>({
-    resolver: zodResolver(isActiveSchema),
-    defaultValues: { isActive: IsActive.ACTIVE },
-  });
-  const [blockUser, { isLoading, isError, error }] = useBlockUserByIdMutation();
+// Role Schema
+const roleSchema = z.object({
+  role: z.nativeEnum(UserRoles),
+});
 
-  // Block User
+export function RowActions({ row }: { row: Row<IUser> }) {
+  const [openStatus, setOpenStatus] = useState(false);
+  const [openRole, setOpenRole] = useState(false);
+
+  const formStatus = useForm<z.infer<typeof isActiveSchema>>({
+    resolver: zodResolver(isActiveSchema),
+    defaultValues: { isActive: row.original?.isActive || IsActive.ACTIVE },
+  });
+
+  const formRole = useForm<z.infer<typeof roleSchema>>({
+    resolver: zodResolver(roleSchema),
+    defaultValues: { role: row.original?.role || UserRoles.SENDER },
+  });
+
+  const [blockUser, { isLoading: isLoadingStatus }] =
+    useBlockUserByIdMutation();
+  const [updateUserRole, { isLoading: isLoadingRole }] =
+    useUpdateUserRoleMutation();
+
   const handleBlock = async (data: z.infer<typeof isActiveSchema>) => {
     try {
-      const res = await blockUser({
-        id: row.original?._id,
-        data,
-      }).unwrap();
-
+      const res = await blockUser({ id: row.original?._id, data }).unwrap();
       if (res.success) {
-        setOpen(false);
-        toast.success("User blocked successfully");
+        setOpenStatus(false);
+        toast.success("User status updated successfully");
       }
-    } catch (error) {
-      console.error("Failed to change status", error);
+    } catch (err) {
+      toast.error(
+        err &&
+          typeof err === "object" &&
+          "data" in err &&
+          err.data &&
+          typeof err.data === "object" &&
+          "message" in err.data &&
+          typeof err.data.message === "string"
+          ? err.data.message
+          : "Failed to update status"
+      );
     }
   };
 
-  useEffect(() => {
-    if (isError) {
-      toast.error("Failed to change status", {
-        description: (error as { data?: { message?: string } })?.data?.message,
-      });
+  const handleUpdateRole = async (data: z.infer<typeof roleSchema>) => {
+    try {
+      const res = await updateUserRole({
+        id: row.original?._id as string,
+        role: data.role,
+      }).unwrap();
+      if (res.success) {
+        setOpenRole(false);
+        toast.success("User role updated successfully");
+      }
+    } catch (err) {
+      toast.error(
+        err &&
+          typeof err === "object" &&
+          "data" in err &&
+          err.data &&
+          typeof err.data === "object" &&
+          "message" in err.data &&
+          typeof err.data.message === "string"
+          ? err.data.message
+          : "Failed to update role"
+      );
     }
-  }, [isError, error]);
+  };
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <div className='flex justify-end'>
-          <Button
-            size='icon'
-            variant='ghost'
-            className='shadow-none'
-            aria-label='Edit item'>
-            <EllipsisIcon size={16} aria-hidden='true' />
+    <>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button size='icon' variant='ghost' aria-label='Edit item'>
+            <EllipsisIcon size={16} />
           </Button>
-        </div>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align='end'>
-        <DropdownMenuItem asChild>
-          <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>
-              <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                <span>Active Status</span>
-              </DropdownMenuItem>
-            </DialogTrigger>
-            <DialogContent className='sm:max-w-[425px]'>
-              <DialogHeader>
-                <DialogTitle>Change Active Status</DialogTitle>
-                <DialogDescription>
-                  Are you sure you want to change the active status of user{" "}
-                  {row.original?.name}?
-                </DialogDescription>
-              </DialogHeader>
-              <Form {...form}>
-                <form
-                  onSubmit={form.handleSubmit(handleBlock)}
-                  className='space-y-4'>
-                  <FormField
-                    control={form.control}
-                    name='isActive'
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Select a status</FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}>
-                          <FormControl className='w-full'>
-                            <SelectTrigger>
-                              <SelectValue placeholder='Select a status' />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value='ACTIVE'>Active</SelectItem>
-                            <SelectItem value='INACTIVE'>Inactive</SelectItem>
-                            <SelectItem value='BLOCKED'>Blocked</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <DialogFooter>
-                    <DialogClose asChild>
-                      <Button variant='outline' type='button'>
-                        Cancel
-                      </Button>
-                    </DialogClose>
-                    <Button type='submit' disabled={isLoading}>
-                      {isLoading ? "Updating..." : "Update Status"}
-                    </Button>
-                  </DialogFooter>
-                </form>
-              </Form>
-            </DialogContent>
-          </Dialog>
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+        </DropdownMenuTrigger>
+
+        <DropdownMenuContent align='end'>
+          <DropdownMenuItem onClick={() => setOpenStatus(true)}>
+            Active Status
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => setOpenRole(true)}>
+            Change Role
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      {/* Status Modal */}
+      <Dialog open={openStatus} onOpenChange={setOpenStatus}>
+        <DialogContent className='sm:max-w-[425px]'>
+          <DialogHeader>
+            <DialogTitle>Change Active Status</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to change the active status of user{" "}
+              {row.original?.name}?
+            </DialogDescription>
+          </DialogHeader>
+
+          <Form {...formStatus}>
+            <form
+              onSubmit={formStatus.handleSubmit(handleBlock)}
+              className='space-y-4'>
+              <FormField
+                control={formStatus.control}
+                name='isActive'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Select a status</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}>
+                      <FormControl className='w-full'>
+                        <SelectTrigger>
+                          <SelectValue placeholder='Select a status' />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value={IsActive.ACTIVE}>Active</SelectItem>
+                        <SelectItem value={IsActive.INACTIVE}>
+                          Inactive
+                        </SelectItem>
+                        <SelectItem value={IsActive.BLOCKED}>
+                          Blocked
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <DialogFooter>
+                <DialogClose asChild>
+                  <Button variant='outline'>Cancel</Button>
+                </DialogClose>
+                <Button type='submit' disabled={isLoadingStatus}>
+                  {isLoadingStatus ? "Updating..." : "Update Status"}
+                </Button>
+              </DialogFooter>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Role Modal */}
+      <Dialog open={openRole} onOpenChange={setOpenRole}>
+        <DialogContent className='sm:max-w-[425px]'>
+          <DialogHeader>
+            <DialogTitle>Change User Role</DialogTitle>
+            <DialogDescription>
+              You can update the role of user {row.original?.name} here.
+            </DialogDescription>
+          </DialogHeader>
+
+          <Form {...formRole}>
+            <form
+              onSubmit={formRole.handleSubmit(handleUpdateRole)}
+              className='space-y-4'>
+              <FormField
+                control={formRole.control}
+                name='role'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Select Role</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}>
+                      <FormControl className='w-full'>
+                        <SelectTrigger>
+                          <SelectValue placeholder='Select a role' />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {Object.values(UserRoles).map((role) => (
+                          <SelectItem key={role} value={role}>
+                            {role}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <DialogFooter>
+                <DialogClose asChild>
+                  <Button variant='outline'>Cancel</Button>
+                </DialogClose>
+                <Button type='submit' disabled={isLoadingRole}>
+                  {isLoadingRole ? "Updating..." : "Update Role"}
+                </Button>
+              </DialogFooter>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }

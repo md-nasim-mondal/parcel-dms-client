@@ -40,7 +40,7 @@ export default function About() {
   ];
 
   return (
-    <div className='min-h-screen pt-20'>
+    <div className='min-h-screen'>
       {/* Hero Section - Soft Gradient */}
       <section className='py-20 bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-gray-900 dark:via-blue-950 dark:to-indigo-900'>
         <div className='container mx-auto px-4 text-center'>

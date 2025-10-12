@@ -1,141 +1,205 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Button } from "@/components/ui/button";
 import {
-  useVerifyOtpMutation,
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSlot,
+} from "@/components/ui/input-otp";
+import { cn } from "@/lib/utils";
+import {
   useSendOtpMutation,
+  useVerifyOtpMutation,
 } from "@/redux/features/auth/auth.api";
-import { setUser } from "@/redux/features/auth/auth.slice";
-import { useNavigate, useSearchParams } from "react-router";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Loader2, MailCheck } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { useForm } from "react-hook-form";
+import { useLocation, useNavigate } from "react-router";
 import { toast } from "sonner";
-import { useDispatch } from "react-redux";
-import { useState } from "react";
-import { OTPInput } from "input-otp";
+import { z } from "zod";
 
-const Verify = () => {
-  const [searchParams] = useSearchParams();
-  const email = searchParams.get("email") || "";
+const FormSchema = z.object({
+  pin: z.string().min(6, {
+    message: "Your one-time password must be 6 digits.",
+  }),
+});
+
+export default function Verify() {
+  const location = useLocation();
   const navigate = useNavigate();
-  const dispatch = useDispatch();
 
-  const [otp, setOtp] = useState("");
+  const locationEmail = location.state?.email || "";
+  const [email, setEmail] = useState(
+    locationEmail || localStorage.getItem("verify_email") || ""
+  );
+
+  const [otpSent, setOtpSent] = useState(true);
+  const [sendOtp, { isLoading: isSendingOtp }] = useSendOtpMutation();
   const [verifyOtp, { isLoading: isVerifying }] = useVerifyOtpMutation();
-  const [sendOtp, { isLoading: isResending }] = useSendOtpMutation();
+  const [timer, setTimer] = useState(0);
+  const hasVerified = useRef(false);
 
-  const handleVerify = async () => {
-    if (!email) {
-      toast.error("Email is required for verification");
-      return;
-    }
+  const form = useForm<z.infer<typeof FormSchema>>({
+    resolver: zodResolver(FormSchema),
+    defaultValues: {
+      pin: "",
+    },
+  });
 
-    if (otp.length !== 6) {
-      toast.error("Please enter a valid 6-digit OTP");
-      return;
-    }
+  const handleSendOtp = async () => {
+    if (!email) return toast.error("Email not found!");
 
+    const toastId = toast.loading("Sending OTP...");
     try {
-      const result = await verifyOtp({ email, otp }).unwrap();
-
-      if (result.success) {
-        toast.success("Email verified successfully!");
-
-        if (result.data?.user) {
-          dispatch(setUser(result.data.user));
-
-          // Redirect based on user role
-          const role = result.data.user.role;
-          if (role === "admin" || role === "super_admin") {
-            navigate("/admin");
-          } else if (role === "sender") {
-            navigate("/sender");
-          } else if (role === "receiver") {
-            navigate("/receiver");
-          }
-        } else {
-          navigate("/login");
-        }
+      const res = await sendOtp({ email }).unwrap();
+      if (res?.success) {
+        toast.success("OTP sent successfully!", { id: toastId });
+        setOtpSent(true);
+        localStorage.setItem("verify_email", email);
+        setTimer(30);
+      } else {
+        toast.error(res?.message || "Failed to send OTP", { id: toastId });
       }
-    } catch (error: unknown) {
-      const message =
-        (error as { data?: { message?: string } })?.data?.message ||
-        "Verification failed. Please try again.";
-      toast.error(message);
+    } catch (err: any) {
+      console.error(err);
+      toast.error(err?.data?.message || "Error sending OTP", { id: toastId });
     }
   };
 
-  const handleResendOtp = async () => {
-    if (!email) {
-      toast.error("Email is required to resend OTP");
-      return;
-    }
-
+  const onSubmit = async (data: z.infer<typeof FormSchema>) => {
+    const toastId = toast.loading("Verifying OTP...");
     try {
-      await sendOtp({ email }).unwrap();
-      toast.success("OTP sent successfully!");
-    } catch (error) {
-      toast.error(
-        (error as { data?: { message?: string } })?.data?.message ||
-          "Failed to send OTP. Please try again."
-      );
+      const res = await verifyOtp({ email, otp: data.pin }).unwrap();
+      if (res?.success) {
+        toast.success("OTP Verified Successfully!", { id: toastId });
+        hasVerified.current = true;
+        localStorage.removeItem("verify_email");
+        setEmail("");
+        await navigate("/login", { replace: true });
+      } else {
+        toast.error(res?.message || "Invalid OTP", { id: toastId });
+        form.setError("pin", { message: res?.message || "Invalid OTP" });
+      }
+    } catch (err: any) {
+      console.error(err);
+      toast.error(err?.data?.message || "Verification failed!", { id: toastId });
     }
   };
 
-  const isLoading = isVerifying || isResending;
+  useEffect(() => {
+    if (timer > 0) {
+      const interval = setInterval(() => {
+        setTimer((prev) => prev - 1);
+      }, 1000);
+      return () => clearInterval(interval);
+    }
+  }, [timer]);
+
+  useEffect(() => {
+    if (!email && !hasVerified.current) {
+      navigate("/", { replace: true });
+    }
+  }, [email, navigate]);
 
   return (
-    <div className='min-h-screen flex items-center justify-center bg-muted/30'>
-      <div className='w-full max-w-md p-8 space-y-8 bg-background rounded-lg shadow-lg'>
-        <div className='text-center'>
-          <h1 className='text-2xl font-bold'>Verify Your Email</h1>
-          <p className='text-muted-foreground mt-2'>
-            We've sent a verification code to{" "}
-            <span className='font-medium'>{email || "your email"}</span>
-          </p>
-        </div>
-
-        <div className='space-y-6'>
-          <div className='space-y-4'>
-            <div className='flex justify-center'>
-              <OTPInput
-                maxLength={6}
-                value={otp}
-                onChange={setOtp}
-                render={({ slots }) => (
-                  <div className='flex gap-2'>
-                    {slots.map((slot, idx) => (
-                      <div
-                        key={idx}
-                        className='w-10 h-12 border rounded-md flex items-center justify-center text-lg'>
-                        {slot !== null ? slot.toString() : ""}
-                      </div>
-                    ))}
-                  </div>
-                )}
-              />
+    <div className='grid place-content-center h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-gray-900 dark:via-blue-950 dark:to-indigo-900'>
+      {!otpSent ? (
+        <Card className='bg-white/80 dark:bg-gray-800/80 min-w-[300px] w-full max-w-md'>
+          <CardHeader className="text-center">
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/30 mb-4">
+              <MailCheck className="h-8 w-8 text-blue-600 dark:text-blue-400" />
             </div>
-          </div>
-
-          <Button
-            onClick={handleVerify}
-            className='w-full'
-            disabled={isLoading || otp.length !== 6}>
-            {isVerifying ? "Verifying..." : "Verify"}
-          </Button>
-
-          <div className='text-center'>
-            <p className='text-sm text-muted-foreground'>
-              Didn't receive the code?{" "}
-              <button
-                type='button'
-                onClick={handleResendOtp}
-                className='text-primary hover:underline'
-                disabled={isLoading}>
-                {isResending ? "Sending..." : "Resend"}
-              </button>
-            </p>
-          </div>
-        </div>
-      </div>
+            <CardTitle className='text-xl'>Verify Your Email</CardTitle>
+            <CardDescription>
+              We will send you a 6-digit code at <br />{" "}
+              <span className='font-semibold text-primary'>{email}</span>
+            </CardDescription>
+          </CardHeader>
+          <CardFooter className='flex justify-end p-6'>
+            <Button onClick={handleSendOtp} className='w-full' disabled={isSendingOtp}>
+              {isSendingOtp && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {isSendingOtp ? "Sending..." : "Send OTP"}
+            </Button>
+          </CardFooter>
+        </Card>
+      ) : (
+        <Card className='bg-white/80 dark:bg-gray-800/80 min-w-[300px] w-full max-w-md'>
+          <CardHeader className="text-center">
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/30 mb-4">
+              <MailCheck className="h-8 w-8 text-blue-600 dark:text-blue-400" />
+            </div>
+            <CardTitle className='text-xl'>Enter Your OTP</CardTitle>
+            <CardDescription>
+              Please enter the code sent to <br />{" "}
+              <span className='font-semibold text-primary'>{email}</span>
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Form {...form}>
+              <form id='otp-form' onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
+                <FormField
+                  control={form.control}
+                  name='pin'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="sr-only">One-Time Password</FormLabel>
+                      <FormControl>
+                        <div className="flex justify-center">
+                          <InputOTP maxLength={6} {...field}>
+                            <InputOTPGroup>
+                              {[0, 1, 2, 3, 4, 5].map((i) => (<InputOTPSlot key={i} index={i} />))}
+                            </InputOTPGroup>
+                          </InputOTP>
+                        </div>
+                      </FormControl>
+                      <FormDescription className="text-center">
+                        <Button
+                          onClick={handleSendOtp}
+                          type='button'
+                          variant='link'
+                          disabled={timer > 0 || isSendingOtp}
+                           // ✅ FIX: Used cn() for conditional styling
+                          className={cn(
+                            "p-0 h-auto",
+                            timer > 0 && "text-muted-foreground"
+                          )}
+                        >
+                          {isSendingOtp ? "Sending..." : "Resend OTP"}
+                        </Button>
+                        {timer > 0 && ` in ${timer}s`}
+                      </FormDescription>
+                      <FormMessage className="text-center" />
+                    </FormItem>
+                  )}
+                />
+              </form>
+            </Form>
+          </CardContent>
+          <CardFooter className='flex justify-end p-6'>
+            <Button form='otp-form' type='submit' className="w-full" disabled={isVerifying}>
+               {isVerifying && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+               {isVerifying ? "Verifying..." : "Verify"}
+            </Button>
+          </CardFooter>
+        </Card>
+      )}
     </div>
   );
-};
-
-export default Verify;
+}

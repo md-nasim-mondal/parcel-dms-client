@@ -56,13 +56,13 @@ export const parcelApi = baseApi.injectEndpoints({
     deleteParcel: builder.mutation<unknown, string>({
       query: (id) => ({
         url: `/parcels/delete/${id}`,
-        method: "POST",
+        method: "DELETE",
       }),
       invalidatesTags: ["PARCELS"],
     }),
     getParcelStatusLog: builder.query<IResponse<IParcel>, string | undefined>({
       query: (id) => ({
-        url: `/parcels/${id}/status-log`,
+        url: `/parcels/status-log/${id}`,
         method: "GET",
       }),
       providesTags: ["PARCELS"],

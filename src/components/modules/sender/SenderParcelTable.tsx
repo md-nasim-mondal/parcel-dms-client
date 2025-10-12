@@ -607,16 +607,18 @@ export default function SenderParcelTable() {
   }
 
   return (
-    <div className='space-y-4  overflow-x-hidden bg-card p-4 md:p-8 rounded-2xl'>
+    <div className='space-y-4 overflow-x-hidden md:p-6 rounded-2xl'>
       {/* Filters */}
       {content}
 
       {/* Table */}
-      <div className='bg-card rounded-md border overflow-auto'>
+      <div className='rounded-md border overflow-auto'>
         <Table className='table-auto min-w-full'>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id} className='hover:bg-transparent'>
+              <TableRow
+                className='dark:bg-slate-900 dark:hover:bg-slate-800 dark:even:bg-slate-800/50'
+                key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
                   return (
                     <TableHead
@@ -678,6 +680,7 @@ export default function SenderParcelTable() {
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow
+                  className='dark:bg-slate-900 dark:hover:bg-slate-800 dark:even:bg-slate-800/50'
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}>
                   {row.getVisibleCells().map((cell) => (
@@ -691,7 +694,7 @@ export default function SenderParcelTable() {
                 </TableRow>
               ))
             ) : (
-              <TableRow>
+              <TableRow className='dark:bg-slate-900 dark:hover:bg-slate-800 dark:even:bg-slate-800/50'>
                 <TableCell
                   colSpan={columns.length}
                   className='h-24 text-center'>
@@ -704,9 +707,9 @@ export default function SenderParcelTable() {
       </div>
 
       {/* Pagination */}
-      <div className='flex items-center justify-between gap-8'>
+      <div className='flex flex-wrap items-center justify-between gap-8'>
         {/* Results per page */}
-        <div className='flex items-center gap-3'>
+        <div className='flex flex-wrap items-center gap-3'>
           <Label htmlFor={id} className='max-sm:sr-only'>
             Rows per page
           </Label>
@@ -902,7 +905,7 @@ function RowActions({ row }: { row: Row<IParcel> }) {
       <DropdownMenuContent align='end'>
         <DropdownMenuGroup>
           <DropdownMenuItem>
-            <Link to={`/sender/${row.original?._id}/status`}>
+            <Link to={`/sender/dashboard/parcels/status/${row.original?._id}`}>
               <span>Show Status</span>
             </Link>
           </DropdownMenuItem>
