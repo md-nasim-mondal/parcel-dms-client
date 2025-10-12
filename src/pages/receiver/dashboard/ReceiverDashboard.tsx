@@ -199,7 +199,7 @@ const ReceiverDashboard = () => {
 
       <div className='grid grid-cols-1 lg:grid-cols-2 gap-6'>
         {/* Incoming Parcels */}
-        <Card className="bg-slate-800/40">
+        <Card className='dark:bg-slate-800/40'>
           <CardHeader>
             <CardTitle className='flex items-center'>
               <MapPin className='w-5 h-5 mr-2' />
@@ -250,7 +250,7 @@ const ReceiverDashboard = () => {
         </Card>
 
         {/* Recent Deliveries */}
-        <Card className="bg-slate-800/40">
+        <Card className='dark:bg-slate-800/40'>
           <CardHeader>
             <CardTitle className='flex items-center'>
               <CheckCircle className='w-5 h-5 mr-2' />

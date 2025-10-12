@@ -134,7 +134,7 @@ export default function TrackingPage() {
             Enter your tracking number to get real-time updates on your parcel's
             journey.
           </p>
-          <Card className='mt-8 shadow-lg border-slate-200/50 dark:border-slate-800/50'>
+          <Card className='mt-8 dark:bg-slate-800/40 shadow-lg border-slate-200/50 dark:border-slate-800/50'>
             <CardContent className='p-6'>
               <form
                 onSubmit={handleTrack}
@@ -175,8 +175,8 @@ export default function TrackingPage() {
           )}
           {!isLoading && !isFetching && shipmentData && (
             <div className='space-y-8 animate-in fade-in-50'>
-              <Card className='overflow-hidden'>
-                <CardHeader className='bg-slate-50 dark:bg-slate-800/50 p-6'>
+              <Card className='overflow-hidden dark:bg-slate-800/40'>
+                <CardHeader className='bg-slate-50 dark:bg-slate-800/20 p-6'>
                   <div className='flex flex-col md:flex-row md:items-start justify-between gap-4'>
                     <div>
                       <p className='text-sm text-muted-foreground'>
@@ -226,7 +226,7 @@ export default function TrackingPage() {
                   </div>
                 </CardContent>
               </Card>
-              <Card>
+              <Card className="dark:bg-slate-800/40">
                 <CardHeader>
                   <CardTitle>Tracking History</CardTitle>
                 </CardHeader>
@@ -295,7 +295,7 @@ export default function TrackingPage() {
             </div>
           )}
           {!isLoading && !isFetching && !shipmentData && (
-            <Card className='mt-8'>
+            <Card className='mt-8 dark:bg-slate-800/40'>
               <CardContent className='p-8 text-center'>
                 <AlertCircle className='w-12 h-12 text-muted-foreground mx-auto mb-4' />
                 <h3 className='font-semibold text-lg text-slate-900 dark:text-white'>
