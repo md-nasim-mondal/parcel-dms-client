@@ -14,6 +14,7 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import { useNavigate } from "react-router";
 
@@ -35,8 +36,10 @@ export function NavMain({
 }) {
   const navigate = useNavigate();
 
+  const {setOpenMobile} = useSidebar()
+
   return (
-    <SidebarGroup className="pt-0">
+    <SidebarGroup onClick={() => setOpenMobile(false)} className="pt-0">
       {title && <SidebarGroupLabel>{title}</SidebarGroupLabel>}
       <SidebarMenu>
         {items.map((item) => (

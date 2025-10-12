@@ -607,7 +607,7 @@ export default function SenderParcelTable() {
   }
 
   return (
-    <div className='space-y-4 overflow-x-hidden p-4 md:p-8 rounded-2xl'>
+    <div className='space-y-4 overflow-x-hidden md:p-6 rounded-2xl'>
       {/* Filters */}
       {content}
 
@@ -707,9 +707,9 @@ export default function SenderParcelTable() {
       </div>
 
       {/* Pagination */}
-      <div className='flex items-center justify-between gap-8'>
+      <div className='flex flex-wrap items-center justify-between gap-8'>
         {/* Results per page */}
-        <div className='flex items-center gap-3'>
+        <div className='flex flex-wrap items-center gap-3'>
           <Label htmlFor={id} className='max-sm:sr-only'>
             Rows per page
           </Label>

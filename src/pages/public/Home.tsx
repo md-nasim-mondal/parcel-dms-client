@@ -386,11 +386,11 @@ export default function Home() {
           <h2 className='text-3xl font-bold text-center mb-16 text-gray-900 dark:text-white'>
             Frequently Asked Questions
           </h2>
-          <div className='space-y-4'>
+          <div className='space-y-4 dark:bg-slate-800/40 p-3 md:p-6 lg:p-8 rounded-2xl'>
             {faqData.map((faq, index) => (
               <Card
                 key={index}
-                className='border-0 shadow-sm hover:shadow-md transition-all duration-200 p-0'>
+                className='border-0 dark:bg-slate-800/40 shadow-sm hover:shadow-md transition-all duration-200 p-0'>
                 <CardContent className='p-0'>
                   <button
                     onClick={() => toggleFaq(index)}

@@ -718,9 +718,9 @@ export default function UsersTable() {
       </div>
 
       {/* Pagination */}
-      <div className='flex items-center justify-between gap-1 md:gap-8'>
+      <div className='flex flex-wrap items-center justify-between gap-1 md:gap-8'>
         {/* Results per page */}
-        <div className='flex items-center gap-3'>
+        <div className='flex flex-wrap items-center gap-3'>
           <Label htmlFor={id} className='max-sm:sr-only'>
             Rows Per Page
           </Label>

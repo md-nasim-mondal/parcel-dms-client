@@ -43,7 +43,7 @@ import { useAuth } from "@/hooks/useAuth";
 // Navigation links array to be used in both desktop and mobile menus
 const navigationLinks = [
   { href: "/", label: "Home", icon: Home, role: "PUBLIC" },
-  { href: "/tracking", label: "Track Package", icon: Package, role: "PUBLIC" },
+  { href: "/track-parcel", label: "Track Parcel", icon: Package, role: "PUBLIC" },
   { href: "/services", label: "Services", icon: Truck, role: "PUBLIC" },
   { href: "/contact", label: "Contact", icon: Contact, role: "PUBLIC" },
   { href: "/about", label: "About", icon: ShieldAlert, role: "PUBLIC" },
@@ -124,7 +124,7 @@ export default function Navbar() {
 
   return (
     <header className='border-b bg-white/80 dark:bg-gray-950/80 backdrop-blur-sm sticky top-0 z-50'>
-      <div className='container mx-auto px-4 flex h-16 items-center justify-between'>
+      <div className='container mx-auto px-2 md:px-4 flex h-16 items-center justify-between'>
         {/* Left side - Logo and Navigation */}
         <div className='flex items-center gap-6'>
           {/* Logo */}
@@ -304,7 +304,7 @@ export default function Navbar() {
             </PopoverTrigger>
             <PopoverContent
               align='end'
-              className='w-64 p-4 lg:hidden mt-2'
+              className='w-64 dark:bg-slate-800 p-4 lg:hidden mt-2 max-h-[80vh] overflow-y-auto'
               sideOffset={10}>
               {/* User Info for Mobile */}
               {isAuthenticated && user && (
@@ -314,7 +314,7 @@ export default function Navbar() {
                     <p className='text-sm font-medium text-gray-900 dark:text-white truncate'>
                       {user.name}
                     </p>
-                    <p className='text-xs text-gray-500 dark:text-gray-400 truncate'>
+                    <p className='text-xs text-gray-500 dark:text-white truncate'>
                       {user.email}
                     </p>
                     <p className='text-xs text-blue-600 dark:text-blue-400 capitalize'>
