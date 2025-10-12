@@ -3,7 +3,15 @@ import { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router";
 import { useForm, type SubmitHandler, type FieldValues } from "react-hook-form";
 import { toast } from "sonner";
-import { Eye, EyeOff, Mail, Lock, ArrowRight, Loader2 } from "lucide-react";
+import {
+  Eye,
+  EyeOff,
+  Mail,
+  Lock,
+  ArrowRight,
+  Loader2,
+  UserCheck,
+} from "lucide-react";
 
 import { useLoginMutation } from "@/redux/features/auth/auth.api";
 import { setUser } from "@/redux/features/auth/auth.slice";
@@ -22,7 +30,11 @@ import {
 import { Input } from "@/components/ui/input";
 import { getRoleBasedPathPrefix } from "@/hooks/useSidebarLinks";
 
-export function LoginForm() {
+export function LoginForm({
+  setIsModalOpen,
+}: {
+  setIsModalOpen: (value: boolean) => void;
+}) {
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch();
@@ -181,6 +193,15 @@ export function LoginForm() {
               Create one
             </Link>
           </p>
+        </div>
+        {/* Credentials Button */}
+        <div className='mt-6 text-center'>
+          <button
+            onClick={() => setIsModalOpen(true)}
+            className='inline-flex items-center gap-2 rounded-lg bg-blue-100 px-4 py-2 text-sm font-semibold text-blue-700 transition-transform hover:scale-105 dark:bg-blue-900/50 dark:text-blue-300'>
+            <UserCheck className='h-4 w-4' />
+            View Demo Credentials
+          </button>
         </div>
       </CardContent>
     </Card>
