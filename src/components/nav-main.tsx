@@ -1,4 +1,5 @@
 import { ChevronRight, type LucideIcon } from "lucide-react";
+import { useLocation } from "react-router";
 
 import {
   Collapsible,
@@ -35,8 +36,10 @@ export function NavMain({
   title?: string;
 }) {
   const navigate = useNavigate();
+  const { pathname } = useLocation();
+  const { setOpenMobile } = useSidebar();
 
-  const {setOpenMobile} = useSidebar()
+  const isActive = (url: string) => pathname === url;
 
   return (
     <SidebarGroup onClick={() => setOpenMobile(false)} className="pt-0">
@@ -47,14 +50,22 @@ export function NavMain({
             key={item.title}
             asChild
             defaultOpen={item.isActive}
-            className='group/collapsible'>
+            className="group/collapsible"
+          >
             <SidebarMenuItem onClick={() => navigate(item?.url)}>
               <CollapsibleTrigger asChild>
-                <SidebarMenuButton tooltip={item.title}>
+                <SidebarMenuButton
+                  tooltip={item.title}
+                  className={
+                    isActive(item.url)
+                      ? "bg-primary/10 text-primary font-semibold"
+                      : ""
+                  }
+                >
                   {item.icon && <item.icon />}
                   <span>{item.title}</span>
                   {item.items && (
-                    <ChevronRight className='ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90' />
+                    <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
                   )}
                 </SidebarMenuButton>
               </CollapsibleTrigger>
@@ -63,7 +74,14 @@ export function NavMain({
                   <SidebarMenuSub>
                     {item.items?.map((subItem) => (
                       <SidebarMenuSubItem key={subItem.title}>
-                        <SidebarMenuSubButton asChild>
+                        <SidebarMenuSubButton
+                          asChild
+                          className={
+                            isActive(subItem.url)
+                              ? "bg-primary/10 text-primary font-semibold"
+                              : ""
+                          }
+                        >
                           <a href={subItem.url}>
                             <span>{subItem.title}</span>
                           </a>

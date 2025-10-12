@@ -52,13 +52,15 @@ export function NavUser({ user }: { user: IUser | null }) {
     <SidebarMenu>
       <SidebarMenuItem>
         <DropdownMenu>
-          <DropdownMenuTrigger asChild>
+          <DropdownMenuTrigger className=' dark:hover:bg-slate-600' asChild>
             <SidebarMenuButton
               size='lg'
-              className='data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground'>
+              className='data-[state=open]:bg-sidebar-accent dark:data-[state=open]:bg-slate-700/20 data-[state=open]:text-sidebar-accent-foreground'>
               <Avatar className='h-8 w-8 rounded-lg'>
                 <AvatarImage src={user?.picture} alt={user?.name} />
-                <AvatarFallback className='rounded-lg dark:bg-slate-600/50'>{initials}</AvatarFallback>
+                <AvatarFallback className='rounded-lg dark:bg-slate-600/50'>
+                  {initials}
+                </AvatarFallback>
               </Avatar>
               <div className='grid flex-1 text-left text-sm leading-tight'>
                 <span className='truncate font-medium'>{user?.name}</span>
@@ -76,7 +78,9 @@ export function NavUser({ user }: { user: IUser | null }) {
               <div className='flex items-center gap-2 px-1 py-1.5 text-left text-sm'>
                 <Avatar className='h-8 w-8 rounded-lg'>
                   <AvatarImage src={user?.picture} alt={user?.name} />
-                  <AvatarFallback className='rounded-lg'>{initials}</AvatarFallback>
+                  <AvatarFallback className='rounded-lg dark:bg-slate-800'>
+                    {initials}
+                  </AvatarFallback>
                 </Avatar>
                 <div className='grid flex-1 text-left text-sm leading-tight'>
                   <span className='truncate font-medium'>{user?.name}</span>
@@ -86,7 +90,12 @@ export function NavUser({ user }: { user: IUser | null }) {
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem onClick={() => navigate(`${getRoleBasedPathPrefix(user?.role)}/dashboard/profile`)}>
+              <DropdownMenuItem
+                onClick={() =>
+                  navigate(
+                    `${getRoleBasedPathPrefix(user?.role)}/dashboard/profile`
+                  )
+                }>
                 <BadgeCheck />
                 Profile
               </DropdownMenuItem>

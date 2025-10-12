@@ -22,7 +22,7 @@ export default function ProtectedRoute({
 
   // If not authenticated, redirect to login
   if (!isAuthenticated) {
-    toast.error("Please login to access this page")
+    toast.error("Please login to access this page");
     return (
       <Navigate
         to='/login'
@@ -37,7 +37,11 @@ export default function ProtectedRoute({
 
   // If user data is not available yet, show loading
   if (!user) {
-    return <LoadingSpinner text='Loading user data...' />;
+    return (
+      <div className='min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-gray-900 dark:via-blue-950 dark:to-indigo-900 '>
+        <LoadingSpinner text='Loading user data...' />
+      </div>
+    );
   }
 
   // Check role-based access
