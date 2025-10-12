@@ -1,4 +1,4 @@
-import type { IUser } from "@/types";
+import type { IUser } from "@/types/user.type";
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 
 interface AuthState {
