@@ -16,12 +16,12 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import type { IUser } from "@/types";
 import { authApi, useLogoutMutation } from "@/redux/features/auth/auth.api";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router";
 import { logout as logoutAction } from "@/redux/features/auth/auth.slice";
 import { getRoleBasedPathPrefix } from "@/hooks/useSidebarLinks";
+import type { IUser } from "@/types/user.type";
 
 export function NavUser({ user }: { user: IUser | null }) {
   const { isMobile } = useSidebar();
@@ -58,7 +58,7 @@ export function NavUser({ user }: { user: IUser | null }) {
               className='data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground'>
               <Avatar className='h-8 w-8 rounded-lg'>
                 <AvatarImage src={user?.picture} alt={user?.name} />
-                <AvatarFallback className='rounded-lg'>{initials}</AvatarFallback>
+                <AvatarFallback className='rounded-lg dark:bg-slate-600/50'>{initials}</AvatarFallback>
               </Avatar>
               <div className='grid flex-1 text-left text-sm leading-tight'>
                 <span className='truncate font-medium'>{user?.name}</span>
@@ -68,7 +68,7 @@ export function NavUser({ user }: { user: IUser | null }) {
             </SidebarMenuButton>
           </DropdownMenuTrigger>
           <DropdownMenuContent
-            className='w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg'
+            className='w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg dark:bg-slate-800'
             side={isMobile ? "bottom" : "right"}
             align='end'
             sideOffset={4}>

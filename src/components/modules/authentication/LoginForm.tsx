@@ -95,7 +95,6 @@ export function LoginForm() {
                       Forgot Password?
                     </Link>
                   </div>
-                  got-{" "}
                   <FormControl>
                     <div className='relative'>
                       <Lock className='absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400' />
@@ -171,12 +170,14 @@ export function LoginForm() {
           </svg>
           Continue with Google
         </Button> */}
-        
-      {/* Footer Text */}
-        <div className="text-center mt-6 text-sm">
-          <p className="text-gray-600 dark:text-gray-400">
+
+        {/* Footer Text */}
+        <div className='text-center mt-6 text-sm'>
+          <p className='text-gray-600 dark:text-gray-400'>
             Don't have an account?{" "}
-            <Link to="/register" className="font-medium text-blue-600 dark:text-blue-400 hover:underline">
+            <Link
+              to='/register'
+              className='font-medium text-blue-600 dark:text-blue-400 hover:underline'>
               Create one
             </Link>
           </p>

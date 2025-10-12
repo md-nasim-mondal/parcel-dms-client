@@ -230,7 +230,7 @@ const SenderDashboard: FC = () => {
           </CardHeader>
           <CardContent>
             <Tabs defaultValue='type'>
-              <TabsList className='grid w-full grid-cols-2'>
+              <TabsList className='grid w-full grid-cols-2 dark:bg-slate-800/40'>
                 <TabsTrigger value='type'>By Type</TabsTrigger>
                 <TabsTrigger value='shipping'>By Shipping</TabsTrigger>
               </TabsList>

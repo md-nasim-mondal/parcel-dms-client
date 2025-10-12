@@ -115,7 +115,7 @@ export function AdminCreateParcelDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className='max-h-[80%] overflow-y-auto'>
+      <DialogContent className='max-h-[80%] overflow-y-auto dark:bg-slate-800'>
         <DialogHeader>
           <DialogTitle>Create Parcel</DialogTitle>
           <DialogDescription>
