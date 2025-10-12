@@ -39,6 +39,7 @@ import { authApi, useLogoutMutation } from "@/redux/features/auth/auth.api";
 import { useDispatch } from "react-redux";
 import { logout as logoutAction } from "@/redux/features/auth/auth.slice";
 import { useAuth } from "@/hooks/useAuth";
+import { getRoleBasedPathPrefix } from "@/hooks/useSidebarLinks";
 
 // Navigation links array to be used in both desktop and mobile menus
 const navigationLinks = [
@@ -63,6 +64,10 @@ export default function Navbar() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
+
+  const prefix = getRoleBasedPathPrefix(user?.role);
+
+  console.log(prefix);
 
   const handleLogout = async () => {
     try {
@@ -201,7 +206,7 @@ export default function Navbar() {
                       size='icon'
                       className={cn(
                         "rounded-full p-0 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all",
-                        isActiveRoute("/profile") &&
+                        isActiveRoute(`${prefix}/dashboard/profile`) &&
                           "ring-2 ring-blue-200 dark:ring-blue-800"
                       )}>
                       {getUserAvatar()}
@@ -244,10 +249,10 @@ export default function Navbar() {
 
                     <DropdownMenuItem asChild>
                       <Link
-                        to='/profile'
+                        to={`${prefix}/dashboard/profile`}
                         className={cn(
                           "flex items-center w-full cursor-pointer",
-                          isActiveRoute("/profile") &&
+                          isActiveRoute(`${prefix}/dashboard/profile`) &&
                             "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"
                         )}>
                         <User className='w-4 h-4 mr-2' />
@@ -378,11 +383,11 @@ export default function Navbar() {
                         size='sm'
                         className={cn(
                           "w-full justify-start",
-                          isActiveRoute("/profile") &&
+                          isActiveRoute(`${prefix}/dashboard/profile`) &&
                             "text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/30"
                         )}>
                         <Link
-                          to='/profile'
+                          to={`${prefix}/dashboard/profile`}
                           onClick={() => setMobileMenuOpen(false)}
                           className='flex items-center gap-2'>
                           <User className='w-4 h-4' />
