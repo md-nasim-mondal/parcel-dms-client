@@ -11,7 +11,7 @@ type ThemeProviderProps = {
 
 export function ThemeProvider({
   children,
-  defaultTheme = "system",
+  defaultTheme = "dark",
   storageKey = "parcel-dms-ui-theme",
   ...props
 }: ThemeProviderProps) {

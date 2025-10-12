@@ -1,29 +1,65 @@
-import App from "@/App";
-import About from "@/pages/public/About";
-import Login from "@/pages/public/authentication/Login";
-import Register from "@/pages/public/authentication/Register";
-import Contact from "@/pages/public/Contact";
-import Home from "@/pages/public/Home";
-import Services from "@/pages/public/Services";
-import Tracking from "@/pages/public/TrackParcel";
 import { createBrowserRouter } from "react-router";
+import { lazy, Suspense } from "react";
 import ErrorBoundary from "@/components/layout/error/ErrorBoundary";
 import ProtectedRoute from "@/routes/middlewares/ProtectedRoute";
 import DashboardLayout from "@/components/layout/DashboardLayout";
-import SenderDashboard from "@/pages/sender/dashboard/SenderDashboard";
-import ReceiverDashboard from "@/pages/receiver/dashboard/ReceiverDashboard";
-import AdminDashboard from "@/pages/admin/dashboard/AdminDashboard";
-import Verify from "@/pages/public/authentication/Verify";
-import SenderParcels from "@/pages/sender/dashboard/SenderParcels";
-import ManageUsers from "@/pages/admin/dashboard/ManageUsers";
-import ManageParcels from "@/pages/admin/dashboard/ManageParcels";
-import ForgotPassword from "@/pages/public/authentication/ForgotPassword";
-import ResetPassword from "@/pages/public/authentication/ResetPassword";
-import Profile from "@/pages/shared/Profile";
-import DeliveryHistory from "@/pages/receiver/dashboard/DeliveryHistory";
-import IncomingParcels from "@/pages/receiver/dashboard/IncomingParcels";
-import ViewParcelDetails from "@/pages/admin/dashboard/ViewParcelDetails";
-import ParcelStatus from "@/pages/sender/dashboard/ParcelStatus";
+import App from "@/App";
+
+// 🔹 Lazy Imports
+const Home = lazy(() => import("@/pages/public/Home"));
+const About = lazy(() => import("@/pages/public/About"));
+const Services = lazy(() => import("@/pages/public/Services"));
+const Contact = lazy(() => import("@/pages/public/Contact"));
+const Tracking = lazy(() => import("@/pages/public/TrackParcel"));
+const Login = lazy(() => import("@/pages/public/authentication/Login"));
+const Register = lazy(() => import("@/pages/public/authentication/Register"));
+const Verify = lazy(() => import("@/pages/public/authentication/Verify"));
+const ForgotPassword = lazy(() =>
+  import("@/pages/public/authentication/ForgotPassword")
+);
+const ResetPassword = lazy(() =>
+  import("@/pages/public/authentication/ResetPassword")
+);
+const SenderDashboard = lazy(() =>
+  import("@/pages/sender/dashboard/SenderDashboard")
+);
+const SenderParcels = lazy(() =>
+  import("@/pages/sender/dashboard/SenderParcels")
+);
+const ParcelStatus = lazy(() =>
+  import("@/pages/sender/dashboard/ParcelStatus")
+);
+const ReceiverDashboard = lazy(() =>
+  import("@/pages/receiver/dashboard/ReceiverDashboard")
+);
+const IncomingParcels = lazy(() =>
+  import("@/pages/receiver/dashboard/IncomingParcels")
+);
+const DeliveryHistory = lazy(() =>
+  import("@/pages/receiver/dashboard/DeliveryHistory")
+);
+const AdminDashboard = lazy(() =>
+  import("@/pages/admin/dashboard/AdminDashboard")
+);
+const ManageUsers = lazy(() =>
+  import("@/pages/admin/dashboard/ManageUsers")
+);
+const ManageParcels = lazy(() =>
+  import("@/pages/admin/dashboard/ManageParcels")
+);
+const ViewParcelDetails = lazy(() =>
+  import("@/pages/admin/dashboard/ViewParcelDetails")
+);
+const Profile = lazy(() => import("@/pages/shared/Profile"));
+const Unauthorized = lazy(() => import("@/pages/Unauthorized"));
+const NotFound = lazy(() => import("@/pages/NotFound"));
+
+// 🔹 Suspense Wrapper
+const withSuspense = (Component: React.ComponentType) => (
+  <Suspense fallback={<div className="text-center p-10">Loading...</div>}>
+    <Component />
+  </Suspense>
+);
 
 export const router = createBrowserRouter([
   {
@@ -31,112 +67,52 @@ export const router = createBrowserRouter([
     path: "/",
     errorElement: <ErrorBoundary />,
     children: [
-      {
-        Component: Home,
-        index: true,
-      },
-      {
-        Component: Tracking,
-        path: "/track-parcel",
-      },
-      {
-        Component: Services,
-        path: "/services",
-      },
-      {
-        Component: About,
-        path: "/about",
-      },
-      {
-        Component: Contact,
-        path: "/contact",
-      },
+      { index: true, element: withSuspense(Home) },
+      { path: "/track-parcel", element: withSuspense(Tracking) },
+      { path: "/services", element: withSuspense(Services) },
+      { path: "/about", element: withSuspense(About) },
+      { path: "/contact", element: withSuspense(Contact) },
     ],
   },
-  {
-    Component: Login,
-    path: "login",
-    errorElement: <ErrorBoundary />,
-  },
-  {
-    Component: Register,
-    path: "register",
-    errorElement: <ErrorBoundary />,
-  },
-  {
-    Component: Verify,
-    path: "verify",
-    errorElement: <ErrorBoundary />,
-  },
-  {
-    Component: ForgotPassword,
-    path: "forgot-password",
-    errorElement: <ErrorBoundary />,
-  },
-  {
-    Component: ResetPassword,
-    path: "reset-password",
-    errorElement: <ErrorBoundary />,
-  },
-  // ✅ Protected Dashboard Routes - Fixed structure
+  { path: "login", element: withSuspense(Login), errorElement: <ErrorBoundary /> },
+  { path: "register", element: withSuspense(Register), errorElement: <ErrorBoundary /> },
+  { path: "verify", element: withSuspense(Verify), errorElement: <ErrorBoundary /> },
+  { path: "forgot-password", element: withSuspense(ForgotPassword), errorElement: <ErrorBoundary /> },
+  { path: "reset-password", element: withSuspense(ResetPassword), errorElement: <ErrorBoundary /> },
+
+  // 🔹 Sender Dashboard
   {
     path: "/sender/dashboard",
     element: (
-      <ProtectedRoute children={<DashboardLayout />} requiredRole='sender' />
+      <ProtectedRoute children={<DashboardLayout />} requiredRole="sender" />
     ),
     errorElement: <ErrorBoundary />,
     children: [
-      {
-        index: true,
-        Component: SenderDashboard,
-      },
-      {
-        path: "dashboard",
-        Component: SenderDashboard,
-      },
-      {
-        path: "profile",
-        Component: Profile,
-      },
-      {
-        path: "parcels",
-        Component: SenderParcels,
-      },
-      {
-        path: "parcels/status/:id",
-        Component: ParcelStatus,
-      },
+      { index: true, element: withSuspense(SenderDashboard) },
+      { path: "dashboard", element: withSuspense(SenderDashboard) },
+      { path: "profile", element: withSuspense(Profile) },
+      { path: "parcels", element: withSuspense(SenderParcels) },
+      { path: "parcels/status/:id", element: withSuspense(ParcelStatus) },
     ],
   },
+
+  // 🔹 Receiver Dashboard
   {
     path: "/receiver/dashboard",
     element: (
-      <ProtectedRoute children={<DashboardLayout />} requiredRole='receiver' />
+      <ProtectedRoute children={<DashboardLayout />} requiredRole="receiver" />
     ),
     errorElement: <ErrorBoundary />,
     children: [
-      {
-        index: true,
-        Component: ReceiverDashboard,
-      },
-      {
-        path: "dashboard",
-        Component: ReceiverDashboard,
-      },
-      {
-        path: "profile",
-        Component: Profile,
-      },
-      {
-        path: "incoming-parcels",
-        Component: IncomingParcels,
-      },
-      {
-        path: "delivery-history",
-        Component: DeliveryHistory,
-      },
+      { index: true, element: withSuspense(ReceiverDashboard) },
+      { path: "dashboard", element: withSuspense(ReceiverDashboard) },
+      { path: "profile", element: withSuspense(Profile) },
+      { path: "incoming-parcels", element: withSuspense(IncomingParcels) },
+      { path: "delivery-history", element: withSuspense(DeliveryHistory) },
     ],
   },
+
+  // 🔹 Admin Dashboard
   {
     path: "/admin/dashboard",
     element: (
@@ -147,30 +123,15 @@ export const router = createBrowserRouter([
     ),
     errorElement: <ErrorBoundary />,
     children: [
-      {
-        index: true,
-        Component: AdminDashboard,
-      },
-      {
-        path: "dashboard",
-        Component: AdminDashboard,
-      },
-      {
-        path: "profile",
-        Component: Profile,
-      },
-      {
-        path: "manage-users",
-        Component: ManageUsers,
-      },
-      {
-        path: "manage-parcels",
-        Component: ManageParcels,
-      },
-      {
-        path: "parcel/details/:id",
-        Component: ViewParcelDetails,
-      },
+      { index: true, element: withSuspense(AdminDashboard) },
+      { path: "dashboard", element: withSuspense(AdminDashboard) },
+      { path: "profile", element: withSuspense(Profile) },
+      { path: "manage-users", element: withSuspense(ManageUsers) },
+      { path: "manage-parcels", element: withSuspense(ManageParcels) },
+      { path: "parcel/details/:id", element: withSuspense(ViewParcelDetails) },
     ],
   },
+
+  { path: "/unauthorized", element: withSuspense(Unauthorized) },
+  { path: "*", element: withSuspense(NotFound) },
 ]);

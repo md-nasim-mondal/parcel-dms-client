@@ -1,6 +1,7 @@
 import LoadingSpinner from "@/components/layout/loading/LoadingSpinner";
 import { useAuth } from "@/hooks/useAuth";
 import { Navigate, useLocation } from "react-router";
+import { toast } from "sonner";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -21,6 +22,7 @@ export default function ProtectedRoute({
 
   // If not authenticated, redirect to login
   if (!isAuthenticated) {
+    toast.error("Please login to access this page")
     return (
       <Navigate
         to='/login'
