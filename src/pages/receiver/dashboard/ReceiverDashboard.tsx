@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useGetReceiverStatsQuery } from "@/redux/features/stats/stats.api";
 import { Link, useNavigate } from "react-router";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Package, CheckCircle, Truck, MapPin } from "lucide-react";
+import { Package, CheckCircle, Truck, MapPin, Eye } from "lucide-react";
 import {
   useGetIncomingParcelsQuery,
   useGetReceiverParcelHistoryQuery,
@@ -122,7 +122,7 @@ const ReceiverDashboard = () => {
   return (
     <div className='space-y-6'>
       {/* Header */}
-      <div className='flex justify-between items-center'>
+      <div className='flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4'>
         <div>
           <h1 className='text-3xl font-bold text-gray-900 dark:text-white'>
             Receiver Dashboard
@@ -131,6 +131,13 @@ const ReceiverDashboard = () => {
             Track incoming parcels and manage deliveries
           </p>
         </div>
+        <Button asChild className='w-full sm:w-auto'>
+          <Link
+            to='/receiver/dashboard/incoming-parcels'
+            className='flex items-center gap-2'>
+            <Eye className='mr-1 h-4 w-4' /> View Incoming Parcels
+          </Link>
+        </Button>
       </div>
 
       {/* Stats Grid */}
@@ -192,7 +199,7 @@ const ReceiverDashboard = () => {
 
       <div className='grid grid-cols-1 lg:grid-cols-2 gap-6'>
         {/* Incoming Parcels */}
-        <Card>
+        <Card className="bg-slate-800/40">
           <CardHeader>
             <CardTitle className='flex items-center'>
               <MapPin className='w-5 h-5 mr-2' />
@@ -243,7 +250,7 @@ const ReceiverDashboard = () => {
         </Card>
 
         {/* Recent Deliveries */}
-        <Card>
+        <Card className="bg-slate-800/40">
           <CardHeader>
             <CardTitle className='flex items-center'>
               <CheckCircle className='w-5 h-5 mr-2' />

@@ -146,7 +146,7 @@ const SenderDashboard: FC = () => {
           <Link
             to='/sender/dashboard/parcels'
             className='flex items-center gap-2'>
-            <Eye className='mr-2 h-4 w-4' /> View All Parcels
+            <Eye className='mr-1 h-4 w-4' /> View All Parcels
           </Link>
         </Button>
       </div>
@@ -180,7 +180,7 @@ const SenderDashboard: FC = () => {
       </div>
 
       <div className='grid gap-6 md:grid-cols-2'>
-        <Card>
+        <Card className="bg-slate-800/40">
           <CardHeader>
             <CardTitle className='flex items-center'>
               <PieIcon className='w-5 h-5 mr-2' />
@@ -221,7 +221,7 @@ const SenderDashboard: FC = () => {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="bg-slate-800/40">
           <CardHeader>
             <CardTitle className='flex items-center'>
               <BarChart2 className='w-5 h-5 mr-2' />
@@ -299,7 +299,7 @@ const SenderDashboard: FC = () => {
         </Card>
       </div>
 
-      <Card>
+      <Card className="bg-slate-800/40">
         <CardHeader>
           <CardTitle>Top Receivers</CardTitle>
           <CardDescription>
