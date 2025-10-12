@@ -1,7 +1,5 @@
 import { cn } from "@/lib/utils";
-import { Package } from "lucide-react";
-
-import { Zap } from "lucide-react";
+import { Package, Truck } from "lucide-react";
 
 interface LogoProps {
   className?: string;
@@ -31,11 +29,11 @@ export const Logo: React.FC<LogoProps> = ({ className, size = "md" }) => {
         <div
           className={cn(
             "absolute -bottom-1 -right-1 w-4 h-4 rounded-full flex items-center justify-center",
-            "bg-amber-500 border-2 border-white dark:border-gray-900",
+            "bg-green-500 border-2 border-white dark:border-gray-900",
             size === "lg" ? "w-5 h-5" : "",
             size === "sm" ? "w-3 h-3" : ""
           )}>
-          <Zap className='w-2 h-2 text-white' />
+          <Truck className='w-2 h-2 text-white' />
         </div>
       </div>
 
@@ -98,11 +96,11 @@ export const Logo1: React.FC<Logo1Props> = ({
         <div
           className={cn(
             "absolute -bottom-1 -right-1 w-4 h-4 rounded-full flex items-center justify-center",
-            "bg-amber-500 border-2 border-white dark:border-gray-900",
+            "bg-green-500 border-2 border-white dark:border-gray-900",
             size === "lg" ? "w-5 h-5" : "",
             size === "sm" ? "w-3 h-3" : ""
           )}>
-          <Zap className='w-2 h-2 text-white' />
+          <Truck className='w-2 h-2 text-white' />
         </div>
       </div>
       {isExpended && (
