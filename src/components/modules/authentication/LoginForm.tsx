@@ -171,6 +171,16 @@ export function LoginForm() {
           </svg>
           Continue with Google
         </Button> */}
+        
+      {/* Footer Text */}
+        <div className="text-center mt-6 text-sm">
+          <p className="text-gray-600 dark:text-gray-400">
+            Don't have an account?{" "}
+            <Link to="/register" className="font-medium text-blue-600 dark:text-blue-400 hover:underline">
+              Create one
+            </Link>
+          </p>
+        </div>
       </CardContent>
     </Card>
   );

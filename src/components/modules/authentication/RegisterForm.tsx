@@ -1,7 +1,7 @@
 /* eslint-disable react-refresh/only-export-components */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
-import { useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -312,6 +312,18 @@ export function RegisterForm() {
           </svg>
           Continue with Google
         </Button> */}
+
+        {/* Footer Text */}
+        <div className='text-center mt-6 text-sm'>
+          <p className='text-gray-600 dark:text-gray-400'>
+            Already have an account?{" "}
+            <Link
+              to='/login'
+              className='font-medium text-blue-600 dark:text-blue-400 hover:underline'>
+              Sign In
+            </Link>
+          </p>
+        </div>
       </CardContent>
     </Card>
   );
