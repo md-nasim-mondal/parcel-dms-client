@@ -1,7 +1,7 @@
 import SenderParcelTable from "@/components/modules/sender/SenderParcelTable";
 
-function MyParcels() {
+function SenderParcels() {
   return <SenderParcelTable />;
 }
 
-export default MyParcels;
+export default SenderParcels;

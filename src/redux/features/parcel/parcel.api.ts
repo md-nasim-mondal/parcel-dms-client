@@ -62,7 +62,7 @@ export const parcelApi = baseApi.injectEndpoints({
     }),
     getParcelStatusLog: builder.query<IResponse<IParcel>, string | undefined>({
       query: (id) => ({
-        url: `/parcels/${id}/status-log`,
+        url: `/parcels/status-log/${id}`,
         method: "GET",
       }),
       providesTags: ["PARCELS"],

@@ -51,7 +51,7 @@ export const navLinkGroups: NavLinkGroup[] = [
       },
       {
         title: "My Parcels",
-        url: "/my-parcels",
+        url: "/parcels",
         icon: Package,
         roles: [Role.SENDER],
       },

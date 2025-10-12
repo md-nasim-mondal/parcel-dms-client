@@ -905,7 +905,7 @@ function RowActions({ row }: { row: Row<IParcel> }) {
       <DropdownMenuContent align='end'>
         <DropdownMenuGroup>
           <DropdownMenuItem>
-            <Link to={`/sender/${row.original?._id}/status`}>
+            <Link to={`/sender/dashboard/parcels/status/${row.original?._id}`}>
               <span>Show Status</span>
             </Link>
           </DropdownMenuItem>

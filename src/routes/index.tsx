@@ -14,7 +14,7 @@ import SenderDashboard from "@/pages/sender/dashboard/SenderDashboard";
 import ReceiverDashboard from "@/pages/receiver/dashboard/ReceiverDashboard";
 import AdminDashboard from "@/pages/admin/dashboard/AdminDashboard";
 import Verify from "@/pages/public/authentication/Verify";
-import MyParcels from "@/pages/sender/dashboard/MyParcels";
+import SenderParcels from "@/pages/sender/dashboard/SenderParcels";
 import ManageUsers from "@/pages/admin/dashboard/ManageUsers";
 import ManageParcels from "@/pages/admin/dashboard/ManageParcels";
 import ForgotPassword from "@/pages/public/authentication/ForgotPassword";
@@ -23,6 +23,7 @@ import Profile from "@/pages/shared/Profile";
 import DeliveryHistory from "@/pages/receiver/dashboard/DeliveryHistory";
 import IncomingParcels from "@/pages/receiver/dashboard/IncomingParcels";
 import ViewParcelDetails from "@/pages/admin/dashboard/ViewParcelDetails";
+import ParcelStatus from "@/pages/sender/dashboard/ParcelStatus";
 
 export const router = createBrowserRouter([
   {
@@ -98,8 +99,12 @@ export const router = createBrowserRouter([
         Component: Profile,
       },
       {
-        path: "my-parcels",
-        Component: MyParcels,
+        path: "parcels",
+        Component: SenderParcels,
+      },
+      {
+        path: "parcels/status/:id",
+        Component: ParcelStatus,
       },
     ],
   },
