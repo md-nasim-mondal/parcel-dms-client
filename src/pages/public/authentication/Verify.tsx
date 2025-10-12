@@ -22,6 +22,7 @@ import {
   InputOTPGroup,
   InputOTPSlot,
 } from "@/components/ui/input-otp";
+import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
 import {
   useSendOtpMutation,
@@ -44,6 +45,7 @@ const FormSchema = z.object({
 export default function Verify() {
   const location = useLocation();
   const navigate = useNavigate();
+  const { user, isLoading } = useAuth();
 
   const locationEmail = location.state?.email || "";
   const [email, setEmail] = useState(
@@ -99,7 +101,9 @@ export default function Verify() {
       }
     } catch (err: any) {
       console.error(err);
-      toast.error(err?.data?.message || "Verification failed!", { id: toastId });
+      toast.error(err?.data?.message || "Verification failed!", {
+        id: toastId,
+      });
     }
   };
 
@@ -118,13 +122,29 @@ export default function Verify() {
     }
   }, [email, navigate]);
 
+  useEffect(() => {
+    if (!isLoading && user) {
+      navigate("/");
+    }
+  }, [user, isLoading, navigate]); // dependency array
+
+  if (isLoading) {
+    return (
+      <div className='min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900'>
+        <div className='animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-600'></div>
+      </div>
+    );
+  }
+
+  if (user) return null;
+
   return (
     <div className='grid place-content-center h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-gray-900 dark:via-blue-950 dark:to-indigo-900'>
       {!otpSent ? (
         <Card className='bg-white/80 dark:bg-gray-800/80 min-w-[300px] w-full max-w-md'>
-          <CardHeader className="text-center">
-            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/30 mb-4">
-              <MailCheck className="h-8 w-8 text-blue-600 dark:text-blue-400" />
+          <CardHeader className='text-center'>
+            <div className='mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/30 mb-4'>
+              <MailCheck className='h-8 w-8 text-blue-600 dark:text-blue-400' />
             </div>
             <CardTitle className='text-xl'>Verify Your Email</CardTitle>
             <CardDescription>
@@ -133,17 +153,22 @@ export default function Verify() {
             </CardDescription>
           </CardHeader>
           <CardFooter className='flex justify-end p-6'>
-            <Button onClick={handleSendOtp} className='w-full' disabled={isSendingOtp}>
-              {isSendingOtp && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            <Button
+              onClick={handleSendOtp}
+              className='w-full'
+              disabled={isSendingOtp}>
+              {isSendingOtp && (
+                <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+              )}
               {isSendingOtp ? "Sending..." : "Send OTP"}
             </Button>
           </CardFooter>
         </Card>
       ) : (
         <Card className='bg-white/80 dark:bg-gray-800/80 min-w-[300px] w-full max-w-md'>
-          <CardHeader className="text-center">
-            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/30 mb-4">
-              <MailCheck className="h-8 w-8 text-blue-600 dark:text-blue-400" />
+          <CardHeader className='text-center'>
+            <div className='mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/30 mb-4'>
+              <MailCheck className='h-8 w-8 text-blue-600 dark:text-blue-400' />
             </div>
             <CardTitle className='text-xl'>Enter Your OTP</CardTitle>
             <CardDescription>
@@ -153,39 +178,45 @@ export default function Verify() {
           </CardHeader>
           <CardContent>
             <Form {...form}>
-              <form id='otp-form' onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
+              <form
+                id='otp-form'
+                onSubmit={form.handleSubmit(onSubmit)}
+                className='space-y-6'>
                 <FormField
                   control={form.control}
                   name='pin'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="sr-only">One-Time Password</FormLabel>
+                      <FormLabel className='sr-only'>
+                        One-Time Password
+                      </FormLabel>
                       <FormControl>
-                        <div className="flex justify-center">
+                        <div className='flex justify-center'>
                           <InputOTP maxLength={6} {...field}>
                             <InputOTPGroup>
-                              {[0, 1, 2, 3, 4, 5].map((i) => (<InputOTPSlot key={i} index={i} />))}
+                              {[0, 1, 2, 3, 4, 5].map((i) => (
+                                <InputOTPSlot key={i} index={i} />
+                              ))}
                             </InputOTPGroup>
                           </InputOTP>
                         </div>
                       </FormControl>
-                      <FormDescription className="text-center">
+                      <FormDescription className='text-center'>
                         <Button
                           onClick={handleSendOtp}
                           type='button'
                           variant='link'
                           disabled={timer > 0 || isSendingOtp}
-                           // ✅ FIX: Used cn() for conditional styling
+                          // ✅ FIX: Used cn() for conditional styling
                           className={cn(
                             "p-0 h-auto",
                             timer > 0 && "text-muted-foreground"
-                          )}
-                        >
+                          )}>
                           {isSendingOtp ? "Sending..." : "Resend OTP"}
                         </Button>
                         {timer > 0 && ` in ${timer}s`}
                       </FormDescription>
-                      <FormMessage className="text-center" />
+                      <FormMessage className='text-center' />
                     </FormItem>
                   )}
                 />
@@ -193,9 +224,13 @@ export default function Verify() {
             </Form>
           </CardContent>
           <CardFooter className='flex justify-end p-6'>
-            <Button form='otp-form' type='submit' className="w-full" disabled={isVerifying}>
-               {isVerifying && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-               {isVerifying ? "Verifying..." : "Verify"}
+            <Button
+              form='otp-form'
+              type='submit'
+              className='w-full'
+              disabled={isVerifying}>
+              {isVerifying && <Loader2 className='mr-2 h-4 w-4 animate-spin' />}
+              {isVerifying ? "Verifying..." : "Verify"}
             </Button>
           </CardFooter>
         </Card>

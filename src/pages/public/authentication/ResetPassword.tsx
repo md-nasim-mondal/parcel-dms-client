@@ -9,6 +9,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { useAuth } from "@/hooks/useAuth";
 import { useResetPasswordMutation } from "@/redux/features/auth/auth.api";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { jwtDecode } from "jwt-decode";
@@ -44,6 +45,7 @@ type TResetPasswordSchema = z.infer<typeof resetPasswordSchema>;
 const ResetPassword = () => {
   // ===== 1. ALL HOOKS AT THE TOP =====
   const [searchParams] = useSearchParams();
+  const { user, isLoading: isUserLoading } = useAuth();
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -60,6 +62,12 @@ const ResetPassword = () => {
 
   const id = searchParams.get("id");
   const token = searchParams.get("token");
+
+  useEffect(() => {
+    if (!isLoading && user) {
+      navigate("/");
+    }
+  }, [user, isLoading, navigate]); // dependency array
 
   useEffect(() => {
     // This effect now runs unconditionally, but the logic inside is conditional
@@ -90,20 +98,19 @@ const ResetPassword = () => {
   // ===== 2. CONDITIONAL RETURNS (EARLY EXITS) =====
   if (!id || !token) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-4 py-12 sm:px-6 lg:px-8">
-        <div className="max-w-md w-full space-y-8 bg-white dark:bg-gray-800 p-8 rounded-lg shadow-md">
-          <div className="text-center">
-            <h2 className="mt-6 text-3xl font-extrabold text-gray-900 dark:text-white">
+      <div className='min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-4 py-12 sm:px-6 lg:px-8'>
+        <div className='max-w-md w-full space-y-8 bg-white dark:bg-gray-800 p-8 rounded-lg shadow-md'>
+          <div className='text-center'>
+            <h2 className='mt-6 text-3xl font-extrabold text-gray-900 dark:text-white'>
               Invalid Reset Link
             </h2>
-            <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+            <p className='mt-2 text-sm text-gray-600 dark:text-gray-400'>
               The password reset link is invalid or has expired.
             </p>
-            <div className="mt-8">
+            <div className='mt-8'>
               <Link
-                to="/forgot-password"
-                className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 transition-colors font-medium"
-              >
+                to='/forgot-password'
+                className='text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 transition-colors font-medium'>
                 Request a new password reset link
               </Link>
             </div>
@@ -115,10 +122,10 @@ const ResetPassword = () => {
 
   if (checkingToken) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
-        <div className="flex flex-col items-center space-y-4">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-          <p className="text-gray-600 dark:text-gray-400">Verifying token...</p>
+      <div className='min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900'>
+        <div className='flex flex-col items-center space-y-4'>
+          <div className='animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600'></div>
+          <p className='text-gray-600 dark:text-gray-400'>Verifying token...</p>
         </div>
       </div>
     );
@@ -150,14 +157,24 @@ const ResetPassword = () => {
     }
   };
 
+  if (isUserLoading) {
+    return (
+      <div className='min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900'>
+        <div className='animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-600'></div>
+      </div>
+    );
+  }
+
+  if (user) return null;
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-4 py-12 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8 bg-white dark:bg-gray-800 p-8 rounded-lg shadow-md">
-        <div className="text-center">
-          <h2 className="mt-6 text-3xl font-extrabold text-gray-900 dark:text-white">
+    <div className='min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-4 py-12 sm:px-6 lg:px-8'>
+      <div className='max-w-md w-full space-y-8 bg-white dark:bg-gray-800 p-8 rounded-lg shadow-md'>
+        <div className='text-center'>
+          <h2 className='mt-6 text-3xl font-extrabold text-gray-900 dark:text-white'>
             Reset Password
           </h2>
-          <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+          <p className='mt-2 text-sm text-gray-600 dark:text-gray-400'>
             Enter your new password below
           </p>
         </div>
@@ -165,97 +182,92 @@ const ResetPassword = () => {
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
-            className="mt-8 space-y-6"
-          >
+            className='mt-8 space-y-6'>
             <FormField
               control={form.control}
-              name="newPassword"
+              name='newPassword'
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>New Password</FormLabel>
                   <FormControl>
-                    <div className="relative">
-                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <KeyRound className="h-5 w-5 text-gray-400" />
+                    <div className='relative'>
+                      <div className='absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none'>
+                        <KeyRound className='h-5 w-5 text-gray-400' />
                       </div>
                       <Input
                         type={showPassword ? "text" : "password"}
-                        placeholder="Enter new password"
+                        placeholder='Enter new password'
                         {...field}
-                        className="pl-10 pr-12 py-3 border-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 transition-all duration-200"
+                        className='pl-10 pr-12 py-3 border-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 transition-all duration-200'
                         disabled={isLoading}
                       />
                       <button
-                        type="button"
+                        type='button'
                         onClick={() => setShowPassword(!showPassword)}
                         disabled={isLoading}
-                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors disabled:opacity-50"
-                      >
+                        className='absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors disabled:opacity-50'>
                         {showPassword ? (
-                          <EyeOff className="w-4 h-4" />
+                          <EyeOff className='w-4 h-4' />
                         ) : (
-                          <Eye className="w-4 h-4" />
+                          <Eye className='w-4 h-4' />
                         )}
                       </button>
                     </div>
                   </FormControl>
-                  <FormMessage className="text-red-500 text-sm" />
+                  <FormMessage className='text-red-500 text-sm' />
                 </FormItem>
               )}
             />
 
             <FormField
               control={form.control}
-              name="confirmPassword"
+              name='confirmPassword'
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Confirm Password</FormLabel>
                   <FormControl>
-                    <div className="relative">
-                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <KeyRound className="h-5 w-5 text-gray-400" />
+                    <div className='relative'>
+                      <div className='absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none'>
+                        <KeyRound className='h-5 w-5 text-gray-400' />
                       </div>
                       <Input
                         type={showConfirmPassword ? "text" : "password"}
-                        placeholder="Confirm new password"
+                        placeholder='Confirm new password'
                         {...field}
-                        className="pl-10 pr-12 py-3 border-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 transition-all duration-200"
+                        className='pl-10 pr-12 py-3 border-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 transition-all duration-200'
                         disabled={isLoading}
                       />
                       <button
-                        type="button"
+                        type='button'
                         onClick={() =>
                           setShowConfirmPassword(!showConfirmPassword)
                         }
                         disabled={isLoading}
-                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors disabled:opacity-50"
-                      >
+                        className='absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors disabled:opacity-50'>
                         {showConfirmPassword ? (
-                          <EyeOff className="w-4 h-4" />
+                          <EyeOff className='w-4 h-4' />
                         ) : (
-                          <Eye className="w-4 h-4" />
+                          <Eye className='w-4 h-4' />
                         )}
                       </button>
                     </div>
                   </FormControl>
-                  <FormMessage className="text-red-500 text-sm" />
+                  <FormMessage className='text-red-500 text-sm' />
                 </FormItem>
               )}
             />
 
             <Button
-              type="submit"
-              className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md transition-colors duration-200"
-              disabled={isLoading}
-            >
+              type='submit'
+              className='w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md transition-colors duration-200'
+              disabled={isLoading}>
               {isLoading ? "Resetting..." : "Reset Password"}
             </Button>
 
-            <div className="text-center mt-4">
+            <div className='text-center mt-4'>
               <Link
-                to="/login"
-                className="text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 transition-colors font-medium"
-              >
+                to='/login'
+                className='text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 transition-colors font-medium'>
                 Back to Login
               </Link>
             </div>
