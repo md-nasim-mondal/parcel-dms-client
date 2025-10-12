@@ -8,7 +8,6 @@ import { Eye, EyeOff, Mail, Lock, ArrowRight, Loader2 } from "lucide-react";
 import { useLoginMutation } from "@/redux/features/auth/auth.api";
 import { setUser } from "@/redux/features/auth/auth.slice";
 import { useDispatch } from "react-redux";
-import { config } from "@/config";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -96,6 +95,7 @@ export function LoginForm() {
                       Forgot Password?
                     </Link>
                   </div>
+                  got-{" "}
                   <FormControl>
                     <div className='relative'>
                       <Lock className='absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400' />
@@ -133,7 +133,7 @@ export function LoginForm() {
           </form>
         </Form>
 
-        <div className='relative my-6'>
+        {/* <div className='relative my-6'>
           <div className='absolute inset-0 flex items-center'>
             <div className='w-full border-t border-gray-300 dark:border-gray-600'></div>
           </div>
@@ -170,7 +170,7 @@ export function LoginForm() {
             />
           </svg>
           Continue with Google
-        </Button>
+        </Button> */}
       </CardContent>
     </Card>
   );

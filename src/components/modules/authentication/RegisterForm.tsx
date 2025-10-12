@@ -6,16 +6,39 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
-import { Eye, EyeOff, Mail, Lock, User, Phone, ArrowRight, UserCheck, Loader2, MapPin } from "lucide-react"; // MapPin icon import kora hoyeche
+import {
+  Eye,
+  EyeOff,
+  Mail,
+  Lock,
+  User,
+  Phone,
+  ArrowRight,
+  UserCheck,
+  Loader2,
+  MapPin,
+} from "lucide-react"; // MapPin icon import kora hoyeche
 
 import { useRegisterMutation } from "@/redux/features/auth/auth.api";
-import { config } from "@/config";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export const Role = { SENDER: "sender", RECEIVER: "receiver" } as const;
 
@@ -25,8 +48,12 @@ export const registerSchema = z
     name: z.string().min(3, "Name must be at least 3 characters"),
     email: z.string().email("Please enter a valid email address"),
     phone: z.string().min(11, "Phone number must be at least 11 digits"),
-    defaultAddress: z.string().min(10, "Address must be at least 10 characters"), // Notun field
-    role: z.enum([Role.SENDER, Role.RECEIVER], { message: "Please select a role" }),
+    defaultAddress: z
+      .string()
+      .min(10, "Address must be at least 10 characters"), // Notun field
+    role: z.enum([Role.SENDER, Role.RECEIVER], {
+      message: "Please select a role",
+    }),
     password: z.string().min(8, "Password must be at least 8 characters"),
     confirmPassword: z.string(),
   })
@@ -60,26 +87,32 @@ export function RegisterForm() {
       toast.success("Account created successfully! Please verify your email.");
       navigate("/verify", { state: { email: data.email }, replace: true });
     } catch (error: any) {
-      toast.error(error?.data?.message || "Registration failed. Please try again.");
+      toast.error(
+        error?.data?.message || "Registration failed. Please try again."
+      );
     }
   };
 
   return (
-    <Card className="border-0 shadow-lg bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm">
-      <CardContent className="p-6">
+    <Card className='border-0 shadow-lg bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm'>
+      <CardContent className='p-6'>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-4'>
             {/* Form Fields */}
             <FormField
               control={form.control}
-              name="name"
+              name='name'
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Full Name</FormLabel>
                   <FormControl>
-                    <div className="relative">
-                      <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                      <Input placeholder="John Doe" {...field} className="pl-9" />
+                    <div className='relative'>
+                      <User className='absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400' />
+                      <Input
+                        placeholder='John Doe'
+                        {...field}
+                        className='pl-9'
+                      />
                     </div>
                   </FormControl>
                   <FormMessage />
@@ -87,17 +120,22 @@ export function RegisterForm() {
               )}
             />
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
               <FormField
                 control={form.control}
-                name="email"
+                name='email'
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Email</FormLabel>
                     <FormControl>
-                      <div className="relative">
-                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                        <Input placeholder="john@example.com" type="email" {...field} className="pl-9" />
+                      <div className='relative'>
+                        <Mail className='absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400' />
+                        <Input
+                          placeholder='john@example.com'
+                          type='email'
+                          {...field}
+                          className='pl-9'
+                        />
                       </div>
                     </FormControl>
                     <FormMessage />
@@ -106,14 +144,18 @@ export function RegisterForm() {
               />
               <FormField
                 control={form.control}
-                name="phone"
+                name='phone'
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Phone</FormLabel>
                     <FormControl>
-                      <div className="relative">
-                        <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                        <Input placeholder="01XXXXXXXXX" {...field} className="pl-9" />
+                      <div className='relative'>
+                        <Phone className='absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400' />
+                        <Input
+                          placeholder='01XXXXXXXXX'
+                          {...field}
+                          className='pl-9'
+                        />
                       </div>
                     </FormControl>
                     <FormMessage />
@@ -125,14 +167,18 @@ export function RegisterForm() {
             {/* Step 3: defaultAddress er jonno notun FormField add kora hoyeche */}
             <FormField
               control={form.control}
-              name="defaultAddress"
+              name='defaultAddress'
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Default Address</FormLabel>
                   <FormControl>
-                    <div className="relative">
-                      <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                      <Input placeholder="123 Main St, Dhaka" {...field} className="pl-9" />
+                    <div className='relative'>
+                      <MapPin className='absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400' />
+                      <Input
+                        placeholder='123 Main St, Dhaka'
+                        {...field}
+                        className='pl-9'
+                      />
                     </div>
                   </FormControl>
                   <FormMessage />
@@ -142,16 +188,18 @@ export function RegisterForm() {
 
             <FormField
               control={form.control}
-              name="role"
+              name='role'
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Register as a</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}>
                     <FormControl>
-                      <div className="relative">
-                        <UserCheck className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 z-10" />
-                        <SelectTrigger className="pl-9">
-                          <SelectValue placeholder="Select a role" />
+                      <div className='relative'>
+                        <UserCheck className='absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 z-10' />
+                        <SelectTrigger className='pl-9'>
+                          <SelectValue placeholder='Select a role' />
                         </SelectTrigger>
                       </div>
                     </FormControl>
@@ -165,19 +213,31 @@ export function RegisterForm() {
               )}
             />
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
               <FormField
                 control={form.control}
-                name="password"
+                name='password'
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Password</FormLabel>
                     <FormControl>
-                      <div className="relative">
-                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                        <Input type={showPassword ? "text" : "password"} placeholder="••••••••" {...field} className="pl-9 pr-10" />
-                        <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
-                          {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      <div className='relative'>
+                        <Lock className='absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400' />
+                        <Input
+                          type={showPassword ? "text" : "password"}
+                          placeholder='••••••••'
+                          {...field}
+                          className='pl-9 pr-10'
+                        />
+                        <button
+                          type='button'
+                          onClick={() => setShowPassword(!showPassword)}
+                          className='absolute right-3 top-1/2 -translate-y-1/2 text-gray-400'>
+                          {showPassword ? (
+                            <EyeOff className='w-4 h-4' />
+                          ) : (
+                            <Eye className='w-4 h-4' />
+                          )}
                         </button>
                       </div>
                     </FormControl>
@@ -187,16 +247,30 @@ export function RegisterForm() {
               />
               <FormField
                 control={form.control}
-                name="confirmPassword"
+                name='confirmPassword'
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Confirm Password</FormLabel>
                     <FormControl>
-                      <div className="relative">
-                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                        <Input type={showConfirmPassword ? "text" : "password"} placeholder="••••••••" {...field} className="pl-9 pr-10" />
-                        <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
-                          {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      <div className='relative'>
+                        <Lock className='absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400' />
+                        <Input
+                          type={showConfirmPassword ? "text" : "password"}
+                          placeholder='••••••••'
+                          {...field}
+                          className='pl-9 pr-10'
+                        />
+                        <button
+                          type='button'
+                          onClick={() =>
+                            setShowConfirmPassword(!showConfirmPassword)
+                          }
+                          className='absolute right-3 top-1/2 -translate-y-1/2 text-gray-400'>
+                          {showConfirmPassword ? (
+                            <EyeOff className='w-4 h-4' />
+                          ) : (
+                            <Eye className='w-4 h-4' />
+                          )}
                         </button>
                       </div>
                     </FormControl>
@@ -206,14 +280,21 @@ export function RegisterForm() {
               />
             </div>
 
-            <Button type="submit" className="w-full !mt-6 text-white" disabled={isLoading}>
-              {isLoading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <ArrowRight className="w-4 h-4 mr-2" />}
+            <Button
+              type='submit'
+              className='w-full !mt-6 text-white'
+              disabled={isLoading}>
+              {isLoading ? (
+                <Loader2 className='w-4 h-4 animate-spin mr-2' />
+              ) : (
+                <ArrowRight className='w-4 h-4 mr-2' />
+              )}
               {isLoading ? "Creating Account..." : "Create Account"}
             </Button>
           </form>
         </Form>
 
-        <div className="relative my-6">
+        {/* <div className="relative my-6">
           <div className="absolute inset-0 flex items-center">
             <div className="w-full border-t border-gray-300 dark:border-gray-600"></div>
           </div>
@@ -230,7 +311,7 @@ export function RegisterForm() {
             <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
           </svg>
           Continue with Google
-        </Button>
+        </Button> */}
       </CardContent>
     </Card>
   );
