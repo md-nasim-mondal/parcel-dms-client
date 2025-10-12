@@ -6,9 +6,9 @@ import {
   Truck,
   CheckCircle,
   Clock,
-  Plus,
   PieChart as PieIcon,
   BarChart2,
+  Eye,
 } from "lucide-react";
 import {
   ResponsiveContainer,
@@ -144,9 +144,9 @@ const SenderDashboard: FC = () => {
         </div>
         <Button asChild className='w-full sm:w-auto'>
           <Link
-            to='/sender/dashboard/create-parcel'
+            to='/sender/dashboard/parcels'
             className='flex items-center gap-2'>
-            <Plus className='mr-2 h-4 w-4' /> Send New Parcel
+            <Eye className='mr-2 h-4 w-4' /> View All Parcels
           </Link>
         </Button>
       </div>
