@@ -153,3 +153,6 @@ export const router = createBrowserRouter([
   { path: "/unauthorized", element: withSuspense(Unauthorized) },
   { path: "*", element: withSuspense(NotFound) },
 ]);
+
+
+// added lazy import for some components
