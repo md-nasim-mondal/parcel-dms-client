@@ -17,17 +17,17 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { authApi, useLogoutMutation } from "@/redux/features/auth/auth.api";
-import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router";
 import { logout as logoutAction } from "@/redux/features/auth/auth.slice";
 import { getRoleBasedPathPrefix } from "@/hooks/useSidebarLinks";
 import type { IUser } from "@/types/user.type";
+import { useAppDispatch } from "@/redux/hook";
 
 export function NavUser({ user }: { user: IUser | null }) {
   const { isMobile } = useSidebar();
 
   const [logout] = useLogoutMutation();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const handleLogout = async () => {
     try {

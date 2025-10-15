@@ -36,15 +36,20 @@ import { Logo } from "@/assets/icons/Logo";
 import { ModeToggle } from "./ModeToggler";
 import { cn } from "@/lib/utils";
 import { authApi, useLogoutMutation } from "@/redux/features/auth/auth.api";
-import { useDispatch } from "react-redux";
 import { logout as logoutAction } from "@/redux/features/auth/auth.slice";
 import { useAuth } from "@/hooks/useAuth";
 import { getRoleBasedPathPrefix } from "@/hooks/useSidebarLinks";
+import { useAppDispatch } from "@/redux/hook";
 
 // Navigation links array to be used in both desktop and mobile menus
 const navigationLinks = [
   { href: "/", label: "Home", icon: Home, role: "PUBLIC" },
-  { href: "/track-parcel", label: "Track Parcel", icon: Package, role: "PUBLIC" },
+  {
+    href: "/track-parcel",
+    label: "Track Parcel",
+    icon: Package,
+    role: "PUBLIC",
+  },
   { href: "/services", label: "Services", icon: Truck, role: "PUBLIC" },
   { href: "/contact", label: "Contact", icon: Contact, role: "PUBLIC" },
   { href: "/about", label: "About", icon: ShieldAlert, role: "PUBLIC" },
@@ -61,13 +66,11 @@ export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { user, isAuthenticated } = useAuth();
   const [logout] = useLogoutMutation();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const location = useLocation();
 
   const prefix = getRoleBasedPathPrefix(user?.role);
-
-  console.log(prefix);
 
   const handleLogout = async () => {
     try {
@@ -212,7 +215,9 @@ export default function Navbar() {
                       {getUserAvatar()}
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align='end' className='w-56 dark:bg-slate-800'>
+                  <DropdownMenuContent
+                    align='end'
+                    className='w-56 dark:bg-slate-800'>
                     <DropdownMenuLabel>
                       <div className='flex flex-col space-y-1'>
                         <p className='text-sm font-medium'>{user.name}</p>
@@ -221,10 +226,10 @@ export default function Navbar() {
                         </p>
                         <p className='text-xs text-blue-600 dark:text-blue-400'>
                           You are a{" "}
-                          <span className="capitalize">
-                          {user.role === "super_admin"
-                            ? "Super Admin"
-                            : user.role}
+                          <span className='capitalize'>
+                            {user.role === "super_admin"
+                              ? "Super Admin"
+                              : user.role}
                           </span>
                         </p>
                       </div>

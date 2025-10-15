@@ -230,7 +230,7 @@ const ReceiverDashboard = () => {
                   </div>
                   <Button
                     onClick={() =>
-                      navigate(`/tracking?trackingId=${parcel.trackingId}`)
+                      navigate(`/track-parcel?trackingId=${parcel.trackingId}`)
                     }
                     size='sm'
                     variant='outline'>
