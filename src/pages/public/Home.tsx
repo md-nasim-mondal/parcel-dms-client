@@ -283,7 +283,7 @@ export default function Home() {
             {[
               {
                 name: "Standard",
-                price: "$9.99",
+                price: "৳150",
                 icon: Package,
                 features: [
                   "3-5 Business Days",
@@ -294,7 +294,7 @@ export default function Home() {
               },
               {
                 name: "Express",
-                price: "$19.99",
+                price: "৳200",
                 icon: Truck,
                 features: [
                   "Next Day Delivery",
@@ -306,7 +306,7 @@ export default function Home() {
               },
               {
                 name: "Premium",
-                price: "$29.99",
+                price: "৳250",
                 icon: Zap,
                 features: [
                   "Same Day Delivery",
