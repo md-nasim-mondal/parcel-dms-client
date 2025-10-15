@@ -110,35 +110,195 @@ bun run preview
 
 ## Project Structure
 
-src/
-├── assets/          # Static assets like images and icons
-│   ├── icons/       # Icon assets
-│   └── images/      # Image assets
-├── components/      # Reusable UI components
-│   ├── ui/          # Shadcn UI components
-│   ├── layout/      # Layout components
-│   └── modules/     # Feature-specific components
-├── config/          # Configuration files
-├── constants/       # Constant values used across the app
-├── context/         # React context providers
-├── hooks/           # Custom React hooks
-├── lib/             # Utility libraries
-├── pages/           # Page components organized by user roles
-│   ├── admin/       # Admin-specific pages
-│   ├── public/      # Public pages (login, register, etc.)
-│   ├── receiver/    # Receiver-specific pages
-│   ├── sender/      # Sender-specific pages
-│   └── shared/      # Shared pages across roles
-├── providers/       # Provider components
-├── redux/           # Redux store, slices, and API
-│   ├── api/         # RTK Query API slices
-│   ├── features/    # Redux feature slices
-│   ├── hook.ts      # Typed hooks
-│   └── store.ts     # Store configuration
-├── routes/          # Routing configuration
-│   └── middlewares/ # Route protection middlewares
-├── types/           # TypeScript type definitions
-└── utils/           # Utility functions
+
+```
+├── .git/ 🚫 (auto-hidden)
+├── .vercel/ 🚫 (auto-hidden)
+├── dist/ 🚫 (auto-hidden)
+├── node_modules/ 🚫 (auto-hidden)
+├── public/
+│   ├── logo.png
+│   └── vite.svg
+├── src/
+│   ├── assets/
+│   │   ├── icons/
+│   │   │   ├── Logo.tsx
+│   │   │   └── logo.png
+│   │   ├── images/
+│   │   └── react.svg
+│   ├── components/
+│   │   ├── layout/
+│   │   │   ├── error/
+│   │   │   │   └── ErrorBoundary.tsx
+│   │   │   ├── loading/
+│   │   │   │   └── LoadingSpinner.tsx
+│   │   │   ├── CommonLayout.tsx
+│   │   │   ├── DashboardLayout.tsx
+│   │   │   ├── Footer.tsx
+│   │   │   ├── ModeToggler.tsx
+│   │   │   └── Navbar.tsx
+│   │   ├── modules/
+│   │   │   ├── admin/
+│   │   │   │   ├── parcels/
+│   │   │   │   │   ├── AdminParcelDetails.tsx
+│   │   │   │   │   ├── AdminParcelModal.tsx
+│   │   │   │   │   ├── AdminParcelTimeLine.tsx
+│   │   │   │   │   └── ParcelManagementTable.tsx
+│   │   │   │   └── users/
+│   │   │   │       ├── CreateStuff.tsx
+│   │   │   │       └── UsersTable.tsx
+│   │   │   ├── authentication/
+│   │   │   │   ├── LoginForm.tsx
+│   │   │   │   └── RegisterForm.tsx
+│   │   │   ├── charts/
+│   │   │   │   └── index.tsx
+│   │   │   ├── receiver/
+│   │   │   │   ├── ReceiverHistoryParcelTable.tsx
+│   │   │   │   └── ReceiverIncomingParcelTable.tsx
+│   │   │   └── sender/
+│   │   │       ├── SendParcelModal.tsx
+│   │   │       ├── SenderParcelTable.tsx
+│   │   │       ├── StatusDetails.tsx
+│   │   │       └── StatusTimeLine.tsx
+│   │   ├── ui/
+│   │   │   ├── shadcn-io/
+│   │   │   │   └── spinner/
+│   │   │   │       └── index.tsx
+│   │   │   ├── alert-dialog.tsx
+│   │   │   ├── avatar.tsx
+│   │   │   ├── badge.tsx
+│   │   │   ├── breadcrumb.tsx
+│   │   │   ├── button.tsx
+│   │   │   ├── card.tsx
+│   │   │   ├── chart.tsx
+│   │   │   ├── checkbox.tsx
+│   │   │   ├── collapsible.tsx
+│   │   │   ├── dialog.tsx
+│   │   │   ├── dropdown-menu.tsx
+│   │   │   ├── form.tsx
+│   │   │   ├── input-otp.tsx
+│   │   │   ├── input.tsx
+│   │   │   ├── label.tsx
+│   │   │   ├── navigation-menu.tsx
+│   │   │   ├── pagination.tsx
+│   │   │   ├── password.tsx
+│   │   │   ├── popover.tsx
+│   │   │   ├── select.tsx
+│   │   │   ├── separator.tsx
+│   │   │   ├── sheet.tsx
+│   │   │   ├── sidebar.tsx
+│   │   │   ├── skeleton.tsx
+│   │   │   ├── sonner.tsx
+│   │   │   ├── table.tsx
+│   │   │   ├── tabs.tsx
+│   │   │   ├── textarea.tsx
+│   │   │   └── tooltip.tsx
+│   │   ├── DeleteConformation.tsx
+│   │   ├── Error.tsx
+│   │   ├── Information.tsx
+│   │   ├── Loading.tsx
+│   │   ├── app-sidebar.tsx
+│   │   ├── nav-main.tsx
+│   │   ├── nav-projects.tsx
+│   │   ├── nav-user.tsx
+│   │   └── team-switcher.tsx
+│   ├── config/
+│   │   └── index.ts
+│   ├── constants/
+│   │   └── role.ts
+│   ├── context/
+│   │   └── theme.context.ts
+│   ├── hooks/
+│   │   ├── use-mobile.ts
+│   │   ├── useAuth.ts
+│   │   ├── useSidebarLinks.tsx
+│   │   └── useTheme.ts
+│   ├── lib/
+│   │   ├── axios.ts
+│   │   └── utils.ts
+│   ├── pages/
+│   │   ├── admin/
+│   │   │   └── dashboard/
+│   │   │       ├── AdminDashboard.tsx
+│   │   │       ├── ManageParcels.tsx
+│   │   │       ├── ManageUsers.tsx
+│   │   │       └── ViewParcelDetails.tsx
+│   │   ├── public/
+│   │   │   ├── authentication/
+│   │   │   │   ├── ForgotPassword.tsx
+│   │   │   │   ├── Login.tsx
+│   │   │   │   ├── Register.tsx
+│   │   │   │   ├── ResetPassword.tsx
+│   │   │   │   └── Verify.tsx
+│   │   │   ├── About.tsx
+│   │   │   ├── Contact.tsx
+│   │   │   ├── Home.tsx
+│   │   │   ├── NotFound.tsx
+│   │   │   ├── Services.tsx
+│   │   │   ├── TrackParcel.tsx
+│   │   │   └── Unauthorized.tsx
+│   │   ├── receiver/
+│   │   │   └── dashboard/
+│   │   │       ├── DeliveryHistory.tsx
+│   │   │       ├── IncomingParcels.tsx
+│   │   │       └── ReceiverDashboard.tsx
+│   │   ├── sender/
+│   │   │   └── dashboard/
+│   │   │       ├── ParcelStatus.tsx
+│   │   │       ├── SenderDashboard.tsx
+│   │   │       └── SenderParcels.tsx
+│   │   └── shared/
+│   │       └── Profile.tsx
+│   ├── providers/
+│   │   └── theme.provider.tsx
+│   ├── redux/
+│   │   ├── api/
+│   │   │   ├── axiosBaseQuery.ts
+│   │   │   └── baseApi.ts
+│   │   ├── features/
+│   │   │   ├── auth/
+│   │   │   │   ├── auth.api.ts
+│   │   │   │   └── auth.slice.ts
+│   │   │   ├── parcel/
+│   │   │   │   └── parcel.api.ts
+│   │   │   ├── stats/
+│   │   │   │   └── stats.api.ts
+│   │   │   └── user/
+│   │   │       └── user.api.ts
+│   │   ├── hook.ts
+│   │   └── store.ts
+│   ├── routes/
+│   │   ├── middlewares/
+│   │   │   └── ProtectedRoute.tsx
+│   │   └── index.tsx
+│   ├── types/
+│   │   ├── auth.type.ts
+│   │   ├── index.ts
+│   │   ├── parcel.type.ts
+│   │   ├── sender.parcel.type.ts
+│   │   └── user.type.ts
+│   ├── utils/
+│   │   ├── generateRoutes.ts
+│   │   ├── getNameInitials.ts
+│   │   └── getStatusColor.ts
+│   ├── App.tsx
+│   ├── index.css
+│   └── main.tsx
+├── .env.local 🚫 (auto-hidden)
+├── .gitignore
+├── README.md
+├── bun.lock
+├── components.json
+├── eslint.config.js
+├── index.html
+├── package.json
+├── tsconfig.app.json
+├── tsconfig.json
+├── tsconfig.node.json
+├── vercel.json
+└── vite.config.ts
+```
+
 
 
 
