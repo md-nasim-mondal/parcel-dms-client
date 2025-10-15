@@ -5,6 +5,7 @@ import ProtectedRoute from "@/routes/middlewares/ProtectedRoute";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import App from "@/App";
 import Home from "@/pages/public/Home";
+import LoadingSpinner from "@/components/layout/loading/LoadingSpinner";
 
 // 🔹 Lazy Imports
 const About = lazy(() => import("@/pages/public/About"));
@@ -54,7 +55,7 @@ const NotFound = lazy(() => import("@/pages/public/NotFound"));
 
 // 🔹 Suspense Wrapper
 const withSuspense = (Component: React.ComponentType) => (
-  <Suspense fallback={<div className='text-center p-10'>Loading...</div>}>
+  <Suspense fallback={<LoadingSpinner />}>
     <Component />
   </Suspense>
 );

@@ -111,28 +111,28 @@ export default function StatisticsPage() {
     return (
       <div className='space-y-8'>
         <div className='space-y-2'>
-          <Skeleton className='h-8 w-1/3' />
-          <Skeleton className='h-4 w-1/2' />
+          <Skeleton className='h-8 w-1/3 bg-slate-200 dark:bg-slate-700' />
+          <Skeleton className='h-4 w-1/2 bg-slate-200 dark:bg-slate-700' />
         </div>
         <div>
-          <Skeleton className='h-4 w-1/4 mb-4' />
+          <Skeleton className='h-4 w-1/4 mb-4 bg-slate-200 dark:bg-slate-700' />
           <div className='grid grid-cols-2 md:grid-cols-4 gap-6'>
             {[...Array(4)].map((_, i) => (
-              <Skeleton key={i} className='h-28' />
+              <Skeleton key={i} className='h-28 bg-slate-200 dark:bg-slate-700' />
             ))}
           </div>
         </div>
         <div>
-          <Skeleton className='h-4 w-1/4 mb-4' />
+          <Skeleton className='h-4 w-1/4 mb-4 bg-slate-200 dark:bg-slate-700' />
           <div className='grid grid-cols-2 md:grid-cols-4 gap-6'>
             {[...Array(4)].map((_, i) => (
-              <Skeleton key={i} className='h-28' />
+              <Skeleton key={i} className='h-28 bg-slate-200 dark:bg-slate-700' />
             ))}
           </div>
         </div>
         <div className='grid grid-cols-1 lg:grid-cols-2 gap-6'>
           {[...Array(4)].map((_, i) => (
-            <Skeleton key={i} className='h-80' />
+            <Skeleton key={i} className='h-80 bg-slate-200 dark:bg-slate-700' />
           ))}
         </div>
       </div>
