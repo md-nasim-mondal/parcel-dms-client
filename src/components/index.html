@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Parcel Delivery Management System - Project Submission</title>
+    <style type="text/css">
+      @media only screen and (max-width: 280px) {
+        .mobile-hide {
+          display: none !important;
+        }
+        .mobile-center {
+          text-align: center !important;
+        }
+        .mobile-block {
+          display: block !important;
+          width: 100% !important;
+        }
+        .mobile-padding {
+          padding: 15px !important;
+        }
+        .mobile-font {
+          font-size: 14px !important;
+        }
+        .mobile-heading {
+          font-size: 20px !important;
+        }
+      }
+    </style>
+  </head>
+  <body
+    style="
+      margin: 0;
+      padding: 0;
+      padding-top: 12px;
+      padding-bottom: 12px;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f8f9fa;
+      -webkit-text-size-adjust: 100%;
+      -ms-text-size-adjust: 100%;
+    ">
+    <!-- Main Container -->
+    <div
+      style="
+        max-width: 600px;
+        margin: 0 auto;
+        background-color: #ffffff;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        border-radius: 10px;
+        overflow: hidden;
+        width: 100%;
+      ">
+      <!-- Header Section -->
+      <div
+        style="
+          background: linear-gradient(135deg, #1a5f7a 0%, #57c5b6 100%);
+          padding: 25px 20px;
+          text-align: center;
+          color: white;
+        ">
+        <h1
+          style="
+            margin: 0;
+            font-size: 26px;
+            font-weight: 700;
+            line-height: 1.3;
+          ">
+          📦 Parcel Delivery Management System
+        </h1>
+        <p
+          style="
+            margin-top: 8px;
+            font-size: 16px;
+            opacity: 0.95;
+            font-weight: 300;
+          ">
+          Full-Stack Web Application Project Submission
+        </p>
+      </div>
+
+      <!-- Student Information Section -->
+      <div style="padding: 20px">
+        <h2
+          style="
+            color: #1a5f7a;
+            border-bottom: 3px solid #57c5b6;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            font-size: 22px;
+          ">
+          👤 Student Information
+        </h2>
+
+        <div
+          style="
+            flex: 1;
+            min-width: 200px;
+            background: linear-gradient(to right, #f8f9fa, #ffffff);
+            padding: 18px;
+            border-radius: 10px;
+            border-left: 5px solid #1a5f7a;
+          ">
+          <p style="margin: 8px 0; font-size: 15px">
+            <strong style="color: #1a5f7a; display: inline-block; width: 130px"
+              >Name:</strong
+            >
+            Md. Nasim Mondal
+          </p>
+          <p style="margin: 8px 0; font-size: 15px">
+            <strong style="color: #1a5f7a; display: inline-block; width: 130px"
+              >Student ID:</strong
+            >
+            2222081037
+          </p>
+          <p style="margin: 8px 0; font-size: 15px">
+            <strong style="color: #1a5f7a; display: inline-block; width: 130px"
+              >Department:</strong
+            >
+            CSE
+          </p>
+          <p style="margin: 8px 0; font-size: 15px">
+            <strong style="color: #1a5f7a; display: inline-block; width: 130px"
+              >Batch:</strong
+            >
+            57 Section A
+          </p>
+        </div>
+
+        <div
+          style="
+            flex: 1;
+            min-width: 200px;
+            background: linear-gradient(to right, #f8f9fa, #ffffff);
+            padding: 18px;
+            border-radius: 10px;
+            border-left: 5px solid #57c5b6;
+            margin-top: 12px;
+          ">
+          <p style="margin: 8px 0; font-size: 15px">
+            <strong style="color: #1a5f7a; display: inline-block; width: 130px"
+              >Email:</strong
+            >
+            mdnasimmondal622@gmail.com
+          </p>
+          <p style="margin: 8px 0; font-size: 15px">
+            <strong style="color: #1a5f7a; display: inline-block; width: 130px"
+              >Phone:</strong
+            >
+            +880 1627206676
+          </p>
+          <p style="margin: 8px 0; font-size: 15px">
+            <strong style="color: #1a5f7a; display: inline-block; width: 130px"
+              >Project Type:</strong
+            >
+            Full-Stack Web App
+          </p>
+          <p style="margin: 8px 0; font-size: 15px">
+            <strong style="color: #1a5f7a; display: inline-block; width: 130px"
+              >Submission Date:</strong
+            >
+            December 9, 2025
+          </p>
+        </div>
+
+        <!-- Portfolio Link -->
+        <div
+          style="
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            padding: 18px;
+            border-radius: 10px;
+            margin-top: 20px;
+            text-align: center;
+          ">
+          <h3
+            style="
+              margin: 0 0 10px 0;
+              color: white;
+              font-size: 18px;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              gap: 10px;
+            ">
+            <span>🌟</span> My Portfolio Website
+          </h3>
+          <a
+            href="https://nasim-mondal.vercel.app/"
+            style="
+              color: white;
+              text-decoration: none;
+              font-size: 16px;
+              word-break: break-all;
+              font-weight: 500;
+              background-color: rgba(255, 255, 255, 0.2);
+              padding: 10px 15px;
+              border-radius: 8px;
+              display: inline-block;
+              margin-top: 5px;
+            ">
+            https://nasim-mondal.vercel.app/
+          </a>
+          <p
+            style="
+              margin: 10px 0 0 0;
+              color: rgba(255, 255, 255, 0.9);
+              font-size: 14px;
+            ">
+            Explore my other projects and skills
+          </p>
+        </div>
+      </div>
+
+      <!-- Project Information Section -->
+      <div style="padding: 0 20px 20px 20px">
+        <h2
+          style="
+            color: #1a5f7a;
+            border-bottom: 3px solid #1a5f7a;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            font-size: 22px;
+          ">
+          🚀 Project Details
+        </h2>
+
+        <div
+          style="
+            background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #e9ecef;
+            margin-top: 15px;
+          ">
+          <h3
+            style="
+              color: #1a5f7a;
+              margin-top: 0;
+              font-size: 20px;
+              display: flex;
+              align-items: center;
+              gap: 8px;
+            ">
+            <span>📦</span> Parcel Delivery Management System
+          </h3>
+          <p style="color: #495057; line-height: 1.6; font-size: 15px">
+            A comprehensive full-stack web application for managing parcel
+            delivery operations. Features include real-time tracking, multi-user
+            roles, secure authentication, and admin dashboard with analytics.
+          </p>
+
+          <!-- Project Links -->
+          <div style="margin-top: 25px">
+            <!-- Live Link -->
+            <div
+              style="
+                display: flex;
+                margin-bottom: 15px;
+                align-items: flex-start;
+                background-color: #e3f2fd;
+                padding: 15px;
+                border-radius: 10px;
+                border-left: 5px solid #2196f3;
+              ">
+              <div
+                style="
+                  background-color: #2196f3;
+                  color: white;
+                  min-width: 40px;
+                  width: 40px;
+                  height: 40px;
+                  border-radius: 50%;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  margin-right: 15px;
+                  flex-shrink: 0;
+                ">
+                <span style="font-size: 20px">🌐</span>
+              </div>
+              <div style="flex: 1; min-width: 0">
+                <h4 style="margin: 0 0 6px 0; color: #1a5f7a; font-size: 16px">
+                  Live Project Link
+                </h4>
+                <a
+                  href="https://parcel-dms.vercel.app/"
+                  style="
+                    color: #2196f3;
+                    text-decoration: none;
+                    font-size: 15px;
+                    word-break: break-all;
+                    font-weight: 500;
+                  "
+                  >https://parcel-dms.vercel.app/</a
+                >
+              </div>
+            </div>
+
+            <!-- GitHub Client Side -->
+            <div
+              style="
+                display: flex;
+                margin-bottom: 15px;
+                align-items: flex-start;
+                background-color: #f3e5f5;
+                padding: 15px;
+                border-radius: 10px;
+                border-left: 5px solid #9c27b0;
+              ">
+              <div
+                style="
+                  background-color: #9c27b0;
+                  color: white;
+                  min-width: 40px;
+                  width: 40px;
+                  height: 40px;
+                  border-radius: 50%;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  margin-right: 15px;
+                  flex-shrink: 0;
+                ">
+                <span style="font-size: 20px">💻</span>
+              </div>
+              <div style="flex: 1; min-width: 0">
+                <h4 style="margin: 0 0 6px 0; color: #1a5f7a; font-size: 16px">
+                  GitHub - Client Side
+                </h4>
+                <a
+                  href="https://github.com/md-nasim-mondal/parcel-dms-client"
+                  style="
+                    color: #9c27b0;
+                    text-decoration: none;
+                    font-size: 15px;
+                    word-break: break-all;
+                    font-weight: 500;
+                  "
+                  >https://github.com/md-nasim-mondal/parcel-dms-client</a
+                >
+              </div>
+            </div>
+
+            <!-- GitHub Server Side -->
+            <div
+              style="
+                display: flex;
+                margin-bottom: 10px;
+                align-items: flex-start;
+                background-color: #e8f5e9;
+                padding: 15px;
+                border-radius: 10px;
+                border-left: 5px solid #4caf50;
+              ">
+              <div
+                style="
+                  background-color: #4caf50;
+                  color: white;
+                  min-width: 40px;
+                  width: 40px;
+                  height: 40px;
+                  border-radius: 50%;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  margin-right: 15px;
+                  flex-shrink: 0;
+                ">
+                <span style="font-size: 20px">⚙️</span>
+              </div>
+              <div style="flex: 1; min-width: 0">
+                <h4 style="margin: 0 0 6px 0; color: #1a5f7a; font-size: 16px">
+                  GitHub - Server Side
+                </h4>
+                <a
+                  href="https://github.com/md-nasim-mondal/parcel-dms-server"
+                  style="
+                    color: #4caf50;
+                    text-decoration: none;
+                    font-size: 15px;
+                    word-break: break-all;
+                    font-weight: 500;
+                  "
+                  >https://github.com/md-nasim-mondal/parcel-dms-server</a
+                >
+              </div>
+            </div>
+          </div>
+
+          <!-- Project Features -->
+          <div style="margin-top: 25px">
+            <h4
+              style="
+                color: #1a5f7a;
+                margin-bottom: 12px;
+                font-size: 18px;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+              ">
+              <span>✨</span> Key Features
+            </h4>
+            
+              <div
+                style="
+                  background-color: #fff8e1;
+                  padding: 12px;
+                  border-radius: 8px;
+                  border-left: 4px solid #ffb300;
+                ">
+                <h5 style="margin: 0 0 6px 0; color: #1a5f7a; font-size: 14px">
+                  Real-time Tracking
+                </h5>
+              </div>
+              <div
+                style="
+                  background-color: #e8f5e9;
+                  padding: 12px;
+                  border-radius: 8px;
+                  border-left: 4px solid #4caf50;
+                  margin-top: 12px;
+                ">
+                <h5 style="margin: 0 0 6px 0; color: #1a5f7a; font-size: 14px">
+                  Multi-User Roles
+                </h5>
+              </div>
+              <div
+                style="
+                  background-color: #f3e5f5;
+                  padding: 12px;
+                  border-radius: 8px;
+                  border-left: 4px solid #9c27b0;
+                  margin-top: 12px;
+                ">
+                <h5 style="margin: 0 0 6px 0; color: #1a5f7a; font-size: 14px">
+                  Secure Authentication
+                </h5>
+              </div>
+              <div
+                style="
+                  background-color: #e3f2fd;
+                  padding: 12px;
+                  border-radius: 8px;
+                  border-left: 4px solid #2196f3;
+                  margin-top: 12px;
+                ">
+                <h5 style="margin: 0 0 6px 0; color: #1a5f7a; font-size: 14px">
+                  Dashboard Analytics
+                </h5>
+              </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Technologies Used -->
+      <div style="padding: 0 20px 20px 20px">
+        <h2
+          style="
+            color: #1a5f7a;
+            border-bottom: 3px solid #57c5b6;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+            font-size: 22px;
+          ">
+          🛠️ Technologies Stack
+        </h2>
+
+        <div style="margin-top: 15px">
+          <h4 style="color: #495057; margin-bottom: 10px; font-size: 16px">
+            Frontend:
+          </h4>
+
+          <span
+            style="
+              background: linear-gradient(135deg, #61dafb, #4a90e2);
+              color: white;
+              padding: 8px 12px;
+              border-radius: 20px;
+              font-size: 13px;
+            "
+            >React.js</span
+          >
+          <span
+            style="
+              background: linear-gradient(135deg, #3178c6, #235a97);
+              color: white;
+              padding: 8px 12px;
+              border-radius: 20px;
+              font-size: 13px;
+            "
+            >TypeScript</span
+          >
+          <span
+            style="
+              background: linear-gradient(135deg, #06b6d4, #0891b2);
+              color: white;
+              padding: 8px 12px;
+              border-radius: 20px;
+              font-size: 13px;
+            "
+            >Tailwind CSS</span
+          >
+          <span
+            style="
+              background: linear-gradient(135deg, #764abc, #5e3791);
+              color: white;
+              padding: 8px 12px;
+              border-radius: 20px;
+              font-size: 13px;
+            "
+            >Redux Toolkit</span
+          >
+
+          <h4 style="color: #495057; margin-bottom: 10px; font-size: 16px">
+            Backend:
+          </h4>
+
+          <span
+            style="
+              background: linear-gradient(135deg, #68a063, #4d8049);
+              color: white;
+              padding: 8px 12px;
+              border-radius: 20px;
+              font-size: 13px;
+            "
+            >Node.js</span
+          >
+          <span
+            style="
+              background: linear-gradient(135deg, #000000, #333333);
+              color: white;
+              padding: 8px 12px;
+              border-radius: 20px;
+              font-size: 13px;
+            "
+            >Express.js</span
+          >
+          <span
+            style="
+              background: linear-gradient(135deg, #47a248, #388e3c);
+              color: white;
+              padding: 8px 12px;
+              border-radius: 20px;
+              font-size: 13px;
+            "
+            >MongoDB</span
+          >
+          <span
+            style="
+              background: linear-gradient(135deg, #d32f2f, #b71c1c);
+              color: white;
+              padding: 8px 12px;
+              border-radius: 20px;
+              font-size: 13px;
+            "
+            >JWT</span
+          >
+
+          <h4 style="color: #495057; margin-bottom: 10px; font-size: 16px">
+            Deployment:
+          </h4>
+          <span
+            style="
+              background: linear-gradient(135deg, #000000, #333333);
+              color: white;
+              padding: 8px 12px;
+              border-radius: 20px;
+              font-size: 13px;
+            "
+            >Vercel</span
+          >
+          <span
+            style="
+              background: linear-gradient(135deg, #430098, #330074);
+              color: white;
+              padding: 8px 12px;
+              border-radius: 20px;
+              font-size: 13px;
+            "
+            >Git/GitHub</span
+          >
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div
+        style="
+          background: linear-gradient(135deg, #1a5f7a 0%, #0d3b4e 100%);
+          color: white;
+          padding: 25px 20px;
+          text-align: center;
+        ">
+        <h3 style="margin: 0 0 15px 0; font-size: 20px; color: #57c5b6">
+          Thank You for Reviewing!
+        </h3>
+        <p style="margin: 0 0 15px 0; font-size: 15px; line-height: 1.5">
+          This project demonstrates my full-stack development skills and ability
+          to create practical solutions.
+        </p>
+        <div
+          style="
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+          ">
+          <p style="margin: 0; font-size: 14px">
+            © 2025 Parcel Delivery Management System | Academic Project
+          </p>
+          <p style="margin: 5px 0 0 0; font-size: 13px; opacity: 0.8">
+            Md. Nasim Mondal | CSE Batch-57 Section A | ID: 2222081037
+          </p>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
