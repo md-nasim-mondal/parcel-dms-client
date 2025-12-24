@@ -7,7 +7,7 @@ import {
   Users,
   History,
   LayoutGrid,
-  BarChart2,
+  // BarChart2,
   type LucideIcon,
 } from "lucide-react";
 import { Role } from "@/types/user.type";
@@ -93,23 +93,23 @@ export const navLinkGroups: NavLinkGroup[] = [
       },
     ],
   },
-  {
-    title: "System",
-    links: [
-      {
-        title: "Reports",
-        url: "/reports",
-        icon: BarChart2,
-        roles: [Role.SUPER_ADMIN, Role.ADMIN],
-      },
-      {
-        title: "Settings",
-        url: "/settings",
-        icon: LayoutGrid, // Using a generic icon for now
-        roles: [Role.SUPER_ADMIN, Role.ADMIN],
-      },
-    ],
-  },
+  // {
+  //   title: "System",
+  //   links: [
+  //     {
+  //       title: "Reports",
+  //       url: "/reports",
+  //       icon: BarChart2,
+  //       roles: [Role.SUPER_ADMIN, Role.ADMIN],
+  //     },
+  //     {
+  //       title: "Settings",
+  //       url: "/settings",
+  //       icon: LayoutGrid, // Using a generic icon for now
+  //       roles: [Role.SUPER_ADMIN, Role.ADMIN],
+  //     },
+  //   ],
+  // },
 ];
 
 /**

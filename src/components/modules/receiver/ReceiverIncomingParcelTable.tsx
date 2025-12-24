@@ -1,87 +1,87 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import TableSkeleton from "@/components/shared/skeletons/TableSkeleton";
 import {
-  type ColumnDef,
-  type ColumnFiltersState,
-  flexRender,
-  getCoreRowModel,
-  getFacetedUniqueValues,
-  type PaginationState,
-  type Row,
-  type SortingState,
-  useReactTable,
-  type VisibilityState,
+    type ColumnDef,
+    type ColumnFiltersState,
+    flexRender,
+    getCoreRowModel,
+    getFacetedUniqueValues,
+    type PaginationState,
+    type Row,
+    type SortingState,
+    useReactTable,
+    type VisibilityState,
 } from "@tanstack/react-table";
 import {
-  ArrowRightIcon,
-  ChevronDownIcon,
-  ChevronFirstIcon,
-  ChevronLastIcon,
-  ChevronLeftIcon,
-  ChevronRightIcon,
-  ChevronUpIcon,
-  Columns3Icon,
-  EllipsisIcon,
-  FilterIcon,
-  InfoIcon,
-  Package,
-  SearchIcon,
-  Truck,
-  XIcon,
+    ArrowRightIcon,
+    ChevronDownIcon,
+    ChevronFirstIcon,
+    ChevronLastIcon,
+    ChevronLeftIcon,
+    ChevronRightIcon,
+    ChevronUpIcon,
+    Columns3Icon,
+    EllipsisIcon,
+    FilterIcon,
+    InfoIcon,
+    Package,
+    SearchIcon,
+    Truck,
+    XIcon,
 } from "lucide-react";
 import { useEffect, useId, useState } from "react";
 
 import DeleteConfirmation from "@/components/DeleteConformation";
 import Error from "@/components/Error";
 import Information from "@/components/Information";
-import Loading from "@/components/Loading";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuTrigger,
+    DropdownMenu,
+    DropdownMenuCheckboxItem,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
+    Pagination,
+    PaginationContent,
+    PaginationItem,
 } from "@/components/ui/pagination";
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
 } from "@/components/ui/popover";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
 } from "@/components/ui/select";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
 } from "@/components/ui/table";
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
+    Tooltip,
+    TooltipContent,
+    TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import {
-  useConfirmParcelDeliveryMutation,
-  useGetIncomingParcelsQuery,
+    useConfirmParcelDeliveryMutation,
+    useGetIncomingParcelsQuery,
 } from "@/redux/features/parcel/parcel.api";
 import { ParcelStatus, type IParcel } from "@/types/sender.parcel.type";
 import { getNameInitials } from "@/utils/getNameInitials";
@@ -381,7 +381,11 @@ export default function ReceiverIncomingParcelTable() {
   });
 
   if (isLoadingIncomingParcels) {
-    return <Loading message='Loading parcels data...' />;
+    return (
+      <div className='space-y-4 md:p-6'>
+         <TableSkeleton rowCount={10} columnCount={9} />
+      </div>
+    );
   }
 
   if (!isLoadingIncomingParcels && isErrorIncomingParcels) {

@@ -5,7 +5,8 @@ import ProtectedRoute from "@/routes/middlewares/ProtectedRoute";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import App from "@/App";
 import Home from "@/pages/public/Home";
-import LoadingSpinner from "@/components/layout/loading/LoadingSpinner";
+import { AppContentSkeleton } from "@/components/shared/skeletons/AppSkeleton";
+import { DashboardContentSkeleton } from "@/components/shared/skeletons/DashboardSkeleton";
 
 // 🔹 Lazy Imports
 const About = lazy(() => import("@/pages/public/About"));
@@ -33,6 +34,9 @@ const SenderDashboard = lazy(
 const SenderParcels = lazy(
   () => import("@/pages/sender/dashboard/SenderParcels")
 );
+const BookParcel = lazy(
+  () => import("@/pages/sender/dashboard/BookParcel")
+);
 const ParcelStatus = lazy(
   () => import("@/pages/sender/dashboard/ParcelStatus")
 );
@@ -58,13 +62,32 @@ const ViewParcelDetails = lazy(
 const DeliveryDashboard = lazy(
   () => import("@/pages/delivery/dashboard/DeliveryDashboard")
 );
+const AdminReports = lazy(
+  () => import("@/pages/admin/dashboard/AdminReports")
+);
+const AdminSettings = lazy(
+  () => import("@/pages/admin/dashboard/AdminSettings")
+);
 const Profile = lazy(() => import("@/pages/shared/Profile"));
 const Unauthorized = lazy(() => import("@/pages/public/Unauthorized"));
 const NotFound = lazy(() => import("@/pages/public/NotFound"));
 
 // 🔹 Suspense Wrapper
-const withSuspense = (Component: React.ComponentType) => (
-  <Suspense fallback={<LoadingSpinner />}>
+// 🔹 Suspense Wrappers
+const withAppSuspense = (Component: React.ComponentType) => (
+  <Suspense fallback={<AppContentSkeleton />}>
+    <Component />
+  </Suspense>
+);
+
+const withDashboardSuspense = (Component: React.ComponentType) => (
+  <Suspense fallback={<DashboardContentSkeleton />}>
+    <Component />
+  </Suspense>
+);
+
+const withGenericSuspense = (Component: React.ComponentType) => (
+  <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div></div>}>
     <Component />
   </Suspense>
 );
@@ -76,41 +99,41 @@ export const router = createBrowserRouter([
     errorElement: <ErrorBoundary />,
     children: [
       { index: true, element: <Home /> },
-      { path: "/track-parcel", element: withSuspense(Tracking) },
-      { path: "/services", element: withSuspense(Services) },
-      { path: "/services/:id", element: withSuspense(ServiceDetails) },
-      { path: "/about", element: withSuspense(About) },
-      { path: "/contact", element: withSuspense(Contact) },
-      { path: "/privacy", element: withSuspense(Privacy) },
-      { path: "/terms", element: withSuspense(Terms) },
-      { path: "/support", element: withSuspense(Support) },
-      { path: "/blog", element: withSuspense(Blog) },
-      { path: "/blog/:id", element: withSuspense(BlogDetails) },
+      { path: "/track-parcel", element: withAppSuspense(Tracking) },
+      { path: "/services", element: withAppSuspense(Services) },
+      { path: "/services/:id", element: withAppSuspense(ServiceDetails) },
+      { path: "/about", element: withAppSuspense(About) },
+      { path: "/contact", element: withAppSuspense(Contact) },
+      { path: "/privacy", element: withAppSuspense(Privacy) },
+      { path: "/terms", element: withAppSuspense(Terms) },
+      { path: "/support", element: withAppSuspense(Support) },
+      { path: "/blog", element: withAppSuspense(Blog) },
+      { path: "/blog/:id", element: withAppSuspense(BlogDetails) },
     ],
   },
   {
     path: "login",
-    element: withSuspense(Login),
+    element: withGenericSuspense(Login),
     errorElement: <ErrorBoundary />,
   },
   {
     path: "register",
-    element: withSuspense(Register),
+    element: withGenericSuspense(Register),
     errorElement: <ErrorBoundary />,
   },
   {
     path: "verify",
-    element: withSuspense(Verify),
+    element: withGenericSuspense(Verify),
     errorElement: <ErrorBoundary />,
   },
   {
     path: "forgot-password",
-    element: withSuspense(ForgotPassword),
+    element: withGenericSuspense(ForgotPassword),
     errorElement: <ErrorBoundary />,
   },
   {
     path: "reset-password",
-    element: withSuspense(ResetPassword),
+    element: withGenericSuspense(ResetPassword),
     errorElement: <ErrorBoundary />,
   },
 
@@ -122,11 +145,12 @@ export const router = createBrowserRouter([
     ),
     errorElement: <ErrorBoundary />,
     children: [
-      { index: true, element: withSuspense(SenderDashboard) },
-      { path: "dashboard", element: withSuspense(SenderDashboard) },
-      { path: "profile", element: withSuspense(Profile) },
-      { path: "parcels", element: withSuspense(SenderParcels) },
-      { path: "parcels/status/:id", element: withSuspense(ParcelStatus) },
+      { index: true, element: withDashboardSuspense(SenderDashboard) },
+      { path: "dashboard", element: withDashboardSuspense(SenderDashboard) },
+      { path: "profile", element: withDashboardSuspense(Profile) },
+      { path: "parcels", element: withDashboardSuspense(SenderParcels) },
+      { path: "book-parcel", element: withDashboardSuspense(BookParcel) },
+      { path: "parcels/status/:id", element: withDashboardSuspense(ParcelStatus) },
     ],
   },
 
@@ -138,11 +162,11 @@ export const router = createBrowserRouter([
     ),
     errorElement: <ErrorBoundary />,
     children: [
-      { index: true, element: withSuspense(ReceiverDashboard) },
-      { path: "dashboard", element: withSuspense(ReceiverDashboard) },
-      { path: "profile", element: withSuspense(Profile) },
-      { path: "incoming-parcels", element: withSuspense(IncomingParcels) },
-      { path: "delivery-history", element: withSuspense(DeliveryHistory) },
+      { index: true, element: withDashboardSuspense(ReceiverDashboard) },
+      { path: "dashboard", element: withDashboardSuspense(ReceiverDashboard) },
+      { path: "profile", element: withDashboardSuspense(Profile) },
+      { path: "incoming-parcels", element: withDashboardSuspense(IncomingParcels) },
+      { path: "delivery-history", element: withDashboardSuspense(DeliveryHistory) },
     ],
   },
   
@@ -154,9 +178,9 @@ export const router = createBrowserRouter([
     ),
     errorElement: <ErrorBoundary />,
     children: [
-      { index: true, element: withSuspense(DeliveryDashboard) },
-      { path: "dashboard", element: withSuspense(DeliveryDashboard) },
-      { path: "profile", element: withSuspense(Profile) },
+      { index: true, element: withDashboardSuspense(DeliveryDashboard) },
+      { path: "dashboard", element: withDashboardSuspense(DeliveryDashboard) },
+      { path: "profile", element: withDashboardSuspense(Profile) },
     ],
   },
 
@@ -171,15 +195,17 @@ export const router = createBrowserRouter([
     ),
     errorElement: <ErrorBoundary />,
     children: [
-      { index: true, element: withSuspense(AdminDashboard) },
-      { path: "dashboard", element: withSuspense(AdminDashboard) },
-      { path: "profile", element: withSuspense(Profile) },
-      { path: "manage-users", element: withSuspense(ManageUsers) },
-      { path: "manage-parcels", element: withSuspense(ManageParcels) },
-      { path: "parcel/details/:id", element: withSuspense(ViewParcelDetails) },
+      { index: true, element: withDashboardSuspense(AdminDashboard) },
+      { path: "dashboard", element: withDashboardSuspense(AdminDashboard) },
+      { path: "profile", element: withDashboardSuspense(Profile) },
+      { path: "manage-users", element: withDashboardSuspense(ManageUsers) },
+      { path: "manage-parcels", element: withDashboardSuspense(ManageParcels) },
+      { path: "parcel/details/:id", element: withDashboardSuspense(ViewParcelDetails) },
+      { path: "reports", element: withDashboardSuspense(AdminReports) },
+      { path: "settings", element: withDashboardSuspense(AdminSettings) },
     ],
   },
 
-  { path: "/unauthorized", element: withSuspense(Unauthorized) },
-  { path: "*", element: withSuspense(NotFound) },
+  { path: "/unauthorized", element: withGenericSuspense(Unauthorized) },
+  { path: "*", element: withGenericSuspense(NotFound) },
 ]);

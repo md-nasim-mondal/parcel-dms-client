@@ -1,7 +1,7 @@
-import LoadingSpinner from "@/components/layout/loading/LoadingSpinner";
 import { useAuth } from "@/hooks/useAuth";
 import { Navigate, useLocation } from "react-router";
 import { toast } from "sonner";
+import DashboardSkeleton from "@/components/shared/skeletons/DashboardSkeleton";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -15,9 +15,9 @@ export default function ProtectedRoute({
   const { isAuthenticated, user, isLoading } = useAuth();
   const location = useLocation();
 
-  // Show loading spinner while checking authentication
+  // Show loading skeleton while checking authentication
   if (isLoading) {
-    return <LoadingSpinner text='Checking authentication...' />;
+    return <DashboardSkeleton />;
   }
 
   // If not authenticated, redirect to login
@@ -37,11 +37,7 @@ export default function ProtectedRoute({
 
   // If user data is not available yet, show loading
   if (!user) {
-    return (
-      <div className='min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-gray-900 dark:via-blue-950 dark:to-indigo-900 '>
-        <LoadingSpinner text='Loading user data...' />
-      </div>
-    );
+    return <DashboardSkeleton />;
   }
 
   // Check role-based access

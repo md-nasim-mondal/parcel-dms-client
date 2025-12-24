@@ -1,41 +1,42 @@
+import TableSkeleton from "@/components/shared/skeletons/TableSkeleton";
 import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
+    Form,
+    FormControl,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
 } from "@/components/ui/form";
 import {
-  type ColumnDef,
-  type ColumnFiltersState,
-  flexRender,
-  getCoreRowModel,
-  getFacetedUniqueValues,
-  type PaginationState,
-  type Row,
-  type SortingState,
-  useReactTable,
-  type VisibilityState,
+    type ColumnDef,
+    type ColumnFiltersState,
+    flexRender,
+    getCoreRowModel,
+    getFacetedUniqueValues,
+    type PaginationState,
+    type Row,
+    type SortingState,
+    useReactTable,
+    type VisibilityState,
 } from "@tanstack/react-table";
 import {
-  ArrowRightIcon,
-  ChevronDownIcon,
-  ChevronFirstIcon,
-  ChevronLastIcon,
-  ChevronLeftIcon,
-  ChevronRightIcon,
-  ChevronUpIcon,
-  Columns3Icon,
-  EllipsisIcon,
-  FilterIcon,
-  InfoIcon,
-  Package,
-  PlusIcon,
-  Scale,
-  SearchIcon,
-  Truck,
-  XIcon,
+    ArrowRightIcon,
+    ChevronDownIcon,
+    ChevronFirstIcon,
+    ChevronLastIcon,
+    ChevronLeftIcon,
+    ChevronRightIcon,
+    ChevronUpIcon,
+    Columns3Icon,
+    EllipsisIcon,
+    FilterIcon,
+    InfoIcon,
+    Package,
+    PlusIcon,
+    Scale,
+    SearchIcon,
+    Truck,
+    XIcon,
 } from "lucide-react";
 import { useEffect, useId, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -43,68 +44,67 @@ import { useForm } from "react-hook-form";
 import DeleteConfirmation from "@/components/DeleteConformation";
 import Error from "@/components/Error";
 import Information from "@/components/Information";
-import Loading from "@/components/Loading";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
+    Dialog,
+    DialogClose,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
 } from "@/components/ui/dialog";
 import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
+    DropdownMenu,
+    DropdownMenuCheckboxItem,
+    DropdownMenuContent,
+    DropdownMenuGroup,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
+    Pagination,
+    PaginationContent,
+    PaginationItem,
 } from "@/components/ui/pagination";
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
 } from "@/components/ui/popover";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
 } from "@/components/ui/select";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
 } from "@/components/ui/table";
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
+    Tooltip,
+    TooltipContent,
+    TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import {
-  useCancelParcelMutation,
-  useDeleteParcelMutation,
-  useGetSenderParcelsQuery,
+    useCancelParcelMutation,
+    useDeleteParcelMutation,
+    useGetSenderParcelsQuery,
 } from "@/redux/features/parcel/parcel.api";
 import type { IParcel } from "@/types/sender.parcel.type";
 import { ParcelStatus } from "@/types/sender.parcel.type";
@@ -444,7 +444,11 @@ export default function SenderParcelTable() {
   });
 
   if (isLoadingSenderParcels) {
-    return <Loading message='Loading parcels data...' />;
+    return (
+      <div className='space-y-4 md:p-6'>
+         <TableSkeleton rowCount={10} columnCount={8} />
+      </div>
+    );
   }
 
   if (!isLoadingSenderParcels && isErrorSenderParcels) {

@@ -1,6 +1,6 @@
+import DetailsSkeleton from "@/components/shared/skeletons/DetailsSkeleton";
 import Error from "@/components/Error";
 import Information from "@/components/Information";
-import Loading from "@/components/Loading";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
@@ -15,7 +15,7 @@ const StatusDetails = () => {
   const { data, isLoading, isError, error } = useGetParcelStatusLogQuery(id);
 
   if (isLoading) {
-    return <Loading message='Loading details...' />;
+    return <DetailsSkeleton />;
   }
 
   if (!isLoading && isError) {

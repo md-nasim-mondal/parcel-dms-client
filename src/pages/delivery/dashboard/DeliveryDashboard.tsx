@@ -1,15 +1,16 @@
 import {
-    Truck,
-    Package,
-    CheckCircle,
-    Clock,
-    MapPin,
-    Navigation,
+  Truck,
+  Package,
+  CheckCircle,
+  Clock,
+  MapPin,
+  Navigation,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 const StatCard = ({ title, value, icon: Icon, className }: any) => (
   <Card className={cn("border-0 text-white", className)}>
@@ -26,7 +27,7 @@ const StatCard = ({ title, value, icon: Icon, className }: any) => (
 );
 
 export default function DeliveryDashboard() {
-  // Mock Data
+  // Stats Data
   const stats = {
       assigned: 12,
       delivered: 145,
@@ -40,6 +41,18 @@ export default function DeliveryDashboard() {
       { id: "TRK-345678", address: "789 Broadway, NY", status: "Picked Up", time: "4:30 PM", contact: "555-8901" },
   ];
 
+  const handleStartShift = () => {
+    toast.success("Shift started! You are now online.");
+  };
+
+  const handleNavigate = (address: string) => {
+    toast.info(`Starting navigation to: ${address}`);
+  };
+
+  const handleViewDetails = (id: string) => {
+    toast.info(`Viewing details for parcel ${id}`);
+  };
+
   return (
     <div className='space-y-6'>
       <div className='flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4'>
@@ -51,7 +64,7 @@ export default function DeliveryDashboard() {
             Overview of your delivery tasks and performance.
           </p>
         </div>
-         <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+         <Button onClick={handleStartShift} className="bg-blue-600 hover:bg-blue-700 text-white">
             <Truck className="w-4 h-4 mr-2" /> Start Shift
          </Button>
       </div>
@@ -120,7 +133,7 @@ export default function DeliveryDashboard() {
                                   </span>
                               </TableCell>
                               <TableCell className="text-right">
-                                  <Button size="sm" variant="outline">View</Button>
+                                  <Button size="sm" variant="outline" onClick={() => handleViewDetails(parcel.id)}>View</Button>
                               </TableCell>
                            </TableRow>
                         ))}
@@ -141,7 +154,7 @@ export default function DeliveryDashboard() {
                           <p className="font-medium text-lg">123 Main St, NY</p>
                           <p className="text-sm opacity-80">Customer: John Doe</p>
                       </div>
-                      <Button variant="secondary" className="w-full text-blue-700">
+                      <Button variant="secondary" className="w-full text-blue-700" onClick={() => handleNavigate("123 Main St, NY")}>
                           <Navigation className="w-4 h-4 mr-2" /> Navigate
                       </Button>
                   </CardContent>

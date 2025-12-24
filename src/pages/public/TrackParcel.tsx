@@ -1,19 +1,20 @@
 import React, { useState, useMemo, type FC, useEffect } from "react";
+import DetailsSkeleton from "@/components/shared/skeletons/DetailsSkeleton";
 // ✅ Step 1: Import useSearchParams for both reading and writing to the URL
 import { useSearchParams } from "react-router";
 import { useLazyTrackParcelQuery } from "@/redux/features/parcel/parcel.api";
 import { toast } from "sonner";
 import {
-  AlertCircle,
-  CheckCircle,
-  Clock,
-  Loader2,
-  Package,
-  Search,
-  Truck,
-  MapPin,
-  Building,
-  Check,
+    AlertCircle,
+    CheckCircle,
+    Clock,
+    Loader2,
+    Package,
+    Search,
+    Truck,
+    MapPin,
+    Building,
+    Check,
 } from "lucide-react";
 
 // ShadCN UI Components
@@ -21,7 +22,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { Role } from "@/types/user.type";
 
@@ -167,12 +167,7 @@ export default function TrackingPage() {
       {/* Results Section */}
       <section className='py-12'>
         <div className='container mx-auto px-4 max-w-4xl'>
-          {(isLoading || isFetching) && (
-            <div className='space-y-6'>
-              <Skeleton className='h-48 w-full' />
-              <Skeleton className='h-64 w-full' />
-            </div>
-          )}
+          {(isLoading || isFetching) && <DetailsSkeleton />}
           {!isLoading && !isFetching && shipmentData && (
             <div className='space-y-8 animate-in fade-in-50'>
               <Card className='overflow-hidden dark:bg-slate-800/40'>

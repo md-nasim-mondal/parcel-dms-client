@@ -4,13 +4,13 @@ import { Link, useNavigate, useLocation } from "react-router";
 import { useForm, type SubmitHandler, type FieldValues } from "react-hook-form";
 import { toast } from "sonner";
 import {
-    Eye,
-    EyeOff,
-    Mail,
-    Lock,
-    ArrowRight,
-    Loader2,
-    UserCheck,
+  Eye,
+  EyeOff,
+  Mail,
+  Lock,
+  ArrowRight,
+  Loader2,
+  UserCheck,
 } from "lucide-react";
 
 import { useLoginMutation } from "@/redux/features/auth/auth.api";
@@ -20,22 +20,18 @@ import { useDispatch } from "react-redux";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
-    Form,
-    FormControl,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { getRoleBasedPathPrefix } from "@/hooks/useSidebarLinks";
 // import { config } from "@/config";
 
-export function LoginForm({
-  setIsModalOpen,
-}: {
-  setIsModalOpen: (value: boolean) => void;
-}) {
+export function LoginForm() {
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch();
@@ -198,14 +194,48 @@ export function LoginForm({
           </Button>
         </div> */}
 
-        {/* Credentials Button */}
-        <div className='mt-6 text-center'>
-          <button
-            onClick={() => setIsModalOpen(true)}
-            className='inline-flex items-center gap-2 rounded-lg bg-blue-100 px-4 py-2 text-sm font-semibold text-blue-700 transition-transform hover:scale-105 dark:bg-blue-900/50 dark:text-blue-300'>
-            <UserCheck className='h-4 w-4' />
-            View Demo Credentials
-          </button>
+        {/* Demo Credentials Auto-Fill Buttons */}
+        {/* Demo Credentials Auto-Fill Buttons */}
+        <div className='mt-6 grid grid-cols-3 gap-3'>
+           <Button
+            type="button"
+            variant="outline"
+            className="w-full text-[10px] px-1 h-auto py-2 bg-blue-50 text-blue-700 hover:bg-blue-100 border-blue-200 dark:bg-blue-900/20 dark:text-blue-300 dark:border-blue-800"
+            onClick={() => {
+               form.setValue("email", "bedonad434@ekuali.com");
+               form.setValue("password", "12345@Mn");
+               toast.info("Admin credentials filled");
+            }}
+           >
+            <UserCheck className="w-3 h-3 mr-1" />
+            Admin
+           </Button>
+           <Button
+             type="button"
+             variant="outline"
+             className="w-full text-[10px] px-1 h-auto py-2 bg-green-50 text-green-700 hover:bg-green-100 border-green-200 dark:bg-green-900/20 dark:text-green-300 dark:border-green-800"
+             onClick={() => {
+                form.setValue("email", "vilicab354@poesd.com");
+                form.setValue("password", "12345@Mn");
+                toast.info("User details filled");
+             }}
+           >
+             <UserCheck className="w-3 h-3 mr-1" />
+             Sender
+           </Button>
+           <Button
+             type="button"
+             variant="outline"
+             className="w-full text-[10px] px-1 h-auto py-2 bg-purple-50 text-purple-700 hover:bg-purple-100 border-purple-200 dark:bg-purple-900/20 dark:text-purple-300 dark:border-purple-800"
+             onClick={() => {
+                form.setValue("email", "ciweto1555@ekuali.com");
+                form.setValue("password", "12345@Mn");
+                toast.info("Receiver details filled");
+             }}
+           >
+             <UserCheck className="w-3 h-3 mr-1" />
+             Receiver
+           </Button>
         </div>
       </CardContent>
     </Card>

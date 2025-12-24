@@ -1,41 +1,42 @@
 import React from "react";
 import {
-    Card,
-    CardContent,
-    CardHeader,
-    CardTitle,
-    CardDescription,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
 } from "@/components/ui/card";
 import {
-    useGetParcelStatsQuery,
-    useGetUserStatsQuery,
+  useGetParcelStatsQuery,
+  useGetUserStatsQuery,
 } from "@/redux/features/stats/stats.api";
+import { useGetAllParcelsQuery } from "@/redux/features/parcel/parcel.api";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
-    Users,
-    Package,
-    CircleDollarSign,
-    BarChart2,
-    UserCheck,
-    UserX,
-    LineChart,
-    PieChart as PieIcon,
-    Blocks,
+  Users,
+  Package,
+  CircleDollarSign,
+  BarChart2,
+  UserCheck,
+  UserX,
+  LineChart,
+  PieChart as PieIcon,
+  Blocks,
 } from "lucide-react";
 import {
-    ResponsiveContainer,
-    PieChart,
-    Pie,
-    Cell,
-    Tooltip,
-    Legend,
-    Bar,
-    XAxis,
-    YAxis,
-    ComposedChart,
-    Line,
-    BarChart,
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+  Tooltip,
+  Legend,
+  Bar,
+  XAxis,
+  YAxis,
+  ComposedChart,
+  Line,
+  BarChart,
 } from "recharts";
 import { cn } from "@/lib/utils";
 
@@ -89,10 +90,17 @@ export default function StatisticsPage() {
     useGetParcelStatsQuery(undefined);
   const { data: userStatsData, isLoading: isLoadingUser } =
     useGetUserStatsQuery(undefined);
+  
+  const { data: parcelsData, isLoading: isLoadingParcelsList } = useGetAllParcelsQuery({
+    limit: 5,
+    sort: "-createdAt",
+    page: 1,
+  });
 
-  const isLoading = isLoadingParcel || isLoadingUser;
+  const isLoading = isLoadingParcel || isLoadingUser || isLoadingParcelsList;
   const userStats = userStatsData?.data;
   const parcelStats = parcelStatsData?.data;
+  const recentParcels = parcelsData?.data || [];
 
   const parcelGrowthData = [
     {
@@ -451,24 +459,33 @@ export default function StatisticsPage() {
                      </tr>
                   </thead>
                   <tbody>
-                     {[1, 2, 3, 4, 5].map((item) => (
-                        <tr key={item} className="bg-white border-b dark:bg-gray-900 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800">
-                           <td className="px-6 py-4 font-medium text-gray-900 dark:text-white">
-                              TRK-{Math.floor(Math.random() * 1000000)}
+                     {recentParcels.length > 0 ? (
+                        recentParcels.map((parcel: any) => (
+                           <tr key={parcel._id} className="bg-white border-b dark:bg-gray-900 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800">
+                              <td className="px-6 py-4 font-medium text-gray-900 dark:text-white">
+                                 {parcel.parcelId || parcel._id.slice(0, 8).toUpperCase()}
+                              </td>
+                              <td className="px-6 py-4">{parcel.sender?.name || "Unknown"}</td>
+                              <td className="px-6 py-4">
+                                 <span className={`px-2 py-1 rounded-full text-xs ${
+                                    (parcel.currentStatus || parcel.status) === 'delivered' ? 'bg-green-100 text-green-800' : 
+                                    (parcel.currentStatus || parcel.status) === 'pending' ? 'bg-yellow-100 text-yellow-800' : 
+                                    'bg-blue-100 text-blue-800'
+                                 }`}>
+                                    {parcel.currentStatus || parcel.status || "Unknown"}
+                                 </span>
+                              </td>
+                              <td className="px-6 py-4">{new Date(parcel.createdAt).toLocaleDateString()}</td>
+                              <td className="px-6 py-4">৳{parcel.fee || 0}</td>
+                           </tr>
+                        ))
+                     ) : (
+                        <tr>
+                           <td colSpan={5} className="px-6 py-4 text-center text-gray-500">
+                              No recent parcels found
                            </td>
-                           <td className="px-6 py-4">User {item}</td>
-                           <td className="px-6 py-4">
-                              <span className={`px-2 py-1 rounded-full text-xs ${
-                                 item % 3 === 0 ? 'bg-green-100 text-green-800' : 
-                                 item % 3 === 1 ? 'bg-blue-100 text-blue-800' : 'bg-yellow-100 text-yellow-800'
-                              }`}>
-                                 {item % 3 === 0 ? 'Delivered' : item % 3 === 1 ? 'In Transit' : 'Pending'}
-                              </span>
-                           </td>
-                           <td className="px-6 py-4">2024-12-{10 + item}</td>
-                           <td className="px-6 py-4">৳{100 * item + 50}</td>
                         </tr>
-                     ))}
+                     )}
                   </tbody>
                </table>
             </div>

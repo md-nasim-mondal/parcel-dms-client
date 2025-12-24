@@ -1,25 +1,33 @@
 import { useState } from "react";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import {
-    Truck,
-    Package,
-    ArrowRight,
-    Clock,
-    Shield,
-    MapPin,
-    Users,
-    Star,
-    CheckCircle,
-    Heart,
-    Zap,
-    Plus,
-    Minus,
+  Truck,
+  Package,
+  ArrowRight,
+  Clock,
+  Shield,
+  MapPin,
+  Users,
+  Star,
+  CheckCircle,
+  Heart,
+  Zap,
+  Plus,
+  Minus,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 
 export default function Home() {
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
+  const [trackingId, setTrackingId] = useState("");
+  const navigate = useNavigate();
+
+  const handleTrack = () => {
+    if (trackingId.trim()) {
+      navigate(`/track-parcel?trackingId=${trackingId.trim()}`);
+    }
+  };
 
   const toggleFaq = (index: number) => {
     setOpenFaqIndex(openFaqIndex === index ? null : index);
@@ -89,8 +97,11 @@ export default function Home() {
                 type="text" 
                 placeholder="Enter Tracking ID (e.g. TRK-12345678)" 
                 className="flex-1 px-4 py-3 bg-transparent border-none outline-none text-gray-800 dark:text-white placeholder-gray-400 w-full"
+                value={trackingId}
+                onChange={(e) => setTrackingId(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleTrack()}
              />
-             <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-8 w-full sm:w-auto">
+             <Button onClick={handleTrack} size="lg" className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-8 w-full sm:w-auto">
                 Track
              </Button>
           </div>
@@ -270,23 +281,40 @@ export default function Home() {
             What Our Customers Say
           </h2>
           <div className='grid md:grid-cols-3 gap-8'>
-            {[1, 2, 3].map((_, index) => (
+            {[
+              {
+                name: "Sarah Johnson",
+                role: "Business Owner",
+                quote: "SwiftDrop has transformed how we handle logistics. Their service is reliable, and the tracking system gives us complete peace of mind.",
+                rating: 5,
+              },
+              {
+                name: "Michael Chen",
+                role: "E-commerce Manager",
+                quote: "The express delivery option is a game-changer for our rush orders. Customers love the accuracy and speed.",
+                rating: 5,
+              },
+              {
+                name: "Emily Davis",
+                role: "Freelance Artist",
+                quote: "I send delicate artworks internationally, and they always arrive in perfect condition. The insurance options are great too.",
+                rating: 4,
+              },
+            ].map((testimonial, index) => (
               <Card
                 key={index}
                 className='border-0 shadow-sm hover:shadow-md transition-shadow bg-transparent'>
                 <CardContent className='p-6'>
                   <div className='flex items-center mb-4'>
-                    {[...Array(5)].map((_, i) => (
+                    {[...Array(testimonial.rating)].map((_, i) => (
                       <Star
                         key={i}
                         className='w-5 h-5 text-yellow-400 fill-current'
                       />
                     ))}
                   </div>
-                  <p className='text-gray-600 dark:text-gray-300 mb-6 leading-relaxed'>
-                    "SwiftDrop has transformed how we handle logistics. Their
-                    service is reliable, and the tracking system gives us
-                    complete peace of mind."
+                  <p className='text-gray-600 dark:text-gray-300 mb-6 leading-relaxed min-h-[80px]'>
+                    "{testimonial.quote}"
                   </p>
                   <div className='flex items-center'>
                     <div className='w-12 h-12 bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-900 dark:to-blue-800 rounded-full flex items-center justify-center mr-4'>
@@ -294,10 +322,10 @@ export default function Home() {
                     </div>
                     <div>
                       <div className='font-semibold text-gray-900 dark:text-white'>
-                        Sarah Johnson
+                        {testimonial.name}
                       </div>
                       <div className='text-sm text-gray-500 dark:text-gray-400'>
-                        Business Owner
+                        {testimonial.role}
                       </div>
                     </div>
                   </div>
@@ -383,7 +411,7 @@ export default function Home() {
                     asChild
                     className={`w-full ${index === 1 && "text-white"}`}
                     variant={index === 1 ? "default" : "outline"}>
-                    <Link to='/register'>Choose Plan</Link>
+                    <Link to={`/register?plan=${plan.name.toLowerCase()}`}>Choose Plan</Link>
                   </Button>
                 </CardContent>
               </Card>
@@ -487,34 +515,42 @@ export default function Home() {
                      Insights, industry news, and guides for efficient shipping.
                   </p>
                </div>
-               <Button variant="link" className="text-blue-600 dark:text-blue-400 hidden sm:flex">
-                  View All Posts <ArrowRight className="ml-2 w-4 h-4" />
+               <Button asChild variant="link" className="text-blue-600 dark:text-blue-400 hidden sm:flex">
+                  <Link to="/blog">View All Posts <ArrowRight className="ml-2 w-4 h-4" /></Link>
                </Button>
             </div>
            
             <div className='grid md:grid-cols-3 gap-8'>
                {[
                   {
+                     id: 1,
                      title: "Holiday Shipping Deadlines 2025",
                      category: "News",
                      date: "Dec 15, 2025",
-                     image: "bg-red-100 dark:bg-red-900/20"
+                     image: "bg-red-100 dark:bg-red-900/20",
+                     excerpt: "Ensure your gifts arrive on time with our updated holiday schedule."
                   },
                    {
+                     id: 2,
                      title: "New International Routes Added",
                      category: "Expansion",
                      date: "Dec 10, 2025",
-                     image: "bg-blue-100 dark:bg-blue-900/20"
+                     image: "bg-blue-100 dark:bg-blue-900/20",
+                     excerpt: "We are now shipping to 15 new countries across Asia and Europe."
                   },
                    {
+                     id: 3,
                      title: "Sustainable Packaging Guide",
                      category: "Tips",
                      date: "Nov 28, 2025",
-                     image: "bg-green-100 dark:bg-green-900/20"
+                     image: "bg-green-100 dark:bg-green-900/20",
+                     excerpt: "Learn how to pack your parcels efficiently and purely eco-friendly."
                   }
                ].map((post, index) => (
                   <Card key={index} className='overflow-hidden hover:shadow-lg transition-shadow border-none'>
-                     <div className={`h-48 ${post.image} w-full`}></div>
+                     <Link to={`/blog/${post.id}`}>
+                        <div className={`h-48 ${post.image} w-full transition-transform hover:scale-105 duration-500`}></div>
+                     </Link>
                      <CardContent className='p-6'>
                         <div className="flex gap-2 mb-3">
                            <span className="text-xs font-semibold px-2 py-1 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full">
@@ -524,14 +560,16 @@ export default function Home() {
                               <Clock className="w-3 h-3 mr-1" /> {post.date}
                            </span>
                         </div>
-                        <h3 className='text-xl font-bold mb-2 text-gray-900 dark:text-white hover:text-blue-600 transition-colors cursor-pointer'>
-                           {post.title}
-                        </h3>
+                        <Link to={`/blog/${post.id}`}>
+                           <h3 className='text-xl font-bold mb-2 text-gray-900 dark:text-white hover:text-blue-600 transition-colors cursor-pointer'>
+                              {post.title}
+                           </h3>
+                        </Link>
                         <p className="text-gray-600 dark:text-gray-400 text-sm mb-4">
-                           Stay updated with the latest shipping trends and important announcements to ensure your deliveries are always on time.
+                           {post.excerpt}
                         </p>
-                        <Button variant="link" className="p-0 h-auto text-blue-600 dark:text-blue-400">
-                           Read More
+                        <Button asChild variant="link" className="p-0 h-auto text-blue-600 dark:text-blue-400">
+                           <Link to={`/blog/${post.id}`}>Read More</Link>
                         </Button>
                      </CardContent>
                   </Card>
