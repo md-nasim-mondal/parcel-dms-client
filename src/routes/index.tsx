@@ -10,8 +10,14 @@ import LoadingSpinner from "@/components/layout/loading/LoadingSpinner";
 // 🔹 Lazy Imports
 const About = lazy(() => import("@/pages/public/About"));
 const Services = lazy(() => import("@/pages/public/Services"));
+const ServiceDetails = lazy(() => import("@/pages/public/ServiceDetails"));
 const Contact = lazy(() => import("@/pages/public/Contact"));
 const Tracking = lazy(() => import("@/pages/public/TrackParcel"));
+const Privacy = lazy(() => import("@/pages/public/Privacy"));
+const Terms = lazy(() => import("@/pages/public/Terms"));
+const Support = lazy(() => import("@/pages/public/Support"));
+const Blog = lazy(() => import("@/pages/public/Blog"));
+const BlogDetails = lazy(() => import("@/pages/public/BlogDetails"));
 const Login = lazy(() => import("@/pages/public/authentication/Login"));
 const Register = lazy(() => import("@/pages/public/authentication/Register"));
 const Verify = lazy(() => import("@/pages/public/authentication/Verify"));
@@ -49,6 +55,9 @@ const ManageParcels = lazy(
 const ViewParcelDetails = lazy(
   () => import("@/pages/admin/dashboard/ViewParcelDetails")
 );
+const DeliveryDashboard = lazy(
+  () => import("@/pages/delivery/dashboard/DeliveryDashboard")
+);
 const Profile = lazy(() => import("@/pages/shared/Profile"));
 const Unauthorized = lazy(() => import("@/pages/public/Unauthorized"));
 const NotFound = lazy(() => import("@/pages/public/NotFound"));
@@ -69,8 +78,14 @@ export const router = createBrowserRouter([
       { index: true, element: <Home /> },
       { path: "/track-parcel", element: withSuspense(Tracking) },
       { path: "/services", element: withSuspense(Services) },
+      { path: "/services/:id", element: withSuspense(ServiceDetails) },
       { path: "/about", element: withSuspense(About) },
       { path: "/contact", element: withSuspense(Contact) },
+      { path: "/privacy", element: withSuspense(Privacy) },
+      { path: "/terms", element: withSuspense(Terms) },
+      { path: "/support", element: withSuspense(Support) },
+      { path: "/blog", element: withSuspense(Blog) },
+      { path: "/blog/:id", element: withSuspense(BlogDetails) },
     ],
   },
   {
@@ -128,6 +143,20 @@ export const router = createBrowserRouter([
       { path: "profile", element: withSuspense(Profile) },
       { path: "incoming-parcels", element: withSuspense(IncomingParcels) },
       { path: "delivery-history", element: withSuspense(DeliveryHistory) },
+    ],
+  },
+  
+  // 🔹 Delivery Man Dashboard
+  {
+    path: "/delivery-men/dashboard",
+    element: (
+      <ProtectedRoute children={<DashboardLayout />} requiredRole='delivery_men' />
+    ),
+    errorElement: <ErrorBoundary />,
+    children: [
+      { index: true, element: withSuspense(DeliveryDashboard) },
+      { path: "dashboard", element: withSuspense(DeliveryDashboard) },
+      { path: "profile", element: withSuspense(Profile) },
     ],
   },
 

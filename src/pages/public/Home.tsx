@@ -1,19 +1,19 @@
 import { useState } from "react";
 import { Link } from "react-router";
 import {
-  Truck,
-  Package,
-  ArrowRight,
-  Clock,
-  Shield,
-  MapPin,
-  Users,
-  Star,
-  CheckCircle,
-  Heart,
-  Zap,
-  Plus,
-  Minus,
+    Truck,
+    Package,
+    ArrowRight,
+    Clock,
+    Shield,
+    MapPin,
+    Users,
+    Star,
+    CheckCircle,
+    Heart,
+    Zap,
+    Plus,
+    Minus,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -54,48 +54,83 @@ export default function Home() {
 
   return (
     <div className='min-h-screen'>
-      {/* Hero Section - Soft Gradient */}
-      <section className='bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-gray-900 dark:via-blue-950 dark:to-indigo-900 py-20'>
-        <div className='container mx-auto px-4 text-center'>
-          <div className='flex justify-center mb-6'>
+      {/* Hero Section - Interactive & Functional */}
+      <section className='relative min-h-[70vh] flex items-center justify-center bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-gray-900 dark:via-blue-950 dark:to-indigo-900 overflow-hidden'>
+         {/* Background Decoration */}
+        <div className="absolute inset-0 w-full h-full opacity-30 dark:opacity-20 pointer-events-none">
+            <div className="absolute top-20 left-10 w-72 h-72 bg-blue-300 rounded-full mix-blend-multiply filter blur-3xl animate-blob"></div>
+            <div className="absolute top-20 right-10 w-72 h-72 bg-indigo-300 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-2000"></div>
+            <div className="absolute -bottom-8 left-20 w-72 h-72 bg-purple-300 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-4000"></div>
+        </div>
+
+        <div className='container mx-auto px-4 text-center z-10 pt-20 pb-32'>
+          <div className='flex justify-center mb-8 animate-fade-in-up'>
             <div className='relative'>
-              <div className='w-20 h-20 bg-blue-100 dark:bg-blue-900 rounded-2xl flex items-center justify-center'>
-                <Package className='w-10 h-10 text-blue-600 dark:text-blue-400' />
+              <div className='w-24 h-24 bg-white/50 dark:bg-white/10 backdrop-blur-md rounded-3xl flex items-center justify-center shadow-lg transform rotate-3 hover:rotate-6 transition-transform'>
+                <Package className='w-12 h-12 text-blue-600 dark:text-blue-400' />
               </div>
-              <div className='absolute -bottom-2 -right-2 w-10 h-10 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center'>
-                <Truck className='w-5 h-5 text-green-600 dark:text-green-400' />
+              <div className='absolute -bottom-4 -right-4 w-12 h-12 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center shadow-md animate-bounce'>
+                <Truck className='w-6 h-6 text-green-600 dark:text-green-400' />
               </div>
             </div>
           </div>
 
-          <h1 className='text-4xl md:text-5xl font-bold mb-6 text-gray-900 dark:text-white'>
-            Fast & Reliable
-            <span className='block text-blue-600 dark:text-blue-400'>
-              Parcel Delivery
-            </span>
+          <h1 className='text-5xl md:text-6xl font-extrabold mb-6 text-gray-900 dark:text-white tracking-tight animate-fade-in-up animation-delay-100'>
+            Delivery Made <span className='text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600'>Simple</span>
           </h1>
-          <p className='text-lg md:text-xl mb-8 text-gray-600 dark:text-gray-300 max-w-3xl mx-auto leading-relaxed'>
-            Experience seamless package delivery with real-time tracking, secure
-            handling, and dedicated customer support. Your trust is our
-            priority.
+          <p className='text-lg md:text-xl mb-10 text-gray-600 dark:text-gray-300 max-w-3xl mx-auto leading-relaxed animate-fade-in-up animation-delay-200'>
+            Connect with the fastest logistics network. Whether it's local or international, 
+            we ensure your parcel arrives safely and on time.
           </p>
-          <div className='flex flex-col sm:flex-row gap-4 justify-center'>
-            <Button
-              asChild
-              size='lg'
-              className='bg-blue-600 hover:bg-blue-700 text-white'>
-              <Link to='/tracking' className='flex items-center'>
-                Track Your Package <ArrowRight className='w-4 h-4 ml-2' />
-              </Link>
-            </Button>
-            <Button
+          
+          {/* Tracking Input - Functional Highlight */}
+          <div className="max-w-xl mx-auto mb-10 bg-white dark:bg-slate-800 p-2 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 flex flex-col sm:flex-row gap-2 animate-fade-in-up animation-delay-300">
+             <input 
+                type="text" 
+                placeholder="Enter Tracking ID (e.g. TRK-12345678)" 
+                className="flex-1 px-4 py-3 bg-transparent border-none outline-none text-gray-800 dark:text-white placeholder-gray-400 w-full"
+             />
+             <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-8 w-full sm:w-auto">
+                Track
+             </Button>
+          </div>
+
+          <div className='flex flex-col sm:flex-row gap-4 justify-center animate-fade-in-up animation-delay-400'>
+             <Button
               asChild
               variant='outline'
               size='lg'
               className='border-blue-600 text-blue-600 hover:bg-blue-50 dark:border-blue-400 dark:text-blue-400 dark:hover:bg-blue-900/20'>
               <Link to='/register'>Get Started</Link>
             </Button>
+            <Button
+              asChild
+              variant='ghost'
+              size='lg'
+              className='text-gray-600 dark:text-gray-300 hover:bg-black/5 dark:hover:bg-white/10'>
+              <Link to='/contact'>Contact Sales</Link>
+            </Button>
           </div>
+        </div>
+
+        {/* Scroll Hint */}
+        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce hidden md:block">
+            <div className="w-8 h-12 rounded-full border-2 border-gray-400 dark:border-gray-600 flex justify-center pt-2 opacity-60">
+                <div className="w-1 h-3 bg-gray-400 dark:bg-gray-600 rounded-full animate-scroll"></div>
+            </div>
+        </div>
+      </section>
+
+      {/* Trusted Partners Section - New Section */}
+      <section className="py-12 border-b border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-950">
+        <div className="container mx-auto px-4 text-center">
+            <p className="text-sm font-semibold text-gray-500 uppercase tracking-widest mb-8">Trusted by 500+ Businesses</p>
+            <div className="flex flex-wrap justify-center gap-12 opacity-60 grayscale hover:grayscale-0 transition-all duration-500">
+                {/* Fallback to text if icons missing, using simple placeholders for 'Logos' */}
+                {['Amazon', 'eBay', 'Shopify', 'Walmart', 'AliExpress'].map(brand => (
+                    <span key={brand} className="text-xl font-bold text-gray-400 dark:text-gray-600 hover:text-blue-600 dark:hover:text-blue-400 cursor-default">{brand}</span>
+                ))}
+            </div>
         </div>
       </section>
 
@@ -440,6 +475,71 @@ export default function Home() {
           </div>
         </div>
       </section>
+      {/* Blog/News Section - New Section */}
+      <section className='py-20 bg-slate-50 dark:bg-gray-800/50'>
+         <div className='container mx-auto px-4'>
+            <div className="flex justify-between items-end mb-12">
+               <div>
+                  <h2 className='text-3xl font-bold mb-4 text-gray-900 dark:text-white'>
+                     Latest Updates
+                  </h2>
+                  <p className='text-gray-600 dark:text-gray-300 max-w-2xl'>
+                     Insights, industry news, and guides for efficient shipping.
+                  </p>
+               </div>
+               <Button variant="link" className="text-blue-600 dark:text-blue-400 hidden sm:flex">
+                  View All Posts <ArrowRight className="ml-2 w-4 h-4" />
+               </Button>
+            </div>
+           
+            <div className='grid md:grid-cols-3 gap-8'>
+               {[
+                  {
+                     title: "Holiday Shipping Deadlines 2025",
+                     category: "News",
+                     date: "Dec 15, 2025",
+                     image: "bg-red-100 dark:bg-red-900/20"
+                  },
+                   {
+                     title: "New International Routes Added",
+                     category: "Expansion",
+                     date: "Dec 10, 2025",
+                     image: "bg-blue-100 dark:bg-blue-900/20"
+                  },
+                   {
+                     title: "Sustainable Packaging Guide",
+                     category: "Tips",
+                     date: "Nov 28, 2025",
+                     image: "bg-green-100 dark:bg-green-900/20"
+                  }
+               ].map((post, index) => (
+                  <Card key={index} className='overflow-hidden hover:shadow-lg transition-shadow border-none'>
+                     <div className={`h-48 ${post.image} w-full`}></div>
+                     <CardContent className='p-6'>
+                        <div className="flex gap-2 mb-3">
+                           <span className="text-xs font-semibold px-2 py-1 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full">
+                              {post.category}
+                           </span>
+                           <span className="text-xs text-gray-500 flex items-center">
+                              <Clock className="w-3 h-3 mr-1" /> {post.date}
+                           </span>
+                        </div>
+                        <h3 className='text-xl font-bold mb-2 text-gray-900 dark:text-white hover:text-blue-600 transition-colors cursor-pointer'>
+                           {post.title}
+                        </h3>
+                        <p className="text-gray-600 dark:text-gray-400 text-sm mb-4">
+                           Stay updated with the latest shipping trends and important announcements to ensure your deliveries are always on time.
+                        </p>
+                        <Button variant="link" className="p-0 h-auto text-blue-600 dark:text-blue-400">
+                           Read More
+                        </Button>
+                     </CardContent>
+                  </Card>
+               ))}
+            </div>
+         </div>
+      </section>
+
     </div>
   );
 }

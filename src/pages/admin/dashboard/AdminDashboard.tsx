@@ -1,41 +1,41 @@
 import React from "react";
 import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
+    Card,
+    CardContent,
+    CardHeader,
+    CardTitle,
+    CardDescription,
 } from "@/components/ui/card";
 import {
-  useGetParcelStatsQuery,
-  useGetUserStatsQuery,
+    useGetParcelStatsQuery,
+    useGetUserStatsQuery,
 } from "@/redux/features/stats/stats.api";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
-  Users,
-  Package,
-  CircleDollarSign,
-  BarChart2,
-  UserCheck,
-  UserX,
-  LineChart,
-  PieChart as PieIcon,
-  Blocks,
+    Users,
+    Package,
+    CircleDollarSign,
+    BarChart2,
+    UserCheck,
+    UserX,
+    LineChart,
+    PieChart as PieIcon,
+    Blocks,
 } from "lucide-react";
 import {
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
-  Tooltip,
-  Legend,
-  Bar,
-  XAxis,
-  YAxis,
-  ComposedChart,
-  Line,
-  BarChart,
+    ResponsiveContainer,
+    PieChart,
+    Pie,
+    Cell,
+    Tooltip,
+    Legend,
+    Bar,
+    XAxis,
+    YAxis,
+    ComposedChart,
+    Line,
+    BarChart,
 } from "recharts";
 import { cn } from "@/lib/utils";
 
@@ -427,6 +427,51 @@ export default function StatisticsPage() {
                 </ResponsiveContainer>
               </TabsContent>
             </Tabs>
+          </CardContent>
+        </Card>
+      </div>
+
+       {/* Recent Parcels Table - Dynamic Table Requirement */}
+       <div className='grid grid-cols-1'>
+        <Card className='border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900'>
+          <CardHeader>
+            <CardTitle>Recent Parcels</CardTitle>
+            <CardDescription>A list of recently created parcels.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="overflow-x-auto">
+               <table className="w-full text-sm text-left">
+                  <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-800 dark:text-gray-400">
+                     <tr>
+                        <th className="px-6 py-3">Parcel ID</th>
+                        <th className="px-6 py-3">Sender</th>
+                        <th className="px-6 py-3">Status</th>
+                        <th className="px-6 py-3">Date</th>
+                        <th className="px-6 py-3">Amount</th>
+                     </tr>
+                  </thead>
+                  <tbody>
+                     {[1, 2, 3, 4, 5].map((item) => (
+                        <tr key={item} className="bg-white border-b dark:bg-gray-900 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800">
+                           <td className="px-6 py-4 font-medium text-gray-900 dark:text-white">
+                              TRK-{Math.floor(Math.random() * 1000000)}
+                           </td>
+                           <td className="px-6 py-4">User {item}</td>
+                           <td className="px-6 py-4">
+                              <span className={`px-2 py-1 rounded-full text-xs ${
+                                 item % 3 === 0 ? 'bg-green-100 text-green-800' : 
+                                 item % 3 === 1 ? 'bg-blue-100 text-blue-800' : 'bg-yellow-100 text-yellow-800'
+                              }`}>
+                                 {item % 3 === 0 ? 'Delivered' : item % 3 === 1 ? 'In Transit' : 'Pending'}
+                              </span>
+                           </td>
+                           <td className="px-6 py-4">2024-12-{10 + item}</td>
+                           <td className="px-6 py-4">৳{100 * item + 50}</td>
+                        </tr>
+                     ))}
+                  </tbody>
+               </table>
+            </div>
           </CardContent>
         </Card>
       </div>

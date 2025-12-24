@@ -5,6 +5,8 @@ import {
   NavigationMenuItem,
   NavigationMenuLink,
   NavigationMenuList,
+  NavigationMenuTrigger,
+  NavigationMenuContent,
 } from "@/components/ui/navigation-menu";
 import {
   Popover,
@@ -60,6 +62,7 @@ const dashboardLinks = {
   receiver: { href: "/receiver/dashboard", label: "Receiver Dashboard" },
   admin: { href: "/admin/dashboard", label: "Admin Dashboard" },
   super_admin: { href: "/admin/dashboard", label: "Admin Dashboard" },
+  delivery_men: { href: "/delivery-men/dashboard", label: "Delivery Dashboard" },
 };
 
 export default function Navbar() {
@@ -145,29 +148,146 @@ export default function Navbar() {
           {/* Desktop Navigation */}
           <NavigationMenu className='max-lg:hidden'>
             <NavigationMenuList className='gap-1'>
-              {navigationLinks.map((link, index) => {
-                const isActive = isActiveRoute(link.href);
-                return (
-                  <NavigationMenuItem key={index}>
-                    <NavigationMenuLink asChild>
-                      <Link
-                        to={link.href}
-                        className={cn(
-                          "flex items-center gap-1.5 px-4 py-2 rounded-lg font-medium transition-all duration-200",
-                          "text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400",
-                          "hover:bg-blue-50 dark:hover:bg-blue-950/30",
-                          isActive &&
-                            "text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/30",
-                          isActive &&
-                            "border border-blue-200 dark:border-blue-800"
-                        )}>
-                        {link.icon && <link.icon className='w-4 h-4' />}
-                        {link.label}
-                      </Link>
-                    </NavigationMenuLink>
-                  </NavigationMenuItem>
-                );
-              })}
+              <NavigationMenuItem>
+                <NavigationMenuLink asChild>
+                  <Link
+                    to='/'
+                    className={cn(
+                      "flex items-center gap-1.5 px-4 py-2 rounded-lg font-medium transition-all duration-200",
+                      "text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400",
+                      "hover:bg-blue-50 dark:hover:bg-blue-950/30",
+                      isActiveRoute("/") &&
+                        "text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/30",
+                      isActiveRoute("/") && "border border-blue-200 dark:border-blue-800"
+                    )}>
+                    <Home className='w-4 h-4' />
+                    Home
+                  </Link>
+                </NavigationMenuLink>
+              </NavigationMenuItem>
+
+              <NavigationMenuItem>
+                <NavigationMenuLink asChild>
+                  <Link
+                    to='/track-parcel'
+                    className={cn(
+                      "flex items-center gap-1.5 px-4 py-2 rounded-lg font-medium transition-all duration-200",
+                      "text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400",
+                      "hover:bg-blue-50 dark:hover:bg-blue-950/30",
+                      isActiveRoute("/track-parcel") &&
+                        "text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/30",
+                      isActiveRoute("/track-parcel") &&
+                        "border border-blue-200 dark:border-blue-800"
+                    )}>
+                    <Package className='w-4 h-4' />
+                    Track Parcel
+                  </Link>
+                </NavigationMenuLink>
+              </NavigationMenuItem>
+
+              <NavigationMenuItem>
+                <NavigationMenuTrigger
+                   className={cn(
+                    "flex items-center gap-1.5 px-4 py-2 rounded-lg font-medium transition-all duration-200 bg-transparent hover:bg-blue-50 dark:hover:bg-blue-950/30",
+                    "text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400",
+                    isActiveRoute("/services") &&
+                      "text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/30",
+                    isActiveRoute("/services") &&
+                      "border border-blue-200 dark:border-blue-800"
+                  )}
+                >
+                  <Truck className='w-4 h-4 mr-1' />
+                  Services
+                </NavigationMenuTrigger>
+                <NavigationMenuContent>
+                  <ul className="grid gap-3 p-4 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr] dark:bg-slate-900 bg-white">
+                    <li className="row-span-3">
+                      <NavigationMenuLink asChild>
+                        <Link
+                          className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-blue-600 to-blue-700 p-6 no-underline outline-none focus:shadow-md"
+                          to="/services"
+                        >
+                          <Truck className="h-6 w-6 text-white" />
+                          <div className="mb-2 mt-4 text-lg font-medium text-white">
+                            Our Services
+                          </div>
+                          <p className="text-sm leading-tight text-blue-100">
+                            Reliable logistics solutions for all your delivery needs.
+                          </p>
+                        </Link>
+                      </NavigationMenuLink>
+                    </li>
+                    <li>
+                       <NavigationMenuLink asChild>
+                          <Link to="/services" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-slate-100 focus:bg-slate-100 dark:hover:bg-slate-800 dark:focus:bg-slate-800">
+                            <div className="text-sm font-medium leading-none">Express Delivery</div>
+                            <p className="line-clamp-2 text-sm leading-snug text-slate-500 dark:text-slate-400">
+                              Top priority shipping for urgent parcels.
+                            </p>
+                          </Link>
+                       </NavigationMenuLink>
+                    </li>
+                    <li>
+                       <NavigationMenuLink asChild>
+                          <Link to="/services" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-slate-100 focus:bg-slate-100 dark:hover:bg-slate-800 dark:focus:bg-slate-800">
+                            <div className="text-sm font-medium leading-none">Standard Shipping</div>
+                            <p className="line-clamp-2 text-sm leading-snug text-slate-500 dark:text-slate-400">
+                              Cost-effective options for regular deliveries.
+                            </p>
+                          </Link>
+                       </NavigationMenuLink>
+                    </li>
+                     <li>
+                       <NavigationMenuLink asChild>
+                          <Link to="/services" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-slate-100 focus:bg-slate-100 dark:hover:bg-slate-800 dark:focus:bg-slate-800">
+                            <div className="text-sm font-medium leading-none">International</div>
+                            <p className="line-clamp-2 text-sm leading-snug text-slate-500 dark:text-slate-400">
+                              Global shipping with customs handling.
+                            </p>
+                          </Link>
+                       </NavigationMenuLink>
+                    </li>
+                  </ul>
+                </NavigationMenuContent>
+              </NavigationMenuItem>
+
+              <NavigationMenuItem>
+                <NavigationMenuLink asChild>
+                  <Link
+                    to='/about'
+                    className={cn(
+                      "flex items-center gap-1.5 px-4 py-2 rounded-lg font-medium transition-all duration-200",
+                      "text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400",
+                      "hover:bg-blue-50 dark:hover:bg-blue-950/30",
+                      isActiveRoute("/about") &&
+                        "text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/30",
+                      isActiveRoute("/about") &&
+                        "border border-blue-200 dark:border-blue-800"
+                    )}>
+                    <ShieldAlert className='w-4 h-4' />
+                    About
+                  </Link>
+                </NavigationMenuLink>
+              </NavigationMenuItem>
+              
+               <NavigationMenuItem>
+                <NavigationMenuLink asChild>
+                  <Link
+                    to='/contact'
+                    className={cn(
+                      "flex items-center gap-1.5 px-4 py-2 rounded-lg font-medium transition-all duration-200",
+                      "text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400",
+                      "hover:bg-blue-50 dark:hover:bg-blue-950/30",
+                      isActiveRoute("/contact") &&
+                        "text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/30",
+                      isActiveRoute("/contact") &&
+                        "border border-blue-200 dark:border-blue-800"
+                    )}>
+                    <Contact className='w-4 h-4' />
+                    Contact
+                  </Link>
+                </NavigationMenuLink>
+              </NavigationMenuItem>
             </NavigationMenuList>
           </NavigationMenu>
         </div>

@@ -7,6 +7,7 @@ import {
   Users,
   History,
   LayoutGrid,
+  BarChart2,
   type LucideIcon,
 } from "lucide-react";
 import { Role } from "@/types/user.type";
@@ -50,6 +51,12 @@ export const navLinkGroups: NavLinkGroup[] = [
         roles: [Role.SUPER_ADMIN, Role.ADMIN],
       },
       {
+        title: "Book Parcel",
+        url: "/book-parcel",
+        icon: Truck,
+        roles: [Role.SENDER],
+      },
+      {
         title: "My Parcels",
         url: "/parcels",
         icon: Package,
@@ -82,6 +89,23 @@ export const navLinkGroups: NavLinkGroup[] = [
         title: "Manage Users",
         url: "/manage-users",
         icon: Users,
+        roles: [Role.SUPER_ADMIN, Role.ADMIN],
+      },
+    ],
+  },
+  {
+    title: "System",
+    links: [
+      {
+        title: "Reports",
+        url: "/reports",
+        icon: BarChart2,
+        roles: [Role.SUPER_ADMIN, Role.ADMIN],
+      },
+      {
+        title: "Settings",
+        url: "/settings",
+        icon: LayoutGrid, // Using a generic icon for now
         roles: [Role.SUPER_ADMIN, Role.ADMIN],
       },
     ],
